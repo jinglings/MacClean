@@ -1,0 +1,125 @@
+/* 
+  Localizable.strings (English)
+  MacClean
+
+  English localization
+*/
+
+// MARK: - App
+"about_macclean" = "About MacClean";
+"preferences" = "Preferences...";
+"quit" = "Quit MacClean";
+"open_macclean" = "Open MacClean...";
+
+// MARK: - Menu
+"clean_menu" = "Clean";
+"quick_clean" = "Quick Clean";
+"scan_disk" = "Scan Disk";
+
+// MARK: - Tabs
+"features" = "Features";
+"disk_analysis" = "Disk Analysis";
+"cache_cleanup" = "Cache Cleanup";
+"developer_tools" = "Developer Tools";
+"app_uninstaller" = "App Uninstaller";
+
+// MARK: - Disk
+"disk_overview" = "Disk Overview";
+"used" = "Used";
+"available" = "Available";
+"total" = "Total";
+"no_disk_info" = "No disk information available";
+"scanning" = "Scanning...";
+"scanning_disk" = "Scanning disk...";
+"scan_complete" = "Scan complete";
+"scan_failed" = "Scan failed";
+"scan" = "Scan";
+"rescan" = "Rescan";
+"scan_all" = "Scan All";
+
+// MARK: - Clean
+"cleanable" = "Cleanable";
+"cleanable_items" = "Cleanable Items";
+"no_cleanable_items" = "No items to clean";
+"disk_is_clean" = "Your disk is clean!";
+"no_scan_result" = "No scan results";
+"click_scan_to_start" = "Click 'Scan Disk' to start analyzing";
+"clean_selected" = "Clean Selected";
+"cleaning" = "Cleaning...";
+"clean_complete_format" = "Cleaned %@";
+"clean_failed" = "Clean failed";
+"clean_caches" = "Clean Caches";
+"clean_all" = "Clean All";
+"clean" = "Clean";
+"total_selected" = "Total Selected";
+"select_all" = "Select All";
+"deselect_all" = "Deselect All";
+
+// MARK: - Categories
+"category_breakdown" = "Category Breakdown";
+"user_cache" = "User Cache";
+"browser_cache" = "Browser Cache";
+"system_logs" = "System Logs";
+"large_files" = "Large Files";
+"old_files" = "Old Files";
+"duplicates" = "Duplicates";
+
+// MARK: - Cache Cleanup
+"user_caches" = "User Caches";
+"browser_caches" = "Browser Caches";
+"app_caches" = "Application Caches";
+"cache_cleanup_description" = "Clean browser and application caches to free up space";
+
+// MARK: - Developer Tools
+"developer_tools_description" = "Clean development tool caches and build artifacts";
+"xcode_cleanup" = "Xcode Cleanup";
+"xcode_cleanup_description" = "Clean DerivedData, Archives, and device support files";
+"homebrew_cleanup" = "Homebrew Cleanup";
+"homebrew_cleanup_description" = "Clean downloaded packages and logs";
+"npm_cleanup" = "npm/yarn Cleanup";
+"npm_cleanup_description" = "Clean package manager caches";
+"cocoapods_cleanup" = "CocoaPods Cleanup";
+"cocoapods_cleanup_description" = "Clean pods cache directory";
+
+// MARK: - Descriptions
+"cache_safe_to_delete" = "Cache files can be safely deleted. Applications will regenerate them as needed.";
+"browser_cache_description" = "Browser cache stores temporary web data. Safe to delete.";
+"xcode_derived_data_description" = "Build intermediates and indexes. Safe to delete, will be rebuilt.";
+"xcode_archives_description" = "App archives for distribution. Keep if you need to upload to App Store.";
+"homebrew_cache_description" = "Downloaded package files. Safe to delete.";
+"npm_cache_description" = "Cached npm packages. Safe to delete.";
+"cocoapods_cache_description" = "Cached pod specifications. Safe to delete.";
+"user_logs_description" = "Application log files. Safe to delete older logs.";
+
+// MARK: - Permissions
+"permission_required" = "Permission Required";
+"grant_access" = "Grant Access";
+"deny" = "Deny";
+
+// MARK: - License
+"trial" = "Trial";
+"license_trial" = "Trial Version";
+"license_annual" = "Annual Subscription";
+"license_lifetime" = "Lifetime License";
+"trial_days_remaining" = "%d days remaining";
+"activate_license" = "Activate License";
+"restore_purchases" = "Restore Purchases";
+
+// MARK: - License Errors
+"license_error_product_not_found" = "Product not found";
+"license_error_verification_failed" = "Purchase verification failed";
+"license_error_user_cancelled" = "Purchase cancelled";
+"license_error_purchase_pending" = "Purchase is pending";
+"license_error_unknown" = "An unknown error occurred";
+
+// MARK: - Settings
+"settings" = "Settings";
+"general" = "General";
+"appearance" = "Appearance";
+"language" = "Language";
+"launch_at_login" = "Launch at Login";
+"show_in_menu_bar" = "Show in Menu Bar";
+"check_for_updates" = "Check for Updates Automatically";
+"about" = "About";
+"version" = "Version";
+"build" = "Build";

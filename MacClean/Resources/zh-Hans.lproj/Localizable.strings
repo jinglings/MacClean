@@ -1,0 +1,125 @@
+/* 
+  Localizable.strings (Simplified Chinese)
+  MacClean
+
+  简体中文本地化
+*/
+
+// MARK: - App
+"about_macclean" = "关于 MacClean";
+"preferences" = "偏好设置...";
+"quit" = "退出 MacClean";
+"open_macclean" = "打开 MacClean...";
+
+// MARK: - Menu
+"clean_menu" = "清理";
+"quick_clean" = "快速清理";
+"scan_disk" = "扫描磁盘";
+
+// MARK: - Tabs
+"features" = "功能";
+"disk_analysis" = "磁盘分析";
+"cache_cleanup" = "缓存清理";
+"developer_tools" = "开发者工具";
+"app_uninstaller" = "应用卸载";
+
+// MARK: - Disk
+"disk_overview" = "磁盘概览";
+"used" = "已使用";
+"available" = "可用";
+"total" = "总计";
+"no_disk_info" = "暂无磁盘信息";
+"scanning" = "扫描中...";
+"scanning_disk" = "正在扫描磁盘...";
+"scan_complete" = "扫描完成";
+"scan_failed" = "扫描失败";
+"scan" = "扫描";
+"rescan" = "重新扫描";
+"scan_all" = "扫描全部";
+
+// MARK: - Clean
+"cleanable" = "可清理";
+"cleanable_items" = "可清理项目";
+"no_cleanable_items" = "没有可清理的项目";
+"disk_is_clean" = "您的磁盘很干净！";
+"no_scan_result" = "暂无扫描结果";
+"click_scan_to_start" = "点击「扫描磁盘」开始分析";
+"clean_selected" = "清理所选";
+"cleaning" = "清理中...";
+"clean_complete_format" = "已清理 %@";
+"clean_failed" = "清理失败";
+"clean_caches" = "清理缓存";
+"clean_all" = "清理全部";
+"clean" = "清理";
+"total_selected" = "已选择";
+"select_all" = "全选";
+"deselect_all" = "取消全选";
+
+// MARK: - Categories
+"category_breakdown" = "分类详情";
+"user_cache" = "用户缓存";
+"browser_cache" = "浏览器缓存";
+"system_logs" = "系统日志";
+"large_files" = "大文件";
+"old_files" = "旧文件";
+"duplicates" = "重复文件";
+
+// MARK: - Cache Cleanup
+"user_caches" = "用户缓存";
+"browser_caches" = "浏览器缓存";
+"app_caches" = "应用程序缓存";
+"cache_cleanup_description" = "清理浏览器和应用程序缓存以释放空间";
+
+// MARK: - Developer Tools
+"developer_tools_description" = "清理开发工具缓存和构建产物";
+"xcode_cleanup" = "Xcode 清理";
+"xcode_cleanup_description" = "清理 DerivedData、Archives 和设备支持文件";
+"homebrew_cleanup" = "Homebrew 清理";
+"homebrew_cleanup_description" = "清理已下载的软件包和日志";
+"npm_cleanup" = "npm/yarn 清理";
+"npm_cleanup_description" = "清理包管理器缓存";
+"cocoapods_cleanup" = "CocoaPods 清理";
+"cocoapods_cleanup_description" = "清理 Pods 缓存目录";
+
+// MARK: - Descriptions
+"cache_safe_to_delete" = "缓存文件可以安全删除。应用程序会在需要时重新生成。";
+"browser_cache_description" = "浏览器缓存存储临时网页数据。可安全删除。";
+"xcode_derived_data_description" = "构建中间文件和索引。可安全删除，将自动重建。";
+"xcode_archives_description" = "用于发布的应用归档。如需上传 App Store 请保留。";
+"homebrew_cache_description" = "已下载的软件包文件。可安全删除。";
+"npm_cache_description" = "已缓存的 npm 包。可安全删除。";
+"cocoapods_cache_description" = "已缓存的 Pod 规范。可安全删除。";
+"user_logs_description" = "应用程序日志文件。删除旧日志是安全的。";
+
+// MARK: - Permissions
+"permission_required" = "需要权限";
+"grant_access" = "授予访问权限";
+"deny" = "拒绝";
+
+// MARK: - License
+"trial" = "试用";
+"license_trial" = "试用版";
+"license_annual" = "年度订阅";
+"license_lifetime" = "终身授权";
+"trial_days_remaining" = "剩余 %d 天";
+"activate_license" = "激活许可证";
+"restore_purchases" = "恢复购买";
+
+// MARK: - License Errors
+"license_error_product_not_found" = "未找到产品";
+"license_error_verification_failed" = "购买验证失败";
+"license_error_user_cancelled" = "购买已取消";
+"license_error_purchase_pending" = "购买待处理";
+"license_error_unknown" = "发生未知错误";
+
+// MARK: - Settings
+"settings" = "设置";
+"general" = "通用";
+"appearance" = "外观";
+"language" = "语言";
+"launch_at_login" = "登录时启动";
+"show_in_menu_bar" = "在菜单栏显示";
+"check_for_updates" = "自动检查更新";
+"about" = "关于";
+"version" = "版本";
+"build" = "构建号";
