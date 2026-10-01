@@ -266,7 +266,7 @@ h1, h2, h3 { text-wrap: balance; }
 .chip-2 { right: -4%; top: 38%; }
 .chip-3 { left: 6%; bottom: 14%; }
 @media (max-width: 760px) {
-  .chip { padding: 7px 12px 7px 7px; font-size: 12px; border-radius: 12px; }
+  .chip { padding: 9px 14px 9px 9px; font-size: 12px; border-radius: 12px; }
   .chip b { font-size: 14px; }
   .chip .ci { width: 28px; height: 28px; border-radius: 8px; }
   .chip-1 { left: 0; top: -6%; }
@@ -615,7 +615,7 @@ h1, h2, h3 { text-wrap: balance; }
 .step p { margin-top: 12px; color: var(--text-2); }
 .step p + p { margin-top: 10px; }
 .step .note { margin-top: 16px; font-size: 14.5px; color: var(--muted); }
-.kbd { display: inline-block; padding: 1px 8px; border-radius: 6px; border: 1px solid var(--line-2); background: var(--bg-3); font-size: .9em; font-weight: 600; white-space: nowrap; }
+.kbd { display: inline-block; padding: 3px 9px; line-height: 1.3; border-radius: 6px; border: 1px solid var(--line-2); background: var(--bg-3); font-size: .9em; font-weight: 600; white-space: nowrap; }
 @media (max-width: 860px) { .step { grid-template-columns: 1fr; } }
 
 /* CSS illustrations */
