@@ -140,6 +140,10 @@ struct CleanGroupsPage: View {
         }
         if viewModel.permanentSelectedSize > 0 {
             lines.append(String(localized: "废纸篓中的 \(ByteCountFormatter.string(fromByteCount: viewModel.permanentSelectedSize, countStyle: .file)) 将被永久删除，无法恢复。"))
+            if let preview = TrashPreview.load() {
+                lines.append(preview.summary)
+            }
+            lines.append(TrashPreview.irreversibleNote)
         }
         lines.append(String(localized: "共 \(selected.count) 项。"))
         return lines.joined(separator: "\n")

@@ -40,8 +40,8 @@ const config = () => ({
   contactEmail: 'hello@thulem.com',
   announcement: process.env.MOCK_ANNOUNCE || null,
   latestRelease: process.env.MOCK_RELEASE === 'none' ? null : {
-    version: '1.0', build: '12', minOS: '14.0', size: 14_623_418,
-    notes: '## 首个正式版\n- 一键体检、存储地图、释放空间等 12 项功能\n- 所有清理先移入废纸篓，可在 **清理记录** 中恢复\n- 菜单栏面板：磁盘、内存、电池、网络测速\n\n修复了若干问题。',
+    version: '1.1', build: '20', minOS: '14.0', size: 14_623_418,
+    notes: '## 新增：找回文件\n- 从 APFS 本地快照和时间机器备份中找回误删的文件\n- 按文件夹查看最近删掉的文件，或按文件名搜索（支持 * 通配符）\n- 在 MacClean 中清空废纸篓前，会先列出将被永久删除的文件\n\n修复了若干问题。',
     publishedAt: '2026-09-28T08:00:00Z', downloadUrl: '/download/latest',
   },
 });
@@ -155,11 +155,11 @@ createServer(async (req, res) => {
   }
   if (path === '/download/latest') {
     if (process.env.MOCK_RELEASE === 'none') return send(res, 404, { error: 'no release' });
-    res.writeHead(302, { Location: '/files/releases/MacClean-1.0.dmg' });
+    res.writeHead(302, { Location: '/files/releases/MacClean-1.1.dmg' });
     return res.end();
   }
-  if (path === '/files/releases/MacClean-1.0.dmg') {
-    res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="MacClean-1.0.dmg"' });
+  if (path === '/files/releases/MacClean-1.1.dmg') {
+    res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="MacClean-1.1.dmg"' });
     return res.end('fake dmg for local testing\n');
   }
   if (path === '/files/qr-wechat.svg') {

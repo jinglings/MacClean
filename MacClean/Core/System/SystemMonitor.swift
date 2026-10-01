@@ -180,6 +180,8 @@ final class QuickReleaseModel: ObservableObject {
     @Published private(set) var message: String?
     /// 清空废纸篓需要在面板里再点一次确认。
     @Published var isConfirmingEmptyTrash = false
+    /// 点「清空」后展示的废纸篓内容摘要（读不到时为 nil）
+    @Published var trashPreview: TrashPreview?
 
     var junkSize: Int64 { junkItems.reduce(0) { $0 + $1.size } }
     var trashSize: Int64 { trashItems.reduce(0) { $0 + $1.size } }

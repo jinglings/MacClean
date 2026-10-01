@@ -78,6 +78,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     case privacy = "privacy_cleanup"
     case loginItems = "login_items"
     case maintenance = "maintenance"
+    case recovery = "file_recovery"
     case appUninstaller = "app_uninstaller"
 
     var id: String { rawValue }
@@ -95,6 +96,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .privacy: return "hand.raised"
         case .loginItems: return "power"
         case .maintenance: return "wrench.and.screwdriver"
+        case .recovery: return "clock.arrow.circlepath"
         case .appUninstaller: return "square.grid.2x2"
         }
     }

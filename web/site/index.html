@@ -185,6 +185,18 @@
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="cache_cleanup" src="/assets/img/screens/light-zh-cache_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
+            <li class="sc-step g-recover" data-tab="file_recovery">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span>
+              <h3 data-i18n="f.recover">找回文件</h3>
+              <p data-i18n="sc.recover.p">清空了废纸篓也别急。只要文件还在 APFS 本地快照或时间机器备份里，就能把它复制回来。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.recover.b1">「最近删掉的文件」：选一个文件夹，列出快照里有、现在却不见了的文件</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.recover.b2">「按文件名搜索」，支持 * 通配符</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.recover.b3">只复制回原位置，从不覆盖；重名时保存为「名称（恢复）」</span></li>
+              </ul>
+              <p class="sc-note" data-i18n="sc.recover.note">没有快照或备份的文件无法找回。本地快照通常只保留最近约 24 小时。</p>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="file_recovery" src="/assets/img/screens/light-zh-file_recovery.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
             <li class="sc-step g-privacy" data-tab="privacy_cleanup">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#privacy"/></svg></span>
               <h3 data-i18n="f.privacy">隐私清理</h3>
@@ -256,7 +268,7 @@
     <section class="section tight" id="all-features" style="padding-top:0">
       <div class="wrap">
         <div class="sec-head">
-          <h2 data-i18n="bento.h2">十二个工具，各管一件事。</h2>
+          <h2 data-i18n="bento.h2">十三个工具，各管一件事。</h2>
           <p data-i18n="bento.p">再加一个随时待命的菜单栏面板。</p>
         </div>
         <div class="bento">
@@ -270,9 +282,10 @@
           <article class="cell g-login"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span><h3 data-i18n="f.login">启动项</h3><p data-i18n="b.login">登录项、启动代理、守护进程，以及失效残留。</p></article>
           <article class="cell g-maint"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#maint"/></svg></span><h3 data-i18n="f.maint">系统维护</h3><p data-i18n="b.maint">刷新 DNS、重建索引、删除本地快照、重启程序坞。</p></article>
           <article class="cell g-appstorage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appstorage"/></svg></span><h3 data-i18n="f.appstorage">应用占用</h3><p data-i18n="b.appstorage">每个应用的真实大小，包括微信、QQ 聊天数据和 Docker 磁盘。</p></article>
+          <article class="cell wide g-recover"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span><h3 data-i18n="f.recover">找回文件</h3><p data-i18n="b.recover">从本地快照和时间机器备份里找回误删的文件，包括已经清空废纸篓的。</p><div class="meta"><span class="tag" data-i18n="b.recover.t1">本地快照</span><span class="tag" data-i18n="b.recover.t2">时间机器</span><span class="tag" data-i18n="b.recover.t3">只读挂载</span><span class="tag" data-i18n="b.recover.t4">从不覆盖</span></div></article>
           <article class="cell g-appmgr"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appmgr"/></svg></span><h3 data-i18n="f.appmgr">应用管家</h3><p data-i18n="b.appmgr">彻底卸载、检查更新、清理孤立残留。</p></article>
           <article class="cell g-search"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg></span><h3 data-i18n="f.search">文件搜索</h3><p data-i18n="b.search">Spotlight 加上自建索引。</p></article>
-          <article class="cell wide g-menubar"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg></span><h3 data-i18n="f.menubar">菜单栏面板</h3><p data-i18n="b.menubar">磁盘、内存、电池健康度、CPU、网络测速与蓝牙设备电量，点一下菜单栏就能看到。</p><div class="meta"><span class="tag" data-i18n="mb.disk">磁盘</span><span class="tag" data-i18n="mb.mem">内存</span><span class="tag" data-i18n="mb.battery">电池</span><span class="tag">CPU</span><span class="tag" data-i18n="mb.net">网络测速</span><span class="tag" data-i18n="mb.bt">蓝牙电量</span></div></article>
+          <article class="cell full g-menubar"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg></span><h3 data-i18n="f.menubar">菜单栏面板</h3><p data-i18n="b.menubar">磁盘、内存、电池健康度、CPU、网络测速与蓝牙设备电量，点一下菜单栏就能看到。</p><div class="meta"><span class="tag" data-i18n="mb.disk">磁盘</span><span class="tag" data-i18n="mb.mem">内存</span><span class="tag" data-i18n="mb.battery">电池</span><span class="tag">CPU</span><span class="tag" data-i18n="mb.net">网络测速</span><span class="tag" data-i18n="mb.bt">蓝牙电量</span></div></article>
         </div>
       </div>
     </section>
@@ -329,6 +342,14 @@
             <p data-i18n="safe.s4p">后悔了？打开「清理记录」，整批放回原处。</p>
           </li>
         </ol>
+        <div class="second-chance g-recover" data-reveal>
+          <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span>
+          <div>
+            <h3 data-i18n="safe.sc">清空了废纸篓，还有第二次机会</h3>
+            <p data-i18n="safe.scp">开启时间机器时（或系统更新后），macOS 会保留最近约 24 小时的本地快照，时间机器也会定期备份。「找回文件」能从这两处把误删的文件复制回原处，挂载快照是只读的。另外，在 MacClean 里清空废纸篓之前，会先列出哪些文件将被永久删除。</p>
+            <p class="sc-note" data-i18n="safe.scn">没有快照或备份覆盖的文件，任何方法都找不回来。<a href="#faq">怎样提高找回的机会？</a></p>
+          </div>
+        </div>
         <div class="guards">
           <div class="guard big">
             <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#shield"/></svg>
@@ -422,6 +443,7 @@
               <tr><th scope="row" data-i18n="cmp.r5">中文与英文界面</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r5c">视产品而定</td></tr>
               <tr><th scope="row" data-i18n="cmp.r6">一次购买，长期使用</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r6c">多为订阅制</td></tr>
               <tr><th scope="row" data-i18n="cmp.r7">无需注册账户</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r7c">常要求登录</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r8">误删后从快照或时间机器找回</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r8c">很少提供</td></tr>
             </tbody>
           </table>
         </div>
@@ -449,7 +471,9 @@
         <div class="faq">
           <details><summary data-i18n="faq.q1">MacClean 安全吗？会不会删错东西？</summary><div class="ans"><p data-i18n="faq.a1">扫描只读取文件信息。清理时文件会被移到废纸篓，而不是直接删除；系统目录和个人文件夹受 PathGuard 白名单保护，不会出现在可清理列表里。万一删错，在「清理记录」里一键恢复即可。</p></div></details>
           <details><summary data-i18n="faq.q2">它到底会删除什么？</summary><div class="ans"><p data-i18n="faq.a2">只删除你勾选的项目：应用与浏览器缓存、超过 7 天的日志、旧安装包、邮件附件的本地副本、你选中的设备备份、开发缓存等。每一类都写明了来源，以及删掉后会怎样（比如缓存会在需要时重新生成）。</p></div></details>
-          <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。</p></div></details>
+          <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。清空之后，还可以用「找回文件」从本地快照或时间机器备份中尝试找回。</p></div></details>
+          <details><summary data-i18n="faq.q11">清空了废纸篓，还能找回文件吗？</summary><div class="ans"><p data-i18n="faq.a11">有机会，但不能保证。MacClean 1.1 的「找回文件」可以从 APFS 本地快照和时间机器备份里把文件复制回来：开启时间机器时（或系统更新后），macOS 会保留最近约 24 小时的本地快照。如果文件删除时既不在快照里、也没有备份，就无法找回，MacClean 也不会假装能做到。这时可以看看 iCloud 云盘或「照片」里的「最近删除」。</p></div></details>
+          <details><summary data-i18n="faq.q12">怎样提高误删后找回的机会？</summary><div class="ans"><p data-i18n="faq.a12">打开时间机器：它会定期备份，也会让 macOS 保留本地快照。发现误删后尽快找回，本地快照通常只保留约 24 小时。找回之前尽量不要往磁盘写入大量数据（比如下载大文件、安装应用），以免 macOS 为腾出空间提前清理快照。</p></div></details>
           <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
           <details><summary data-i18n="faq.q5">可以退款吗？</summary><div class="ans"><p data-i18n="faq.a5">可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。</p></div></details>
           <details><summary data-i18n="faq.q6">一个许可证能用在几台 Mac 上？</summary><div class="ans"><p data-i18n="faq.a6">终身版可以激活 2 台 Mac，家庭版可以激活 5 台。换电脑时，在旧 Mac 的设置里点「在此 Mac 上停用」，名额就腾出来了。</p></div></details>

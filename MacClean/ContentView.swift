@@ -54,6 +54,9 @@ struct ContentView: View {
                 case .maintenance:
                     MaintenanceView()
 
+                case .recovery:
+                    FileRecoveryView()
+
                 case .appUninstaller:
                     CosmicAppUninstallerView()
                 }

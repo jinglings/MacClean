@@ -91,8 +91,9 @@
         <div class="faq">
           <details><summary data-i18n="faq.q1">MacClean 安全吗？会不会删错东西？</summary><div class="ans"><p data-i18n="faq.a1">扫描只读取文件信息。清理时文件会被移到废纸篓，而不是直接删除；系统目录和个人文件夹受 PathGuard 白名单保护，不会出现在可清理列表里。万一删错，在「清理记录」里一键恢复即可。</p></div></details>
           <details><summary data-i18n="faq.q2">它到底会删除什么？</summary><div class="ans"><p data-i18n="faq.a2">只删除你勾选的项目：应用与浏览器缓存、超过 7 天的日志、旧安装包、邮件附件的本地副本、你选中的设备备份、开发缓存等。每一类都写明了来源，以及删掉后会怎样（比如缓存会在需要时重新生成）。</p></div></details>
-          <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。</p></div></details>
-          <details><summary data-i18n="sp.q.empty">清空废纸篓之后还能恢复吗？</summary><div class="ans"><p data-i18n="sp.a.empty">不能。清空废纸篓是 macOS 的操作，MacClean 无法撤销。「释放空间」里的「废纸篓」一项也是如此。如果你用 Time Machine 备份过，可以从备份中恢复。</p></div></details>
+          <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。清空之后，还可以用「找回文件」从本地快照或时间机器备份中尝试找回。</p></div></details>
+          <details><summary data-i18n="faq.q11">清空了废纸篓，还能找回文件吗？</summary><div class="ans"><p data-i18n="faq.a11">有机会，但不能保证。MacClean 1.1 的「找回文件」可以从 APFS 本地快照和时间机器备份里把文件复制回来：开启时间机器时（或系统更新后），macOS 会保留最近约 24 小时的本地快照。如果文件删除时既不在快照里、也没有备份，就无法找回，MacClean 也不会假装能做到。这时可以看看 iCloud 云盘或「照片」里的「最近删除」。</p></div></details>
+          <details><summary data-i18n="faq.q12">怎样提高误删后找回的机会？</summary><div class="ans"><p data-i18n="faq.a12">打开时间机器：它会定期备份，也会让 macOS 保留本地快照。发现误删后尽快找回，本地快照通常只保留约 24 小时。找回之前尽量不要往磁盘写入大量数据（比如下载大文件、安装应用），以免 macOS 为腾出空间提前清理快照。</p></div></details>
           <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
           <details><summary data-i18n="sp.q.after">付款后多久能拿到许可证？</summary><div class="ans"><p data-i18n="sp.a.after">我们人工核对收款，通常在 24 小时内发放。付款时请务必在备注里填写付款码，这样我们才能对上你的订单。核对完成后，订单页面会直接显示许可证，打开订单链接或用订单号和邮箱<a href="/order.html">查询</a>即可。</p></div></details>
           <details><summary data-i18n="sp.q.nocode">付款时忘了填写备注怎么办？</summary><div class="ans"><p data-i18n="sp.a.nocode">没关系。把订单号、付款时间和金额发邮件给我们，我们会手动核对。</p></div></details>

@@ -326,6 +326,7 @@ extension AppTab {
         case .privacy: pair = (0x4FC3D9, 0x1E8FB8)
         case .loginItems: pair = (0xFF8A5B, 0xE5533D)
         case .maintenance: pair = (0x9AA5B8, 0x5F6B80)
+        case .recovery: pair = (0x34D3B4, 0x0F8F9E)
         case .appUninstaller: pair = (0x3FB4F0, 0x5C6CF2)
         }
         return LinearGradient(colors: [Color(hex: pair.0), Color(hex: pair.1)], startPoint: .topLeading, endPoint: .bottomTrailing)
@@ -340,6 +341,7 @@ extension AppTab {
         case .appStorage: return Color(hex: 0x6247E8)
         case .developerTools, .maintenance: return Color(hex: 0x4E5767)
         case .privacy: return Color(hex: 0x1E8FB8)
+        case .recovery: return Color(hex: 0x0F8F9E)
         case .loginItems: return Color(hex: 0xE5533D)
         }
     }
@@ -358,6 +360,7 @@ extension AppTab {
         case .privacy: return "hand.raised.fill"
         case .loginItems: return "power"
         case .maintenance: return "wrench.and.screwdriver.fill"
+        case .recovery: return "clock.arrow.circlepath"
         case .appUninstaller: return "square.grid.2x2.fill"
         }
     }

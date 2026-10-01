@@ -61,7 +61,7 @@ enum MaintenanceTask: String, CaseIterable, Identifiable, Sendable {
     nonisolated var warning: String? {
         switch self {
         case .rebuildSpotlight: return String(localized: "重建需要较长时间（可能数小时），期间搜索结果不完整。")
-        case .deleteLocalSnapshots: return String(localized: "删除后无法再用这些本地快照恢复文件。")
+        case .deleteLocalSnapshots: return String(localized: "本地快照是误删文件后最可能找回的地方。删除后就无法再从这些快照里找回文件；如果最近误删过文件，请先到「找回文件」里找回，再执行此项。")
         default: return nil
         }
     }

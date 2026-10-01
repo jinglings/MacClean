@@ -49,7 +49,7 @@ struct DiskReleasePanel: View {
             ReleaseRow(
                 icon: "trash",
                 title: "废纸篓",
-                detail: model.isConfirmingEmptyTrash ? "将永久删除，无法恢复。再点一次确认。" : "清空后才会真正释放空间",
+                detail: model.isConfirmingEmptyTrash ? LocalizedStringKey(emptyTrashWarning) : "清空后才会真正释放空间",
                 size: model.isScanning ? nil : model.trashSize,
                 buttonTitle: model.isConfirmingEmptyTrash ? "确认清空" : "清空",
                 isDestructive: model.isConfirmingEmptyTrash,
@@ -59,6 +59,7 @@ struct DiskReleasePanel: View {
                 if model.isConfirmingEmptyTrash {
                     Task { await model.emptyTrash() }
                 } else {
+                    model.trashPreview = TrashPreview.load()
                     model.isConfirmingEmptyTrash = true
                 }
             }
@@ -532,6 +533,14 @@ struct MeterBar: View {
             }
         }
         .frame(height: 5)
+    }
+}
+
+extension DiskReleasePanel {
+    /// 第二次确认时的提示：列出将被永久删除的内容
+    fileprivate var emptyTrashWarning: String {
+        let what = model.trashPreview?.summary ?? ""
+        return String(localized: "\(what)将永久删除，MacClean 无法撤销。再点一次确认。")
     }
 }
 

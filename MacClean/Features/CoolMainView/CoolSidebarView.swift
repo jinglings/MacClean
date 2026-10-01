@@ -32,7 +32,7 @@ struct CoolSidebarView: View {
                             .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(AppTheme.textMuted)
                             .padding(.horizontal, 10)
-                            .padding(.top, section.title == sections.first?.title ? 0 : 10)
+                            .padding(.top, section.title == sections.first?.title ? 0 : 6)
                             .padding(.bottom, 4)
                         ForEach(section.tabs) { tab in
                             sidebarRow(tab)
@@ -91,7 +91,7 @@ struct CoolSidebarView: View {
             (String(localized: "概览"), [.smartCare, .diskAnalysis]),
             (String(localized: "清理"), [.cacheCleanup, .largeOldFiles, .similarPhotos, .developerTools, .privacy]),
             (String(localized: "优化"), [.loginItems, .maintenance]),
-            (String(localized: "管理"), [.appStorage, .appUninstaller, .fileSearch])
+            (String(localized: "管理"), [.appStorage, .appUninstaller, .fileSearch, .recovery])
         ]
     }
 
@@ -270,7 +270,7 @@ private struct SidebarNavRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 10) {
-                GradientIconTile(systemName: tab.filledIcon, gradient: tab.tileGradient, size: 22, cornerRatio: 0.27, glyphRatio: 0.5, shadowColor: tab.tileShadow)
+                GradientIconTile(systemName: tab.filledIcon, gradient: tab.tileGradient, size: 21, cornerRatio: 0.27, glyphRatio: 0.5, shadowColor: tab.tileShadow)
                     .saturation(isSelected || isHovered ? 1 : 0.85)
 
                 Text(title)
@@ -281,7 +281,7 @@ private struct SidebarNavRow: View {
                 Spacer()
             }
             .padding(.horizontal, 7)
-            .frame(height: 32)
+            .frame(height: 29)
             .background(
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
                     .fill(isSelected ? AppTheme.surfaceHover : (isHovered ? AppTheme.ink(0.05) : Color.clear))

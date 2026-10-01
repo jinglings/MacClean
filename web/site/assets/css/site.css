@@ -368,6 +368,7 @@ h1, h2, h3 { text-wrap: balance; }
 .sc-step li .i { color: var(--accent-text); font-size: 20px; margin-top: 2px; }
 .sc-stage { position: sticky; top: calc(var(--nav-h) + max(4vh, (100vh - var(--nav-h) - 46vw * .644) / 2)); align-self: start; }
 .sc-inline { display: none; margin-top: 28px; }
+.sc-step > p.sc-note, .sc-note { margin-top: 16px; font-size: 14px; color: var(--muted); max-width: 460px; }
 .tile {
   width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; color: #fff;
   background: var(--g, var(--brand));
@@ -396,6 +397,7 @@ h1, h2, h3 { text-wrap: balance; }
 .g-privacy { --g: linear-gradient(135deg, #4FC3D9, #1E8FB8); }
 .g-login { --g: linear-gradient(135deg, #FF8A5B, #E5533D); }
 .g-maint { --g: linear-gradient(135deg, #9AA5B8, #5F6B80); }
+.g-recover { --g: linear-gradient(135deg, #34D3B4, #0F8F9E); }
 .g-appmgr { --g: linear-gradient(135deg, #3FB4F0, #5C6CF2); }
 .g-menubar { --g: linear-gradient(135deg, #10B981, #0891B2); }
 
@@ -410,6 +412,7 @@ h1, h2, h3 { text-wrap: balance; }
 .cell h3 { font-size: 20px; letter-spacing: -.015em; margin-top: 18px; font-weight: 650; }
 .cell p { margin-top: 8px; font-size: 14.5px; color: var(--muted); line-height: 1.55; }
 .cell.wide { grid-column: span 2; }
+.cell.full { grid-column: 1 / -1; }
 .cell.tall { grid-row: span 2; }
 .cell .meta { margin-top: auto; padding-top: 18px; display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; color: var(--text-2); background: var(--bg-3); border: 1px solid var(--line); white-space: nowrap; }
@@ -457,6 +460,11 @@ h1, h2, h3 { text-wrap: balance; }
   .flow .dot { grid-row: span 3; }
   .flow .n { margin-top: 2px; }
 }
+.second-chance { margin-top: clamp(48px, 6vw, 80px); display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: start; padding: clamp(22px, 3vw, 34px); border-radius: var(--r-xl); background: var(--bg-3); }
+.second-chance h3 { font-size: clamp(20px, 2vw, 24px); }
+.second-chance p { margin-top: 8px; color: var(--text-2); font-size: 16px; max-width: 760px; }
+.second-chance .sc-note { color: var(--muted); font-size: 14.5px; }
+@media (max-width: 560px) { .second-chance { grid-template-columns: 1fr; } }
 .guards { margin-top: clamp(56px, 7vw, 96px); display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 14px; }
 .guard.big { grid-row: span 2; display: grid; grid-template-columns: 1fr auto; gap: 8px 32px; align-content: start; }
 .guard.big > :not(.pathguard) { grid-column: 1; }
