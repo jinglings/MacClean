@@ -2,34 +2,35 @@
 //  AppUninstallerView.swift
 //  MacClean
 //
-//  应用卸载视图 - 完整功能版本
+//  应用管家：汇总卡 + 四张结果卡（可用更新 / 未使用 / 残留 / 安装包）+ 各自的详情 Sheet。
+//  所有数字来自真实扫描；所有删除都经 CleanupManager 移入废纸篓，可在完成页或「清理记录」中撤销。
 //
 
 import SwiftUI
+import AppKit
 import Combine
+import os
 
 // MARK: - 视图状态
 enum AppUninstallerState {
     case initial      // 初始状态
     case scanning     // 扫描中
     case results      // 显示结果
-    case uninstalling // 卸载中
+    case uninstalling // 卸载 / 清理中
 }
 
 // MARK: - 主视图
 struct AppUninstallerView: View {
     @EnvironmentObject var appState: AppState
-    @StateObject private var viewModel = AppUninstallerViewModel()
-    
+    @ObservedObject private var viewModel = PageModelStore.shared.appUninstaller
+
     var body: some View {
         ZStack {
             AuraPageBackground()
-            
+
             VStack(spacing: 0) {
-                // 顶部栏
                 topBar
-                
-                // 主内容区域
+
                 switch viewModel.state {
                 case .initial:
                     initialView
@@ -42,247 +43,181 @@ struct AppUninstallerView: View {
                 }
             }
         }
+        .sheet(isPresented: $viewModel.showCompletion, onDismiss: { viewModel.completionDismissed() }) {
+            let result = viewModel.lastCleanResult
+            CleanupCompletionView(
+                cleanedSize: result?.freedSpace ?? 0,
+                cleanedCount: result?.cleanedItems ?? 0,
+                failedCount: result?.errors.count ?? 0,
+                onUndo: result?.historySessionID == nil ? nil : {
+                    viewModel.showCompletion = false
+                    Task { await viewModel.undoLastClean() }
+                },
+                onDismiss: { viewModel.showCompletion = false }
+            )
+        }
+        .alert(
+            "操作未完成",
+            isPresented: Binding(get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } }),
+            presenting: viewModel.errorMessage
+        ) { _ in
+            Button("好", role: .cancel) {}
+        } message: { message in
+            Text(message)
+        }
     }
-    
+
     // MARK: - 顶部栏
     private var topBar: some View {
-        HStack {
+        PageHeader(title: String(localized: "应用管家"), subtitle: String(localized: "盘点应用、卸载残留与安装包")) {
             if viewModel.state == .results {
-                Button(action: {
-                    withAnimation {
-                        viewModel.resetToInitial()
-                    }
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrow.counterclockwise")
-                        Text("重新开始")
-                    }
-                    .font(.subheadline)
-                    .foregroundColor(MacCleanTheme.textSecondary)
-                }
-                .buttonStyle(.plain)
-            }
-            
-            Spacer()
-            
-            Text("应用程序")
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            // 升级按钮
-            if !appState.isLicensed {
-                Button(action: {
-                    appState.showLicenseActivation = true
-                }) {
+                Button(action: { viewModel.startScan() }) {
                     HStack(spacing: 6) {
-                        Image(systemName: "crown.fill")
-                        Text("解锁完整版")
+                        Image(systemName: "arrow.counterclockwise")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("重新扫描")
                     }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.black)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        Capsule()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: 0xFFD700), Color(hex: 0xFFA500)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                    )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(NeonOutlineButtonStyle())
             }
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 50)
-        .padding(.bottom, 20)
     }
-    
+
     // MARK: - 初始视图
     private var initialView: some View {
-        VStack(spacing: 30) {
-            Spacer()
-            
-            // 3D 图标
-            AppUninstallerIcon3D()
-                .frame(width: 200, height: 200)
-            
-            // 标题
-            Text("应用程序")
-                .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.white)
-            
-            // 描述
-            VStack(spacing: 8) {
-                Text("掌控您的应用程序。卸载、更新")
-                    .foregroundColor(MacCleanTheme.textSecondary)
-                Text("或删除旧的应用程序残留文件。")
-                    .foregroundColor(MacCleanTheme.textSecondary)
-            }
-            .font(.subheadline)
-            .multilineTextAlignment(.center)
-            
-            Spacer()
-            
-            // 扫描按钮
-            Button(action: {
-                viewModel.startScan()
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                    Text("扫描")
-                }
-            }
-            .buttonStyle(NeonButtonStyle(isLarge: true))
-            .padding(.bottom, 50)
+        ScrollView(showsIndicators: false) {
+            ScanIntroView(
+                icon: "square.grid.2x2",
+                title: String(localized: "掌控你的应用"),
+                message: String(localized: "盘点已安装的应用，彻底卸载不再使用的软件，连同残留文件与安装包一起清掉。"),
+                points: [String(localized: "列出全部应用与真实占用、30 天未打开的应用"), String(localized: "检查 Sparkle 应用的可用更新"), String(localized: "已卸载应用留下的残留文件与安装包"), String(localized: "macOS 可能询问是否允许访问其他应用的数据")],
+                action: { viewModel.startScan() }
+            )
+            .padding(.horizontal, CosmicSizes.pagePadding)
+            .padding(.top, 24)
+            .padding(.bottom, 24)
         }
     }
-    
+
     // MARK: - 扫描中视图
     private var scanningView: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: 24) {
             Spacer()
-            
-            // 扫描动画图标
+
             ZStack {
-                AppUninstallerIcon3D()
-                    .frame(width: 180, height: 180)
-                
-                // 扫描进度环
                 Circle()
-                    .trim(from: 0, to: viewModel.scanProgress)
-                    .stroke(
-                        MacCleanTheme.accentGlow,
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round)
-                    )
-                    .frame(width: 200, height: 200)
+                    .stroke(AppTheme.ink(0.08), lineWidth: 4)
+                    .frame(width: 120, height: 120)
+                Circle()
+                    .trim(from: 0, to: max(0.02, viewModel.scanProgress))
+                    .stroke(AppTheme.accent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
-                    .animation(.linear(duration: 0.1), value: viewModel.scanProgress)
+                    .animation(.easeOut(duration: 0.15), value: viewModel.scanProgress)
+                Text("\(Int(viewModel.scanProgress * 100))%")
+                    .font(.system(size: 24, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundColor(AppTheme.textPrimary)
             }
-            
-            // 状态文字
-            Text("正在扫描应用程序文件...")
-                .font(.title2.bold())
-                .foregroundColor(.white)
-            
-            Text("正在查找应用程序、更新和残留文件。")
-                .font(.subheadline)
-                .foregroundColor(MacCleanTheme.textSecondary)
-            
+
+            VStack(spacing: 8) {
+                Text("正在扫描应用程序…")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(AppTheme.textPrimary)
+                Text("统计每个应用的真实占用、上次打开时间与关联文件")
+                    .font(.system(size: 13))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
+
             if !viewModel.currentScanningItem.isEmpty {
-                Text(viewModel.currentScanningItem)
-                    .font(.caption)
-                    .foregroundColor(MacCleanTheme.textMuted)
+                Text(verbatim: viewModel.currentScanningItem)
+                    .font(.system(size: 11))
+                    .foregroundColor(AppTheme.textMuted)
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .frame(maxWidth: 400)
             }
-            
+
             Spacer()
-            
-            // 停止按钮
-            Button(action: {
+
+            Button("停止扫描") {
                 viewModel.stopScan()
-            }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "stop.fill")
-                    Text("停止")
-                }
             }
-            .buttonStyle(NeonOutlineButtonStyle(color: CosmicTheme.textSecondary))
-            .padding(.bottom, 50)
+            .buttonStyle(NeonOutlineButtonStyle())
+            .padding(.bottom, 40)
         }
     }
-    
+
     // MARK: - 结果视图
     private var resultsView: some View {
-        VStack(spacing: 24) {
-            // 顶部汇总
-            VStack(spacing: 16) {
-                Text("我们在您的 Mac 电脑上找到了 \(viewModel.scanResult?.totalAppsCount ?? 0) 个 App。")
-                    .font(.title2.bold())
-                    .foregroundColor(.white)
-                
-                Button(action: {
-                    viewModel.showAppManager = true
-                }) {
+        VStack(spacing: 20) {
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("共找到 \(viewModel.scanResult?.totalAppsCount ?? 0) 个应用")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    Text("合计占用 \(ByteCountFormatter.string(fromByteCount: viewModel.totalAppsSize, countStyle: .file))（含关联文件）· 按需卸载、更新，或清掉残留与安装包")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.textMuted)
+                }
+                Spacer()
+                Button(action: { viewModel.showAppManager = true }) {
                     HStack(spacing: 6) {
                         Image(systemName: "square.grid.2x2")
-                        Text("管理我的应用程序")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("管理我的应用")
                     }
-                    .font(.subheadline.bold())
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .background(
-                        Capsule()
-                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
-                    )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(NeonOutlineButtonStyle())
             }
-            .padding(.top, 10)
-            
-            // 结果卡片网格
+            .padding(20)
+            .themeCard()
+            .padding(.horizontal, CosmicSizes.pagePadding)
+            .padding(.top, 12)
+
             ScrollView {
                 LazyVGrid(columns: [
                     GridItem(.flexible(), spacing: 16),
                     GridItem(.flexible(), spacing: 16)
                 ], spacing: 16) {
-                    // 可更新应用卡片
                     if let result = viewModel.scanResult {
+                        updatesCard(result)
+
                         ResultCard(
-                            title: "\(result.updatableApps.count) 个可用的应用程序更新",
-                            description: "更新您的软件，以获得最新的功能和兼容性改进。",
-                            icons: result.updatableApps.prefix(3).map { $0.icon },
-                            color: .green,
-                            onCheck: { viewModel.showUpdates = true },
-                            onAction: { viewModel.updateApps() },
-                            actionTitle: "更新"
-                        )
-                        
-                        // 未使用应用卡片
-                        ResultCard(
-                            title: "已发现 \(result.unusedApps.count) 个未使用的应用程序",
-                            description: "您可能不需要这些应用程序，但它们占用了 \(ByteCountFormatter.string(fromByteCount: result.unusedAppsSize, countStyle: .file)) 的存储空间。",
-                            icons: result.unusedApps.prefix(3).map { $0.icon },
-                            color: .orange,
+                            title: "\(result.unusedApps.count) 个应用超过 30 天未打开",
+                            description: "它们连同关联文件占用 \(ByteCountFormatter.string(fromByteCount: result.unusedAppsSize, countStyle: .file))；另有 \(result.unknownUsageApps.count) 个应用没有使用记录。",
+                            iconPaths: result.unusedApps.prefix(3).map(\.path),
+                            color: AppTheme.amber,
+                            iconSystemName: "moon.zzz",
                             onCheck: { viewModel.showUnusedApps = true },
                             onAction: nil,
                             actionTitle: nil
                         )
-                        
-                        // 残留文件卡片
+
                         ResultCard(
-                            title: "发现 \(ByteCountFormatter.string(fromByteCount: result.leftoverSize, countStyle: .file)) 的 \(result.leftoverFiles.count) 个应用程序残留文件",
-                            description: nil,
-                            icons: [],
-                            color: .blue,
-                            iconSystemName: "wrench.and.screwdriver.fill",
+                            title: "\(result.leftoverFiles.count) 个残留文件，共 \(ByteCountFormatter.string(fromByteCount: result.leftoverSize, countStyle: .file))",
+                            description: "已卸载应用留在资源库里的配置与数据。默认不勾选，请逐项确认后再移除。",
+                            iconPaths: [],
+                            color: AppTheme.sky,
+                            iconSystemName: "wrench.and.screwdriver",
                             onCheck: { viewModel.showLeftovers = true },
-                            onAction: { viewModel.removeLeftovers() },
-                            actionTitle: "移除"
-                        )
-                        
-                        // 安装包卡片
-                        ResultCard(
-                            title: "已发现 \(ByteCountFormatter.string(fromByteCount: result.installerSize, countStyle: .file)) 的安装文件",
-                            description: nil,
-                            icons: [],
-                            color: .purple,
-                            iconSystemName: "externaldrive.fill",
-                            onCheck: { viewModel.showInstallers = true },
                             onAction: nil,
                             actionTitle: nil
                         )
+
+                        ResultCard(
+                            title: "\(result.installers.count) 个安装包，共 \(ByteCountFormatter.string(fromByteCount: result.installerSize, countStyle: .file))",
+                            description: "下载文件夹中的 .dmg / .pkg / .xip 安装文件，装好应用后通常不再需要。",
+                            iconPaths: [],
+                            color: AppTheme.violet,
+                            iconSystemName: "externaldrive",
+                            onCheck: { viewModel.showInstallers = true },
+                            onAction: result.installers.isEmpty ? nil : { viewModel.showInstallers = true },
+                            actionTitle: "清理"
+                        )
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, CosmicSizes.pagePadding)
                 .padding(.bottom, 24)
             }
         }
@@ -298,887 +233,554 @@ struct AppUninstallerView: View {
         .sheet(isPresented: $viewModel.showInstallers) {
             InstallersSheet(viewModel: viewModel)
         }
+        .sheet(isPresented: $viewModel.showUpdates) {
+            UpdatesSheet(viewModel: viewModel)
+        }
     }
-    
+
+    @ViewBuilder
+    private func updatesCard(_ result: AppScanResult) -> some View {
+        switch viewModel.updateCheck {
+        case .checking(let done, let total):
+            ResultCard(
+                title: "正在检查更新… \(done)/\(total)",
+                description: "向支持 Sparkle 的应用的更新源查询最新版本。",
+                iconPaths: [],
+                color: AppTheme.mint,
+                iconSystemName: "arrow.triangle.2.circlepath",
+                onCheck: { viewModel.showUpdates = true },
+                onAction: nil,
+                actionTitle: nil
+            )
+        case .idle, .finished:
+            ResultCard(
+                title: "\(viewModel.updatableApps.count) 个应用有可用更新",
+                description: "已检查 \(viewModel.checkedForUpdatesCount) 个支持 Sparkle 的应用；\(result.appStoreAppsCount) 个 App Store 应用请在 App Store 中更新。",
+                iconPaths: viewModel.updatableApps.prefix(3).map(\.path),
+                color: AppTheme.mint,
+                iconSystemName: "arrow.down.circle",
+                onCheck: { viewModel.showUpdates = true },
+                onAction: viewModel.updatableApps.isEmpty ? nil : { viewModel.showUpdates = true },
+                actionTitle: "更新"
+            )
+        }
+    }
+
     // MARK: - 卸载中视图
     private var uninstallingView: some View {
-        VStack(spacing: 30) {
+        VStack(spacing: 20) {
             Spacer()
-            
-            ProgressView()
-                .scaleEffect(2)
-                .tint(MacCleanTheme.accentGlow)
-            
-            Text("正在卸载应用...")
-                .font(.title2.bold())
-                .foregroundColor(.white)
-            
-            Text(viewModel.uninstallStatus)
-                .font(.subheadline)
-                .foregroundColor(MacCleanTheme.textSecondary)
-            
+
+            ProgressView(value: viewModel.cleanProgress)
+                .tint(AppTheme.accent)
+                .frame(width: 260)
+
+            Text(verbatim: viewModel.uninstallStatus)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(AppTheme.textPrimary)
+
+            Text("移入废纸篓的内容可在完成页或「清理记录」中恢复")
+                .font(.system(size: 13))
+                .foregroundColor(AppTheme.textSecondary)
+
             Spacer()
         }
-    }
-}
-
-// MARK: - 3D 应用图标
-struct AppUninstallerIcon3D: View {
-    @State private var rotation: Double = 0
-    
-    var body: some View {
-        ZStack {
-            // 外层光晕
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [
-                            Color(hex: 0x4A90E2).opacity(0.3),
-                            Color(hex: 0x4A90E2).opacity(0.0)
-                        ],
-                        center: .center,
-                        startRadius: 60,
-                        endRadius: 120
-                    )
-                )
-                .frame(width: 220, height: 220)
-            
-            // 六边形背景
-            HexagonShape()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color(hex: 0x3B7DD8),
-                            Color(hex: 0x2E5A9E),
-                            Color(hex: 0x1E3A6E)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 160, height: 160)
-                .shadow(color: Color(hex: 0x4A90E2).opacity(0.5), radius: 20, x: 0, y: 10)
-            
-            // 玻璃效果层
-            HexagonShape()
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.2),
-                            Color.white.opacity(0.0)
-                        ],
-                        startPoint: .top,
-                        endPoint: .center
-                    )
-                )
-                .frame(width: 160, height: 160)
-            
-            // 工具图标
-            VStack(spacing: 8) {
-                Image(systemName: "wrench.and.screwdriver.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(.white)
-                    .rotationEffect(.degrees(rotation))
-                
-                // 底部装饰点
-                HStack(spacing: 6) {
-                    ForEach(0..<5) { i in
-                        Circle()
-                            .fill(Color.white.opacity(0.8))
-                            .frame(width: 6, height: 6)
-                            .offset(y: sin(rotation / 180 * .pi + Double(i)) * 3)
-                    }
-                }
-            }
-        }
-        .onAppear {
-            withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                rotation = 10
-            }
-        }
-    }
-}
-
-// MARK: - 六边形形状
-struct HexagonShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        let radius = min(rect.width, rect.height) / 2
-        
-        for i in 0..<6 {
-            let angle = CGFloat(i) * .pi / 3 - .pi / 2
-            let point = CGPoint(
-                x: center.x + radius * cos(angle),
-                y: center.y + radius * sin(angle)
-            )
-            if i == 0 {
-                path.move(to: point)
-            } else {
-                path.addLine(to: point)
-            }
-        }
-        path.closeSubpath()
-        return path
     }
 }
 
 // MARK: - 结果卡片
 struct ResultCard: View {
-    let title: String
-    let description: String?
-    let icons: [NSImage?]
+    let title: LocalizedStringKey
+    let description: LocalizedStringKey?
+    let iconPaths: [String]
     let color: Color
     var iconSystemName: String? = nil
     let onCheck: () -> Void
     let onAction: (() -> Void)?
-    let actionTitle: String?
-    
+    let actionTitle: LocalizedStringKey?
+
+    @State private var isHovered = false
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // 标题
+        VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(.headline)
-                .foregroundColor(.white)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(AppTheme.textPrimary)
                 .lineLimit(2)
-            
-            // 描述
+
             if let description = description {
                 Text(description)
-                    .font(.caption)
-                    .foregroundColor(MacCleanTheme.textSecondary)
+                    .font(.system(size: 12))
+                    .foregroundColor(AppTheme.textMuted)
                     .lineLimit(2)
             }
-            
+
             Spacer()
-            
-            // 底部区域
+
             HStack {
-                // 图标展示
-                if !icons.isEmpty {
+                if !iconPaths.isEmpty {
                     HStack(spacing: -8) {
-                        ForEach(0..<min(icons.count, 3), id: \.self) { index in
-                            if let icon = icons[index] {
-                                Image(nsImage: icon)
-                                    .resizable()
-                                    .frame(width: 36, height: 36)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                    )
-                            }
+                        ForEach(iconPaths, id: \.self) { path in
+                            AppIconView(path: path, size: 32)
                         }
                     }
                 } else if let systemName = iconSystemName {
                     ZStack {
-                        Circle()
-                            .fill(color.opacity(0.2))
-                            .frame(width: 40, height: 40)
-                        
+                        RoundedRectangle(cornerRadius: 9)
+                            .fill(color.opacity(0.14))
+                            .frame(width: 36, height: 36)
                         Image(systemName: systemName)
-                            .font(.system(size: 18))
+                            .font(.system(size: 15, weight: .medium))
                             .foregroundColor(color)
                     }
                 }
-                
+
                 Spacer()
-                
-                // 操作按钮
+
                 HStack(spacing: 8) {
-                    Button(action: onCheck) {
-                        Text("检查")
-                            .font(.caption.bold())
-                            .foregroundColor(MacCleanTheme.textSecondary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .stroke(MacCleanTheme.textSecondary.opacity(0.3), lineWidth: 1)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    
+                    Button("查看", action: onCheck)
+                        .buttonStyle(NeonOutlineButtonStyle())
+
                     if let action = onAction, let title = actionTitle {
-                        Button(action: action) {
-                            Text(title)
-                                .font(.caption.bold())
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(color)
-                                )
-                        }
-                        .buttonStyle(.plain)
+                        Button(title, action: action)
+                            .buttonStyle(NeonButtonStyle())
                     }
                 }
             }
         }
         .padding(16)
-        .frame(height: 160)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
+        .frame(height: 150)
+        .themeCard(isHovered: isHovered)
+        .onHover { isHovered = $0 }
+    }
+}
+
+// MARK: - 应用图标
+
+/// NSImage 不是 Sendable，扫描结果只带路径，图标在主线程按需取并缓存。
+@MainActor
+enum AppIconCache {
+    private static var cache: [String: NSImage] = [:]
+
+    static func icon(for path: String) -> NSImage {
+        if let cached = cache[path] { return cached }
+        let icon = NSWorkspace.shared.icon(forFile: path)
+        cache[path] = icon
+        return icon
+    }
+}
+
+struct AppIconView: View {
+    let path: String
+    var size: CGFloat = 32
+
+    var body: some View {
+        Image(nsImage: AppIconCache.icon(for: path))
+            .resizable()
+            .interpolation(.high)
+            .frame(width: size, height: size)
+    }
+}
+
+// MARK: - 确认弹窗
+
+struct AppManagerConfirm: Identifiable {
+    let id = UUID()
+    let title: LocalizedStringKey
+    let message: String
+    var confirmTitle: LocalizedStringKey = "移入废纸篓"
+    /// nil 表示只是提示，只有「好」按钮。
+    var action: (() -> Void)? = nil
+}
+
+extension View {
+    func appManagerConfirm(_ request: Binding<AppManagerConfirm?>) -> some View {
+        alert(
+            request.wrappedValue?.title ?? "",
+            isPresented: Binding(get: { request.wrappedValue != nil }, set: { if !$0 { request.wrappedValue = nil } }),
+            presenting: request.wrappedValue
+        ) { confirm in
+            if let action = confirm.action {
+                Button("取消", role: .cancel) {}
+                Button(confirm.confirmTitle, role: .destructive, action: action)
+            } else {
+                Button("好", role: .cancel) {}
+            }
+        } message: { confirm in
+            Text(confirm.message)
+        }
     }
 }
 
 // MARK: - ViewModel
 @MainActor
-class AppUninstallerViewModel: ObservableObject {
+final class AppUninstallerViewModel: ObservableObject {
+    enum UpdateCheckState: Equatable {
+        case idle
+        case checking(done: Int, total: Int)
+        case finished
+    }
+
     @Published var state: AppUninstallerState = .initial
     @Published var scanProgress: Double = 0
     @Published var currentScanningItem: String = ""
     @Published var scanResult: AppScanResult?
     @Published var uninstallStatus: String = ""
-    
+    @Published var cleanProgress: Double = 0
+
+    @Published private(set) var updateCheck: UpdateCheckState = .idle
+    @Published private(set) var updatableApps: [UpdatableApp] = []
+    @Published private(set) var checkedForUpdatesCount = 0
+
+    @Published var lastCleanResult: CleanResult?
+    @Published var showCompletion = false
+    @Published var errorMessage: String?
+    /// 完成页关闭后再弹出的错误（两个弹层不能同时出现）。
+    private var pendingErrorMessage: String?
+
     // Sheet 状态
     @Published var showAppManager = false
     @Published var showUnusedApps = false
     @Published var showLeftovers = false
     @Published var showInstallers = false
     @Published var showUpdates = false
-    
-    // 选中的应用
-    @Published var selectedApps: [AppInfo] = []
-    
+
     private var scanTask: Task<Void, Never>?
-    
+    private var updateTask: Task<Void, Never>?
+    private var scanGeneration = UUID()
+
+    private let ownBundleID = Bundle.main.bundleIdentifier ?? ""
+
+    var totalAppsSize: Int64 { scanResult?.apps.reduce(0) { $0 + $1.totalSize } ?? 0 }
+
+    // MARK: 扫描
+
     func startScan() {
+        scanTask?.cancel()
+        updateTask?.cancel()
+        let generation = UUID()
+        scanGeneration = generation
         state = .scanning
         scanProgress = 0
         currentScanningItem = ""
-        
-        scanTask = Task {
-            do {
-                // 模拟扫描进度
-                for i in 1...10 {
-                    try? await Task.sleep(nanoseconds: 200_000_000) // 0.2秒
-                    
-                    if Task.isCancelled { return }
-                    
-                    scanProgress = Double(i) / 10.0
-                    
-                    switch i {
-                    case 1...3:
-                        currentScanningItem = "正在扫描 /Applications..."
-                    case 4...5:
-                        currentScanningItem = "正在查找未使用的应用..."
-                    case 6...7:
-                        currentScanningItem = "正在扫描残留文件..."
-                    case 8...9:
-                        currentScanningItem = "正在检查安装包..."
-                    default:
-                        currentScanningItem = "正在完成..."
-                    }
-                }
-                
-                // 执行真正的扫描
-                let result = try await AppManager.shared.scanApplications()
-                
-                await MainActor.run {
-                    self.scanResult = result
-                    self.state = .results
-                }
-            } catch {
-                print("扫描失败: \(error)")
-                state = .initial
-            }
+        updatableApps = []
+        updateCheck = .idle
+
+        let ref = WeakRef(self)
+        scanTask = Task.detached(priority: .userInitiated) {
+            let result = AppManager.scan(progress: { fraction, label in
+                Task { @MainActor in ref.object?.reportProgress(fraction, label, generation: generation) }
+            })
+            await ref.object?.finishScan(result, generation: generation)
         }
     }
-    
+
+    private func reportProgress(_ fraction: Double, _ label: String, generation: UUID) {
+        guard generation == scanGeneration, state == .scanning else { return }
+        scanProgress = max(scanProgress, fraction)
+        currentScanningItem = label
+    }
+
+    private func finishScan(_ result: AppScanResult?, generation: UUID) {
+        guard generation == scanGeneration, state == .scanning, let result else { return }
+        scanResult = result
+        scanProgress = 1
+        state = .results
+        startUpdateCheck(apps: result.apps, generation: generation)
+    }
+
     func stopScan() {
         scanTask?.cancel()
-        state = .initial
+        updateTask?.cancel()
+        scanGeneration = UUID()
+        state = scanResult == nil ? .initial : .results
     }
-    
+
     func resetToInitial() {
+        stopScan()
         state = .initial
         scanResult = nil
         scanProgress = 0
     }
-    
-    func updateApps() {
-        // TODO: 实现更新功能
-    }
-    
-    func removeLeftovers() {
-        guard let result = scanResult else { return }
-        
-        state = .uninstalling
-        uninstallStatus = "正在删除残留文件..."
-        
-        Task {
-            do {
-                try await AppManager.shared.deleteFiles(result.leftoverFiles)
-                
-                // 重新扫描
-                startScan()
-            } catch {
-                print("删除失败: \(error)")
-                state = .results
-            }
-        }
-    }
-    
-    func uninstallSelectedApps() {
-        guard !selectedApps.isEmpty else { return }
-        
-        state = .uninstalling
-        
-        Task {
-            for app in selectedApps {
-                uninstallStatus = "正在卸载 \(app.name)..."
-                do {
-                    try await AppManager.shared.uninstallApp(app)
-                } catch {
-                    print("卸载失败: \(error)")
-                }
-            }
-            
-            selectedApps.removeAll()
-            startScan()
-        }
-    }
-}
 
-// MARK: - 应用管理 Sheet
-struct AppManagerSheet: View {
-    @ObservedObject var viewModel: AppUninstallerViewModel
-    @Environment(\.dismiss) var dismiss
-    @State private var searchText = ""
-    @State private var selectedApp: AppInfo?
-    
-    private var filteredApps: [AppInfo] {
-        guard let apps = viewModel.scanResult?.apps else { return [] }
-        if searchText.isEmpty {
-            return apps
-        }
-        return apps.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-    }
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 标题栏
-            HStack {
-                Text("管理应用程序")
-                    .font(.title2.bold())
-                
-                Spacer()
-                
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding()
-            
-            // 搜索栏
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.secondary)
-                TextField("搜索应用...", text: $searchText)
-                    .textFieldStyle(.plain)
-            }
-            .padding(10)
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(8)
-            .padding(.horizontal)
-            
-            // 应用列表
-            HStack(spacing: 0) {
-                // 左侧应用列表
-                List(filteredApps, selection: $selectedApp) { app in
-                    AppListRow(app: app, isSelected: selectedApp?.id == app.id)
-                        .tag(app)
-                }
-                .listStyle(.sidebar)
-                .frame(minWidth: 300)
-                
-                Divider()
-                
-                // 右侧详情
-                if let app = selectedApp {
-                    AppDetailView(app: app, onUninstall: {
-                        viewModel.selectedApps = [app]
-                        dismiss()
-                        viewModel.uninstallSelectedApps()
-                    })
-                } else {
-                    VStack {
-                        Spacer()
-                        Text("选择一个应用查看详情")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-            }
-        }
-        .frame(minWidth: 800, minHeight: 600)
-    }
-}
+    // MARK: 更新检查
 
-// MARK: - 应用列表行
-struct AppListRow: View {
-    let app: AppInfo
-    let isSelected: Bool
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            if let icon = app.icon {
-                Image(nsImage: icon)
-                    .resizable()
-                    .frame(width: 32, height: 32)
-            } else {
-                Image(systemName: "app.fill")
-                    .font(.system(size: 24))
-                    .foregroundColor(.blue)
-                    .frame(width: 32, height: 32)
-            }
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(app.name)
-                    .font(.subheadline.bold())
-                
-                Text(ByteCountFormatter.string(fromByteCount: app.totalSize, countStyle: .file))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
+    private func startUpdateCheck(apps: [AppInfo], generation: UUID) {
+        let candidates = apps.compactMap(AppUpdateChecker.candidate(for:))
+        checkedForUpdatesCount = candidates.count
+        guard !candidates.isEmpty else {
+            updateCheck = .finished
+            return
         }
-        .padding(.vertical, 4)
-        .contentShape(Rectangle())
-    }
-}
-
-// MARK: - 应用详情视图
-struct AppDetailView: View {
-    let app: AppInfo
-    let onUninstall: () -> Void
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // 应用图标和名称
-                VStack(spacing: 16) {
-                    if let icon = app.icon {
-                        Image(nsImage: icon)
-                            .resizable()
-                            .frame(width: 80, height: 80)
-                    }
-                    
-                    Text(app.name)
-                        .font(.title.bold())
-                    
-                    Text("版本 \(app.version)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+        updateCheck = .checking(done: 0, total: candidates.count)
+        let ref = WeakRef(self)
+        updateTask = Task.detached(priority: .utility) {
+            let found = await AppUpdateChecker.check(candidates, progress: { done, total in
+                Task { @MainActor in
+                    guard let model = ref.object, model.scanGeneration == generation, case .checking = model.updateCheck else { return }
+                    model.updateCheck = .checking(done: done, total: total)
                 }
-                .padding(.top, 24)
-                
-                Divider()
-                
-                // 存储信息
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("存储空间")
-                        .font(.headline)
-                    
-                    HStack {
-                        Text("应用本体")
-                        Spacer()
-                        Text(ByteCountFormatter.string(fromByteCount: app.size, countStyle: .file))
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    if !app.relatedFiles.isEmpty {
-                        ForEach(app.relatedFiles) { file in
-                            HStack {
-                                Image(systemName: file.type.icon)
-                                    .foregroundColor(.secondary)
-                                Text(file.type.rawValue)
-                                Spacer()
-                                Text(ByteCountFormatter.string(fromByteCount: file.size, countStyle: .file))
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                    }
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("总计")
-                            .font(.headline)
-                        Spacer()
-                        Text(ByteCountFormatter.string(fromByteCount: app.totalSize, countStyle: .file))
-                            .font(.headline)
-                            .foregroundColor(.red)
-                    }
-                }
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                // 卸载按钮
-                Button(action: onUninstall) {
-                    HStack {
-                        Image(systemName: "trash.fill")
-                        Text("卸载")
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.red)
-                    )
-                }
-                .buttonStyle(.plain)
-                .padding()
-            }
+            })
+            await ref.object?.finishUpdateCheck(found, generation: generation)
         }
-        .frame(minWidth: 400)
     }
-}
 
-// MARK: - 未使用应用 Sheet
-struct UnusedAppsSheet: View {
-    @ObservedObject var viewModel: AppUninstallerViewModel
-    @Environment(\.dismiss) var dismiss
-    @State private var selectedApps: Set<UUID> = []
-    
-    private var unusedApps: [AppInfo] {
-        viewModel.scanResult?.unusedApps ?? []
+    private func finishUpdateCheck(_ found: [UpdatableApp], generation: UUID) {
+        guard generation == scanGeneration else { return }
+        updatableApps = found
+        updateCheck = .finished
     }
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 标题栏
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("未使用的应用程序")
-                        .font(.title2.bold())
-                    Text("这些应用在过去 30 天内未被使用")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding()
-            
-            // 应用列表
-            List {
-                ForEach(unusedApps) { app in
-                    HStack(spacing: 12) {
-                        Toggle("", isOn: Binding(
-                            get: { selectedApps.contains(app.id) },
-                            set: { isSelected in
-                                if isSelected {
-                                    selectedApps.insert(app.id)
-                                } else {
-                                    selectedApps.remove(app.id)
-                                }
-                            }
-                        ))
-                        .toggleStyle(.checkbox)
-                        
-                        if let icon = app.icon {
-                            Image(nsImage: icon)
-                                .resizable()
-                                .frame(width: 40, height: 40)
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            Text(app.name)
-                                .font(.headline)
-                            if let lastUsed = app.lastUsedDate {
-                                Text("上次使用: \(lastUsed, formatter: dateFormatter)")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
-                        
-                        Spacer()
-                        
-                        Text(ByteCountFormatter.string(fromByteCount: app.totalSize, countStyle: .file))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-            
-            Divider()
-            
-            // 底部操作栏
-            HStack {
-                let selectedSize = unusedApps.filter { selectedApps.contains($0.id) }.reduce(0) { $0 + $1.totalSize }
-                
-                Text("已选择 \(selectedApps.count) 个应用，共 \(ByteCountFormatter.string(fromByteCount: selectedSize, countStyle: .file))")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                Button(action: {
-                    let appsToUninstall = unusedApps.filter { selectedApps.contains($0.id) }
-                    viewModel.selectedApps = appsToUninstall
+
+    /// 打开应用，让它自带的 Sparkle 更新器接手；失败时返回给 Sheet 显示的错误。
+    func launchForUpdate(_ app: UpdatableApp) async -> String? {
+        do {
+            _ = try await NSWorkspace.shared.openApplication(at: URL(fileURLWithPath: app.path), configuration: NSWorkspace.OpenConfiguration())
+            return nil
+        } catch {
+            return String(localized: "无法打开「\(app.name)」：\(error.localizedDescription)")
+        }
+    }
+
+    func openReleaseNotes(_ app: UpdatableApp) {
+        guard let url = app.infoURL else { return }
+        NSWorkspace.shared.open(url)
+    }
+
+    func openAppStoreUpdates() {
+        if let url = URL(string: "macappstore://showUpdatesPage") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    // MARK: 选择
+
+    func toggleRelated(appID: AppInfo.ID, fileID: RelatedFile.ID) {
+        guard let appIndex = scanResult?.apps.firstIndex(where: { $0.id == appID }),
+              let fileIndex = scanResult?.apps[appIndex].relatedFiles.firstIndex(where: { $0.id == fileID }) else { return }
+        scanResult?.apps[appIndex].relatedFiles[fileIndex].isSelected.toggle()
+    }
+
+    func setLeftovers(_ ids: Set<RelatedFile.ID>, selected: Bool) {
+        guard var files = scanResult?.leftoverFiles else { return }
+        for index in files.indices where ids.contains(files[index].id) {
+            files[index].isSelected = selected
+        }
+        scanResult?.leftoverFiles = files
+    }
+
+    func app(withID id: AppInfo.ID) -> AppInfo? {
+        scanResult?.apps.first { $0.id == id }
+    }
+
+    // MARK: 付费墙
+
+    /// 动手前检查授权。不允许时先关掉当前 Sheet，再弹出购买页（两个 Sheet 不能叠在一起）。
+    func allowAction(dismiss: () -> Void) -> Bool {
+        if ProGate.allowAction() { return true }
+        let appState = AppState.shared
+        appState.showLicenseActivation = false
+        dismiss()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            appState.showLicenseActivation = true
+        }
+        return false
+    }
+
+    // MARK: 卸载
+
+    func refusalReason(for app: AppInfo) -> String? {
+        if !ownBundleID.isEmpty, app.bundleIdentifier == ownBundleID { return String(localized: "这是 MacClean 自己") }
+        if app.isAppleApp { return String(localized: "系统自带应用不能卸载") }
+        let parent = (app.path as NSString).deletingLastPathComponent
+        let home = FileManager.default.homeDirectoryForCurrentUser.standardizedFileURL.path
+        if parent != "/Applications" && parent != home + "/Applications" { return String(localized: "只能卸载「应用程序」文件夹中的应用") }
+        return nil
+    }
+
+    func isRunning(_ app: AppInfo) -> Bool {
+        !app.bundleIdentifier.isEmpty && !NSRunningApplication.runningApplications(withBundleIdentifier: app.bundleIdentifier).isEmpty
+    }
+
+    /// 生成卸载确认（或拒绝说明）。dismiss 用于在执行前关闭发起操作的 Sheet。
+    func uninstallRequest(for apps: [AppInfo], dismiss: @escaping () -> Void) -> AppManagerConfirm? {
+        guard !apps.isEmpty, allowAction(dismiss: dismiss) else { return nil }
+
+        let refused = apps.compactMap { app in refusalReason(for: app).map { String(localized: "「\(app.name)」：\($0)") } }
+        if !refused.isEmpty {
+            return AppManagerConfirm(title: "无法卸载", message: refused.joined(separator: "\n"))
+        }
+
+        let items = uninstallItems(for: apps)
+        let listing = Self.listing(items)
+        let running = apps.filter(isRunning)
+        if !running.isEmpty {
+            let names = running.map { String(localized: "「\($0.name)」") }.joined(separator: String(localized: "、"))
+            return AppManagerConfirm(
+                title: "需要先退出应用",
+                message: String(localized: "\(names)正在运行，卸载前会先让它退出（请先保存未保存的内容）。") + "\n\n" + listing,
+                confirmTitle: "退出并卸载",
+                action: { [weak self] in
                     dismiss()
-                    viewModel.uninstallSelectedApps()
-                }) {
-                    Text("卸载选中的应用")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(
-                            Capsule()
-                                .fill(selectedApps.isEmpty ? Color.gray : Color.red)
-                        )
+                    Task { await self?.quitThenUninstall(apps) }
                 }
-                .buttonStyle(.plain)
-                .disabled(selectedApps.isEmpty)
-            }
-            .padding()
+            )
         }
-        .frame(minWidth: 600, minHeight: 500)
-    }
-    
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
-    }
-}
-
-// MARK: - 残留文件 Sheet
-struct LeftoversSheet: View {
-    @ObservedObject var viewModel: AppUninstallerViewModel
-    @Environment(\.dismiss) var dismiss
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 标题栏
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("应用程序残留文件")
-                        .font(.title2.bold())
-                    Text("这些文件来自已卸载的应用程序")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
+        return AppManagerConfirm(
+            title: "确认卸载",
+            message: listing,
+            confirmTitle: "卸载",
+            action: { [weak self] in
+                dismiss()
+                Task { await self?.uninstall(apps) }
             }
-            .padding()
-            
-            // 残留文件列表
-            if let leftovers = viewModel.scanResult?.leftoverFiles, !leftovers.isEmpty {
-                List(leftovers) { file in
-                    HStack(spacing: 12) {
-                        Image(systemName: file.type.icon)
-                            .font(.title2)
-                            .foregroundColor(.orange)
-                            .frame(width: 32)
-                        
-                        VStack(alignment: .leading) {
-                            Text(file.name)
-                                .font(.subheadline)
-                            Text(file.path)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                        
-                        Spacer()
-                        
-                        Text(ByteCountFormatter.string(fromByteCount: file.size, countStyle: .file))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
+        )
+    }
+
+    private func uninstallItems(for apps: [AppInfo]) -> [CleanableItem] {
+        apps.flatMap { app -> [CleanableItem] in
+            var bundle = CleanableItem(name: app.name, path: app.path, size: app.size, category: .applications, isSelected: true)
+            bundle.removesContainer = true
+            let related = app.relatedFiles.filter(\.isSelected).map { file -> CleanableItem in
+                var item = CleanableItem(name: "\(app.name) · \(file.name)", path: file.path, size: file.size, category: .appLeftovers, isSelected: true)
+                item.removesContainer = true
+                return item
+            }
+            return [bundle] + related
+        }
+    }
+
+    private func quitThenUninstall(_ apps: [AppInfo]) async {
+        let running = apps.filter(isRunning)
+        state = .uninstalling
+        cleanProgress = 0
+        uninstallStatus = String(localized: "正在退出 \(running.map(\.name).joined(separator: String(localized: "、")))…")
+        for app in running {
+            NSRunningApplication.runningApplications(withBundleIdentifier: app.bundleIdentifier).forEach { $0.terminate() }
+        }
+        for _ in 0..<40 where apps.contains(where: isRunning) {
+            try? await Task.sleep(nanoseconds: 250_000_000)
+        }
+        let stillRunning = apps.filter(isRunning)
+        guard stillRunning.isEmpty else {
+            state = .results
+            let names = stillRunning.map { String(localized: "「\($0.name)」") }.joined(separator: String(localized: "、"))
+            errorMessage = String(localized: "\(names)没有退出（可能在等待保存），请手动退出后再卸载。")
+            return
+        }
+        await uninstall(apps)
+    }
+
+    private func uninstall(_ apps: [AppInfo]) async {
+        let status = apps.count == 1 ? String(localized: "正在卸载「\(apps[0].name)」…") : String(localized: "正在卸载 \(apps.count) 个应用…")
+        await performClean(uninstallItems(for: apps), status: status)
+    }
+
+    // MARK: 残留与安装包
+
+    func leftoverRequest(for files: [RelatedFile], dismiss: @escaping () -> Void) -> AppManagerConfirm? {
+        guard !files.isEmpty, allowAction(dismiss: dismiss) else { return nil }
+        let items = files.map { file -> CleanableItem in
+            var item = CleanableItem(name: file.name, path: file.path, size: file.size, category: .appLeftovers, isSelected: true, description: file.owner)
+            item.removesContainer = true
+            return item
+        }
+        return AppManagerConfirm(
+            title: "移除残留文件",
+            message: Self.listing(items),
+            action: { [weak self] in
+                dismiss()
+                Task { await self?.performClean(items, status: String(localized: "正在移除残留文件…")) }
+            }
+        )
+    }
+
+    func installerRequest(for installers: [InstallerFile], dismiss: @escaping () -> Void) -> AppManagerConfirm? {
+        guard !installers.isEmpty, allowAction(dismiss: dismiss) else { return nil }
+        let items = installers.map { installer -> CleanableItem in
+            var item = CleanableItem(name: installer.name, path: installer.path, size: installer.size, category: .installers, isSelected: true, lastModified: installer.modified)
+            item.removesContainer = true
+            return item
+        }
+        return AppManagerConfirm(
+            title: "清理安装包",
+            message: Self.listing(items),
+            action: { [weak self] in
+                dismiss()
+                Task { await self?.performClean(items, status: String(localized: "正在清理安装包…")) }
+            }
+        )
+    }
+
+    // MARK: 执行与撤销
+
+    private func performClean(_ items: [CleanableItem], status: String) async {
+        guard !items.isEmpty else { return }
+        state = .uninstalling
+        uninstallStatus = status
+        cleanProgress = 0
+        lastCleanResult = nil
+        // 等发起操作的 Sheet 收起，否则很快完成时完成页会和正在消失的 Sheet 冲突
+        try? await Task.sleep(nanoseconds: 350_000_000)
+        let ref = WeakRef(self)
+        do {
+            let result = try await CleanupManager.shared.clean(items: items) { fraction in
+                Task { @MainActor in ref.object?.cleanProgress = fraction }
+            }
+            lastCleanResult = result
+            scanResult?.pruneMissing()
+            state = .results
+            let failure = result.errors.isEmpty ? nil : Self.failureText(result.errors)
+            if result.cleanedItems == 0 {
+                errorMessage = failure ?? String(localized: "没有移除任何内容。")
             } else {
-                VStack {
-                    Spacer()
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 48))
-                        .foregroundColor(.green)
-                    Text("没有发现残留文件")
-                        .font(.headline)
-                        .padding(.top)
-                    Spacer()
-                }
+                pendingErrorMessage = failure
+                showCompletion = true
             }
-            
-            Divider()
-            
-            // 底部操作栏
-            HStack {
-                if let leftovers = viewModel.scanResult?.leftoverFiles {
-                    let totalSize = leftovers.reduce(0) { $0 + $1.size }
-                    Text("共 \(leftovers.count) 个文件，\(ByteCountFormatter.string(fromByteCount: totalSize, countStyle: .file))")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    dismiss()
-                    viewModel.removeLeftovers()
-                }) {
-                    Text("删除全部")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(
-                            Capsule()
-                                .fill(Color.red)
-                        )
-                }
-                .buttonStyle(.plain)
-            }
-            .padding()
+            if let failure { AppManager.log.error("App manager clean errors: \(failure, privacy: .public)") }
+        } catch {
+            state = .results
+            errorMessage = String(localized: "操作失败：\(error.localizedDescription)")
         }
-        .frame(minWidth: 600, minHeight: 400)
     }
-}
 
-// MARK: - 安装包 Sheet
-struct InstallersSheet: View {
-    @ObservedObject var viewModel: AppUninstallerViewModel
-    @Environment(\.dismiss) var dismiss
-    @State private var selectedInstallers: Set<UUID> = []
-    
-    private var installers: [InstallerFile] {
-        viewModel.scanResult?.installers ?? []
-    }
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // 标题栏
-            HStack {
-                VStack(alignment: .leading) {
-                    Text("安装包文件")
-                        .font(.title2.bold())
-                    Text("下载文件夹中的安装包")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding()
-            
-            // 安装包列表
-            List {
-                ForEach(installers) { installer in
-                    HStack(spacing: 12) {
-                        Toggle("", isOn: Binding(
-                            get: { selectedInstallers.contains(installer.id) },
-                            set: { isSelected in
-                                if isSelected {
-                                    selectedInstallers.insert(installer.id)
-                                } else {
-                                    selectedInstallers.remove(installer.id)
-                                }
-                            }
-                        ))
-                        .toggleStyle(.checkbox)
-                        
-                        Image(systemName: installer.name.lowercased().hasSuffix(".dmg") ? "externaldrive.fill" : "doc.zipper")
-                            .font(.title2)
-                            .foregroundColor(.purple)
-                            .frame(width: 32)
-                        
-                        VStack(alignment: .leading) {
-                            Text(installer.name)
-                                .font(.subheadline)
-                            Text(installer.path)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .lineLimit(1)
-                        }
-                        
-                        Spacer()
-                        
-                        Text(ByteCountFormatter.string(fromByteCount: installer.size, countStyle: .file))
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-            
-            Divider()
-            
-            // 底部操作栏
-            HStack {
-                let selectedSize = installers.filter { selectedInstallers.contains($0.id) }.reduce(0) { $0 + $1.size }
-                
-                Text("已选择 \(selectedInstallers.count) 个文件，共 \(ByteCountFormatter.string(fromByteCount: selectedSize, countStyle: .file))")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                Button(action: {
-                    // 删除选中的安装包
-                    Task {
-                        let toDelete = installers.filter { selectedInstallers.contains($0.id) }
-                        try? await AppManager.shared.deleteInstallers(toDelete)
-                        dismiss()
-                        viewModel.startScan()
-                    }
-                }) {
-                    Text("删除选中的文件")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(
-                            Capsule()
-                                .fill(selectedInstallers.isEmpty ? Color.gray : Color.red)
-                        )
-                }
-                .buttonStyle(.plain)
-                .disabled(selectedInstallers.isEmpty)
-            }
-            .padding()
+    func completionDismissed() {
+        guard let message = pendingErrorMessage else { return }
+        pendingErrorMessage = nil
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.errorMessage = message
         }
-        .frame(minWidth: 600, minHeight: 400)
+    }
+
+    func undoLastClean() async {
+        guard let sessionID = lastCleanResult?.historySessionID else { return }
+        pendingErrorMessage = nil
+        let restore = await CleanupManager.shared.restore(sessionID: sessionID)
+        lastCleanResult = nil
+        if !restore.failedPaths.isEmpty {
+            errorMessage = String(localized: "有 \(restore.failedPaths.count) 项没能放回原处，可在废纸篓中手动找回：") + "\n" + restore.failedPaths.prefix(5).map { "• \(Self.abbreviate($0))" }.joined(separator: "\n")
+        }
+        startScan()
+    }
+
+    // MARK: 文案
+
+    nonisolated static func abbreviate(_ path: String) -> String {
+        (path as NSString).abbreviatingWithTildeInPath
+    }
+
+    /// 确认弹窗里的清单：逐项列出路径与大小（最多 12 行），末尾给出总数与总大小。
+    static func listing(_ items: [CleanableItem]) -> String {
+        let format = { (size: Int64) in ByteCountFormatter.string(fromByteCount: size, countStyle: .file) }
+        var lines = items.prefix(12).map { String(localized: "• \(abbreviate($0.path))（\(format($0.size))）") }
+        if items.count > 12 { lines.append(String(localized: "…以及另外 \(items.count - 12) 项")) }
+        let total = items.reduce(0) { $0 + $1.size }
+        return String(localized: "以下内容将移入废纸篓，可在完成页或「清理记录」中恢复：") + "\n\n" + lines.joined(separator: "\n") + "\n\n" + String(localized: "共 \(items.count) 项，\(format(total))")
+    }
+
+    static func failureText(_ errors: [CleanError]) -> String {
+        var lines = errors.prefix(6).map { String(localized: "• \(abbreviate($0.path))：\($0.message)") }
+        if errors.count > 6 { lines.append(String(localized: "…以及另外 \(errors.count - 6) 项")) }
+        return String(localized: "以下 \(errors.count) 项没能移入废纸篓：") + "\n" + lines.joined(separator: "\n") + "\n\n" + String(localized: "管理员安装的应用需要在访达中手动移到废纸篓；其他应用的容器数据可能需要在「系统设置 › 隐私与安全性 › 完全磁盘访问权限」中允许 MacClean。")
     }
 }
 

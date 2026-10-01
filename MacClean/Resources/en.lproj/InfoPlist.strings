@@ -1,0 +1,9 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "MacClean";
+
+/* Bluetooth permission prompt */
+"NSBluetoothAlwaysUsageDescription" = "MacClean needs Bluetooth access to show your connected Bluetooth devices and their battery levels in the menu bar.";
+
+/* Location permission prompts (Wi-Fi network name) */
+"NSLocationUsageDescription" = "macOS only provides the Wi-Fi network name to apps with Location access. MacClean uses it solely to show the current Wi-Fi name and never reads or stores your location.";
+"NSLocationWhenInUseUsageDescription" = "macOS only provides the Wi-Fi network name to apps with Location access. MacClean uses it solely to show the current Wi-Fi name and never reads or stores your location.";

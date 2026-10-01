@@ -2,27 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- 禁用沙盒以访问文件系统 -->
-    <key>com.apple.security.app-sandbox</key>
-    <false/>
-    
-    <!-- 如果需要启用沙盒，使用以下权限 -->
-    <!--
-    <key>com.apple.security.app-sandbox</key>
-    <true/>
-    <key>com.apple.security.files.user-selected.read-write</key>
-    <true/>
-    <key>com.apple.security.files.downloads.read-write</key>
-    <true/>
-    -->
-    
-    <!-- 访问用户目录 -->
-    <key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
-    <array>
-        <string>/Library/Caches/</string>
-        <string>/Library/Logs/</string>
-        <string>/Library/Developer/</string>
-        <string>/.npm/</string>
-    </array>
+	<!-- 不启用沙盒：清理功能需要访问整个用户目录 -->
+	<key>com.apple.security.app-sandbox</key>
+	<false/>
+	<!-- Hardened Runtime 下读取 Wi-Fi 名称（CoreWLAN SSID）需要定位权限 -->
+	<key>com.apple.security.personal-information.location</key>
+	<true/>
+	<!-- 菜单栏显示已连接的蓝牙设备 -->
+	<key>com.apple.security.device.bluetooth</key>
+	<true/>
 </dict>
 </plist>

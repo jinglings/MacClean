@@ -2,63 +2,221 @@
 //  SettingsView.swift
 //  MacClean
 //
-//  设置视图
+//  设置窗口：通用 / 通知 / 许可证 / 关于
 //
 
 import SwiftUI
 import ServiceManagement
+import UserNotifications
 
 struct SettingsView: View {
     var body: some View {
         TabView {
             GeneralSettingsView()
-                .tabItem {
-                    Label("general", systemImage: "gear")
-                }
-            
-            AppearanceSettingsView()
-                .tabItem {
-                    Label("appearance", systemImage: "paintbrush")
-                }
-            
+                .tabItem { Label("通用", systemImage: "gearshape") }
+
+            NotificationSettingsView()
+                .tabItem { Label("通知", systemImage: "bell.badge") }
+
             LicenseSettingsView()
-                .tabItem {
-                    Label("license_trial", systemImage: "key")
-                }
-            
-            AboutSettingsView()
-                .tabItem {
-                    Label("about", systemImage: "info.circle")
-                }
+                .tabItem { Label("许可证", systemImage: "key") }
+
+            AboutView()
+                .frame(width: 520, height: 360)
+                .tabItem { Label("关于", systemImage: "info.circle") }
         }
-        .frame(width: 500, height: 350)
+        .tint(AppTheme.accent)
     }
 }
 
-// MARK: - 通用设置
+// MARK: - 外观
+
+enum AppAppearance: String, CaseIterable, Identifiable {
+    case system, light, dark
+
+    static let storageKey = "appearance"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: return String(localized: "跟随系统")
+        case .light: return String(localized: "浅色")
+        case .dark: return String(localized: "深色")
+        }
+    }
+
+    static var current: AppAppearance {
+        AppAppearance(rawValue: UserDefaults.standard.string(forKey: storageKey) ?? "") ?? .system
+    }
+
+    /// 用 NSApp.appearance 统一作用于主窗口、菜单栏面板与设置窗口
+    func apply() {
+        switch self {
+        case .system: NSApp.appearance = nil
+        case .light: NSApp.appearance = NSAppearance(named: .aqua)
+        case .dark: NSApp.appearance = NSAppearance(named: .darkAqua)
+        }
+    }
+}
+
+// MARK: - 语言
+
+enum AppLanguage: String, CaseIterable, Identifiable {
+    case system
+    case english = "en"
+    case simplifiedChinese = "zh-Hans"
+
+    private static let appleLanguagesKey = "AppleLanguages"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .system: return String(localized: "跟随系统")
+        case .english: return "English"
+        case .simplifiedChinese: return "简体中文"
+        }
+    }
+
+    /// 只看本应用域里的覆盖值（UserDefaults.standard 会回落到全局语言列表）
+    static var stored: AppLanguage {
+        guard let bundleID = Bundle.main.bundleIdentifier,
+              let languages = UserDefaults.standard.persistentDomain(forName: bundleID)?[appleLanguagesKey] as? [String],
+              let first = languages.first else { return .system }
+        return AppLanguage(rawValue: first) ?? .system
+    }
+
+    func store() {
+        if self == .system {
+            UserDefaults.standard.removeObject(forKey: Self.appleLanguagesKey)
+        } else {
+            UserDefaults.standard.set([rawValue], forKey: Self.appleLanguagesKey)
+        }
+    }
+
+    /// 写入后，下次启动实际会用的本地化
+    static var effectiveAfterRelaunch: String? {
+        Bundle.preferredLocalizations(
+            from: Bundle.main.localizations,
+            forPreferences: UserDefaults.standard.stringArray(forKey: appleLanguagesKey)
+        ).first
+    }
+
+    static var needsRelaunch: Bool {
+        effectiveAfterRelaunch != Bundle.main.preferredLocalizations.first
+    }
+
+    static func relaunch() {
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: Bundle.main.bundleURL, configuration: configuration) { _, error in
+            guard error == nil else { return }
+            DispatchQueue.main.async { NSApp.terminate(nil) }
+        }
+    }
+}
+
+// MARK: - 通用
+
 struct GeneralSettingsView: View {
-    @AppStorage("launchAtLogin") private var launchAtLogin = false
     @AppStorage("showInMenuBar") private var showInMenuBar = true
-    @AppStorage("autoCheckUpdates") private var autoCheckUpdates = true
-    
+    @AppStorage(AppAppearance.storageKey) private var appearance = AppAppearance.system.rawValue
+    @ObservedObject private var updater = AppUpdater.shared
+
+    @State private var launchAtLogin = false
+    @State private var loginItemStatus: SMAppService.Status = .notRegistered
+    @State private var loginItemError: String?
+    @State private var language = AppLanguage.stored
+    @State private var needsRelaunch = AppLanguage.needsRelaunch
+
     var body: some View {
         Form {
-            Section {
-                Toggle("launch_at_login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, newValue in
-                        setLaunchAtLogin(newValue)
+            Section("启动") {
+                Toggle("登录时打开 MacClean", isOn: Binding(
+                    get: { launchAtLogin },
+                    set: { setLaunchAtLogin($0) }
+                ))
+                if loginItemStatus == .requiresApproval {
+                    hintRow(String(localized: "需要在「系统设置 → 通用 → 登录项」中允许 MacClean。"), color: AppTheme.warning) {
+                        Button("打开登录项设置") { SMAppService.openSystemSettingsLoginItems() }
                     }
-                
-                Toggle("show_in_menu_bar", isOn: $showInMenuBar)
-                
-                Toggle("check_for_updates", isOn: $autoCheckUpdates)
+                }
+                if let loginItemError {
+                    hintRow(loginItemError, color: AppTheme.danger) { EmptyView() }
+                }
+
+                Toggle(isOn: $showInMenuBar) {
+                    Text("在菜单栏显示")
+                    Text("快速查看磁盘、内存与网络状态")
+                }
+            }
+
+            Section("外观与语言") {
+                Picker("外观", selection: $appearance) {
+                    ForEach(AppAppearance.allCases) { Text($0.title).tag($0.rawValue) }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: appearance) { _, _ in AppAppearance.current.apply() }
+
+                Picker("语言", selection: $language) {
+                    ForEach(AppLanguage.allCases) { Text($0.title).tag($0) }
+                }
+                .onChange(of: language) { _, newValue in
+                    newValue.store()
+                    needsRelaunch = AppLanguage.needsRelaunch
+                }
+
+                if needsRelaunch {
+                    hintRow(String(localized: "重启 MacClean 后生效"), color: AppTheme.accent) {
+                        Button("立即重启") { AppLanguage.relaunch() }
+                    }
+                }
+            }
+
+            Section("更新") {
+                Toggle("自动检查更新", isOn: $updater.automaticallyChecksForUpdates)
+                    .disabled(!updater.isConfigured)
+                if !updater.isConfigured {
+                    hintRow(String(localized: "自动更新将在正式版中启用"), color: AppTheme.textMuted) { EmptyView() }
+                }
+                HStack {
+                    Text("当前版本 \(AppVersionInfo.version)（\(AppVersionInfo.build)）")
+                        .foregroundColor(AppTheme.textSecondary)
+                    Spacer()
+                    Button("立即检查更新") { updater.checkForUpdates() }
+                        .disabled(!updater.canCheckForUpdates)
+                }
             }
         }
         .formStyle(.grouped)
-        .padding()
+        .frame(width: 520, height: 460)
+        .onAppear(perform: refreshLoginItemStatus)
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            refreshLoginItemStatus()
+        }
     }
-    
+
+    private func hintRow<Trailing: View>(_ text: String, color: Color, @ViewBuilder trailing: () -> Trailing) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "info.circle.fill")
+                .foregroundColor(color)
+            Text(text)
+                .font(.system(size: 12))
+                .foregroundColor(AppTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer()
+            trailing()
+        }
+    }
+
+    private func refreshLoginItemStatus() {
+        loginItemStatus = SMAppService.mainApp.status
+        launchAtLogin = loginItemStatus == .enabled || loginItemStatus == .requiresApproval
+    }
+
     private func setLaunchAtLogin(_ enabled: Bool) {
+        loginItemError = nil
         do {
             if enabled {
                 try SMAppService.mainApp.register()
@@ -66,156 +224,91 @@ struct GeneralSettingsView: View {
                 try SMAppService.mainApp.unregister()
             }
         } catch {
-            print("设置登录项失败: \(error)")
+            loginItemError = enabled
+                ? String(localized: "无法添加登录项：\(error.localizedDescription)")
+                : String(localized: "无法移除登录项：\(error.localizedDescription)")
         }
+        refreshLoginItemStatus()
     }
 }
 
-// MARK: - 外观设置
-struct AppearanceSettingsView: View {
-    @AppStorage("selectedTheme") private var selectedTheme = 0
-    @AppStorage("selectedLanguage") private var selectedLanguage = "system"
-    
-    let themes = ["System", "Light", "Dark"]
-    let languages = [
-        ("system", "System"),
-        ("en", "English"),
-        ("zh-Hans", "简体中文")
-    ]
-    
+// MARK: - 通知
+
+struct NotificationSettingsView: View {
+    @AppStorage(NotificationSettingsKey.lowDiskEnabled) private var lowDiskEnabled = true
+    @AppStorage(NotificationSettingsKey.lowDiskThreshold) private var lowDiskThreshold = LowDiskThreshold.gb10.rawValue
+    @AppStorage(NotificationSettingsKey.cleanupReminder) private var cleanupReminder = CleanupReminderInterval.off.rawValue
+    @ObservedObject private var scheduler = DiskAlertScheduler.shared
+
     var body: some View {
         Form {
-            Section {
-                Picker("appearance", selection: $selectedTheme) {
-                    ForEach(0..<themes.count, id: \.self) { index in
-                        Text(themes[index]).tag(index)
-                    }
-                }
-                .pickerStyle(.segmented)
-                
-                Picker("language", selection: $selectedLanguage) {
-                    ForEach(languages, id: \.0) { language in
-                        Text(language.1).tag(language.0)
+            if scheduler.authorizationStatus == .denied {
+                Section {
+                    HStack(spacing: 8) {
+                        Image(systemName: "bell.slash.fill")
+                            .foregroundColor(AppTheme.warning)
+                        Text("系统已关闭 MacClean 的通知，以下提醒不会显示。")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.textSecondary)
+                        Spacer()
+                        Button("打开通知设置") { DiskAlertScheduler.openSystemNotificationSettings() }
                     }
                 }
             }
+
+            Section {
+                Toggle(isOn: $lowDiskEnabled) {
+                    Text("磁盘空间不足提醒")
+                    Text("每 30 分钟检查一次启动盘，24 小时内最多提醒一次")
+                }
+                .onChange(of: lowDiskEnabled) { _, enabled in
+                    if enabled { requestAuthorization() }
+                }
+
+                Picker("可用空间", selection: $lowDiskThreshold) {
+                    ForEach(LowDiskThreshold.allCases) { Text($0.title).tag($0.rawValue) }
+                }
+                .disabled(!lowDiskEnabled)
+            } header: {
+                Text("磁盘空间")
+            }
+
+            Section {
+                Picker(selection: $cleanupReminder) {
+                    ForEach(CleanupReminderInterval.allCases) { Text($0.title).tag($0.rawValue) }
+                } label: {
+                    Text("定期清理提醒")
+                    Text("距上次清理满所选时间后提醒你做一次体检")
+                }
+                .onChange(of: cleanupReminder) { _, value in
+                    if value != CleanupReminderInterval.off.rawValue { requestAuthorization() }
+                }
+            } header: {
+                Text("定期清理")
+            }
         }
         .formStyle(.grouped)
-        .padding()
+        .frame(width: 520, height: 360)
+        .task { await scheduler.refreshAuthorizationStatus() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
+            Task { await scheduler.refreshAuthorizationStatus() }
+        }
+    }
+
+    private func requestAuthorization() {
+        Task { await scheduler.requestAuthorization() }
     }
 }
 
-// MARK: - 许可证设置
+// MARK: - 许可证
+
 struct LicenseSettingsView: View {
-    @EnvironmentObject var appState: AppState
-    @StateObject private var licenseManager = LicenseManager.shared
-    
     var body: some View {
-        Form {
-            Section {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(licenseManager.licenseType.localizedName)
-                            .font(.headline)
-                        
-                        if licenseManager.licenseType == .trial {
-                            Text(String(format: NSLocalizedString("trial_days_remaining", comment: ""), licenseManager.trialDaysRemaining))
-                                .font(.subheadline)
-                                .foregroundColor(.orange)
-                        } else if let expDate = licenseManager.expirationDate {
-                            Text("Expires: \(expDate.formatted(date: .abbreviated, time: .omitted))")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    if licenseManager.isLicensed && licenseManager.licenseType != .trial {
-                        Image(systemName: "checkmark.seal.fill")
-                            .font(.title)
-                            .foregroundColor(.green)
-                    }
-                }
-                
-                if !licenseManager.isLicensed || licenseManager.licenseType == .trial {
-                    Button("activate_license") {
-                        appState.showLicenseActivation = true
-                    }
-                    .buttonStyle(.borderedProminent)
-                }
-                
-                Button("restore_purchases") {
-                    Task {
-                        try? await licenseManager.restorePurchases()
-                    }
-                }
-                .disabled(licenseManager.isLoading)
-            }
+        ScrollView {
+            LicenseStatusView()
+                .padding(24)
         }
-        .formStyle(.grouped)
-        .padding()
-    }
-}
-
-// MARK: - 关于设置
-struct AboutSettingsView: View {
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-    }
-    
-    private var buildNumber: String {
-        Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-    }
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "externaldrive.badge.checkmark")
-                .font(.system(size: 64))
-                .foregroundColor(.accentColor)
-            
-            Text("MacClean")
-                .font(.title.bold())
-            
-            Text("Mac 磁盘清理工具")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-            
-            HStack(spacing: 20) {
-                VStack {
-                    Text("version")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(appVersion)
-                        .font(.headline)
-                }
-                
-                VStack {
-                    Text("build")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(buildNumber)
-                        .font(.headline)
-                }
-            }
-            
-            Divider()
-            
-            Text("© 2026 MacClean. All rights reserved.")
-                .font(.caption)
-                .foregroundColor(.secondary)
-            
-            HStack {
-                Link("Website", destination: URL(string: "https://macclean.app")!)
-                Text("•")
-                Link("Privacy Policy", destination: URL(string: "https://macclean.app/privacy")!)
-                Text("•")
-                Link("Support", destination: URL(string: "https://macclean.app/support")!)
-            }
-            .font(.caption)
-        }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: 520, height: 420)
     }
 }
 

@@ -13,15 +13,20 @@
 
 // MARK: - Menu
 "clean_menu" = "清理";
-"quick_clean" = "快速清理";
+"quick_clean" = "一键清理";
 "scan_disk" = "扫描磁盘";
 
 // MARK: - Tabs
 "features" = "功能";
-"disk_analysis" = "磁盘分析";
-"cache_cleanup" = "缓存清理";
-"developer_tools" = "开发者工具";
-"app_uninstaller" = "应用卸载";
+"smart_care" = "一键体检";
+"disk_analysis" = "存储地图";
+"cache_cleanup" = "释放空间";
+"large_old_files" = "大型与陈旧文件";
+"similar_photos_tab" = "相似照片";
+"app_storage" = "应用占用";
+"file_search" = "文件搜索";
+"developer_tools" = "开发缓存";
+"app_uninstaller" = "应用管家";
 
 // MARK: - Disk
 "disk_overview" = "磁盘概览";
@@ -63,6 +68,7 @@
 "large_files" = "大文件";
 "old_files" = "旧文件";
 "duplicates" = "重复文件";
+"broken_login_items" = "损坏的启动项";
 
 // MARK: - Cache Cleanup
 "user_caches" = "用户缓存";
@@ -123,3 +129,21 @@
 "about" = "关于";
 "version" = "版本";
 "build" = "构建号";
+
+"privacy_cleanup" = "隐私清理";
+"login_items" = "启动项";
+"maintenance" = "系统维护";
+
+/* 清理分类 */
+"app_data" = "应用数据";
+"app_leftovers" = "应用残留";
+"applications" = "应用程序";
+"installers" = "安装包";
+"ios_backups" = "iOS 设备备份";
+"ios_updates" = "iOS 固件更新";
+"mail_attachments" = "邮件附件";
+"privacy_data" = "隐私数据";
+"project_artifacts" = "项目构建产物";
+"similar_photos" = "相似照片";
+"space_lens" = "存储地图项目";
+"trash" = "废纸篓";

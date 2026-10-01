@@ -2,62 +2,68 @@
 //  AppManager.swift
 //  MacClean
 //
-//  应用程序管理器 - 扫描、分析和卸载应用
+//  应用管家：盘点已安装应用（真实占用、上次使用时间、关联文件）、未使用应用、残留文件与安装包。
+//  全部为 nonisolated 静态方法，由 ViewModel 在 Task.detached 中调用（工程默认 MainActor 隔离）。
+//  删除一律交给 CleanupManager（移入废纸篓 + PathGuard 校验 + 清理记录可撤销）。
 //
 
 import Foundation
-import AppKit
+import os
 
 // MARK: - 应用信息模型
-struct AppInfo: Identifiable, Equatable, Hashable {
-    let id = UUID()
+
+nonisolated struct AppInfo: Identifiable, Hashable, Sendable {
     let name: String
     let bundleIdentifier: String
     let path: String
+    /// CFBundleShortVersionString
     let version: String
+    /// CFBundleVersion
+    let buildVersion: String?
+    /// 应用包实际占用（st_blocks，完整递归）。
     let size: Int64
-    let icon: NSImage?
+    /// Spotlight 记录的上次打开时间（kMDItemLastUsedDate）；nil 表示系统没有记录。
     let lastUsedDate: Date?
     let isFromAppStore: Bool
-    var isSelected: Bool = false
+    /// Info.plist 里的 Sparkle 更新源（SUFeedURL）。
+    let feedURL: String?
+    /// ~/Library 中按 bundle id / 应用名找到的关联文件，卸载时一并移入废纸篓。
     var relatedFiles: [RelatedFile] = []
-    
-    var totalSize: Int64 {
-        size + relatedFiles.reduce(0) { $0 + $1.size }
-    }
-    
-    static func == (lhs: AppInfo, rhs: AppInfo) -> Bool {
-        lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
+
+    var id: String { path }
+
+    var relatedSize: Int64 { relatedFiles.filter(\.isSelected).reduce(0) { $0 + $1.size } }
+    var totalSize: Int64 { size + relatedSize }
+    var isAppleApp: Bool { bundleIdentifier.hasPrefix("com.apple.") }
 }
 
 // MARK: - 关联文件模型
-struct RelatedFile: Identifiable, Equatable {
-    let id = UUID()
+
+nonisolated struct RelatedFile: Identifiable, Hashable, Sendable {
     let name: String
     let path: String
     let size: Int64
     let type: RelatedFileType
+    /// 归属说明：卸载时为应用名；残留文件为推断出的 bundle id 或废纸篓里的应用名。
+    var owner: String = ""
+    /// 来自废纸篓中的应用（可信度高于按名称推断的孤立残留）。
+    var fromTrashedApp: Bool = false
     var isSelected: Bool = true
-    
-    static func == (lhs: RelatedFile, rhs: RelatedFile) -> Bool {
-        lhs.id == rhs.id
-    }
+
+    var id: String { path }
 }
 
-enum RelatedFileType: String {
+nonisolated enum RelatedFileType: String, Sendable {
     case preferences = "偏好设置"
     case cache = "缓存文件"
     case applicationSupport = "应用支持"
     case logs = "日志文件"
     case containers = "容器数据"
     case savedState = "保存的状态"
+    case webData = "网页数据"
+    case launchAgent = "启动代理"
     case other = "其他"
-    
+
     var icon: String {
         switch self {
         case .preferences: return "gearshape.fill"
@@ -66,409 +72,196 @@ enum RelatedFileType: String {
         case .logs: return "doc.text.fill"
         case .containers: return "shippingbox.fill"
         case .savedState: return "clock.arrow.circlepath"
+        case .webData: return "globe"
+        case .launchAgent: return "bolt.horizontal.fill"
         case .other: return "doc.fill"
         }
     }
 }
 
-// MARK: - 扫描结果模型
-struct AppScanResult {
-    let apps: [AppInfo]
-    let unusedApps: [AppInfo]
-    let leftoverFiles: [RelatedFile]
-    let installers: [InstallerFile]
-    let updatableApps: [UpdatableApp]
-    let totalAppsCount: Int
-    let unusedAppsSize: Int64
-    let leftoverSize: Int64
-    let installerSize: Int64
-}
-
 // MARK: - 安装包模型
-struct InstallerFile: Identifiable, Equatable {
-    let id = UUID()
+
+nonisolated struct InstallerFile: Identifiable, Hashable, Sendable {
     let name: String
     let path: String
     let size: Int64
-    var isSelected: Bool = true
-    
-    static func == (lhs: InstallerFile, rhs: InstallerFile) -> Bool {
-        lhs.id == rhs.id
-    }
+    let modified: Date?
+
+    var id: String { path }
 }
 
-// MARK: - 可更新应用模型
-struct UpdatableApp: Identifiable {
-    let id = UUID()
-    let name: String
-    let currentVersion: String
-    let latestVersion: String
-    let icon: NSImage?
+// MARK: - 扫描结果模型
+
+nonisolated struct AppScanResult: Sendable {
+    var apps: [AppInfo]
+    var leftoverFiles: [RelatedFile]
+    var installers: [InstallerFile]
+    let scannedAt: Date
+
+    static let unusedThresholdDays = 30
+
+    /// 可以判断是否「长期未使用」的应用：排除系统自带与 MacClean 自己。
+    private var judgeableApps: [AppInfo] {
+        let own = Bundle.main.bundleIdentifier
+        return apps.filter { !$0.isAppleApp && $0.bundleIdentifier != own }
+    }
+
+    /// 有使用记录且超过 30 天没打开的应用。
+    var unusedApps: [AppInfo] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -Self.unusedThresholdDays, to: scannedAt) ?? scannedAt
+        return judgeableApps
+            .filter { ($0.lastUsedDate ?? .distantFuture) < cutoff }
+            .sorted { ($0.lastUsedDate ?? .distantPast) < ($1.lastUsedDate ?? .distantPast) }
+    }
+
+    /// Spotlight 没有使用记录的应用（可能从未打开，也可能索引缺失），单独列出、不计入「未使用」。
+    var unknownUsageApps: [AppInfo] {
+        judgeableApps.filter { $0.lastUsedDate == nil }.sorted { $0.totalSize > $1.totalSize }
+    }
+
+    var appStoreAppsCount: Int { apps.filter(\.isFromAppStore).count }
+    var totalAppsCount: Int { apps.count }
+    var unusedAppsSize: Int64 { unusedApps.reduce(0) { $0 + $1.totalSize } }
+    var leftoverSize: Int64 { leftoverFiles.reduce(0) { $0 + $1.size } }
+    var installerSize: Int64 { installers.reduce(0) { $0 + $1.size } }
+
+    /// 清理后去掉已经不存在的条目（不必整页重扫）。
+    mutating func pruneMissing() {
+        let fm = FileManager.default
+        apps.removeAll { !fm.fileExists(atPath: $0.path) }
+        for index in apps.indices {
+            apps[index].relatedFiles.removeAll { !fm.fileExists(atPath: $0.path) }
+        }
+        leftoverFiles.removeAll { !fm.fileExists(atPath: $0.path) }
+        installers.removeAll { !fm.fileExists(atPath: $0.path) }
+    }
 }
 
 // MARK: - 应用管理器
-actor AppManager {
-    static let shared = AppManager()
-    
-    private let fileManager = FileManager.default
-    private let workspace = NSWorkspace.shared
-    
-    private init() {}
-    
-    // MARK: - 扫描所有应用
-    func scanApplications() async throws -> AppScanResult {
-        print("=== 开始扫描应用程序 ===")
-        
-        var allApps: [AppInfo] = []
-        var unusedApps: [AppInfo] = []
-        var leftoverFiles: [RelatedFile] = []
-        var installers: [InstallerFile] = []
-        let updatableApps: [UpdatableApp] = []
-        
-        // 扫描 /Applications
-        let systemAppsPath = "/Applications"
-        let systemApps = await scanAppsInDirectory(systemAppsPath)
-        allApps.append(contentsOf: systemApps)
-        
-        // 扫描用户应用目录
-        let userAppsPath = NSHomeDirectory() + "/Applications"
-        if fileManager.fileExists(atPath: userAppsPath) {
-            let userApps = await scanAppsInDirectory(userAppsPath)
-            allApps.append(contentsOf: userApps)
+
+enum AppManager {
+    nonisolated static let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "MacClean", category: "AppManager")
+
+    /// 进度回调：0...1 的进度与当前正在处理的条目。
+    typealias Progress = @Sendable (Double, String) -> Void
+
+    nonisolated static let installerExtensions: Set<String> = ["dmg", "pkg", "mpkg", "xip"]
+
+    /// 执行完整扫描。任务被取消时返回 nil。
+    nonisolated static func scan(
+        home: URL = FileManager.default.homeDirectoryForCurrentUser,
+        progress: Progress
+    ) -> AppScanResult? {
+        let homePath = home.standardizedFileURL.path
+        progress(0, String(localized: "正在列出已安装的应用…"))
+
+        // 1. 可卸载的应用：/Applications 与 ~/Applications 的直接子项（与 PathGuard 的允许范围一致）
+        let bundles = ["/Applications", homePath + "/Applications"].flatMap { directory -> [AppBundle] in
+            let names = (try? FileManager.default.contentsOfDirectory(atPath: directory)) ?? []
+            return names.filter { $0.hasSuffix(".app") }.compactMap { AppBundle(path: directory + "/" + $0) }
         }
-        
-        print("共发现 \(allApps.count) 个应用程序")
-        
-        // 查找未使用的应用（30天内未使用）
-        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
-        unusedApps = allApps.filter { app in
-            if let lastUsed = app.lastUsedDate {
-                return lastUsed < thirtyDaysAgo
-            }
-            return false
+        let index = InstalledAppIndex.build(home: homePath, extraApps: bundles)
+        if Task.isCancelled { return nil }
+
+        // 组容器只有被唯一一个应用声明时才算作它的关联文件（同一开发商的多个应用可能共用）
+        let groupsByApp = Dictionary(bundles.map { ($0.path, AppStorageScanner.appGroups(ofAppAt: $0.path)) }, uniquingKeysWith: { a, _ in a })
+        var groupClaims: [String: Int] = [:]
+        for groups in groupsByApp.values {
+            for group in Set(groups) { groupClaims[group, default: 0] += 1 }
         }
-        print("发现 \(unusedApps.count) 个未使用的应用")
-        
-        // 扫描残留文件
-        leftoverFiles = await scanLeftoverFiles()
-        print("发现 \(leftoverFiles.count) 个残留文件")
-        
-        // 扫描安装包
-        installers = await scanInstallers()
-        print("发现 \(installers.count) 个安装包")
-        
-        let unusedAppsSize = unusedApps.reduce(0) { $0 + $1.totalSize }
-        let leftoverSize = leftoverFiles.reduce(0) { $0 + $1.size }
-        let installerSize = installers.reduce(0) { $0 + $1.size }
-        
-        print("=== 扫描完成 ===")
-        
-        return AppScanResult(
-            apps: allApps,
-            unusedApps: unusedApps,
-            leftoverFiles: leftoverFiles,
-            installers: installers,
-            updatableApps: updatableApps,
-            totalAppsCount: allApps.count,
-            unusedAppsSize: unusedAppsSize,
-            leftoverSize: leftoverSize,
-            installerSize: installerSize
-        )
-    }
-    
-    // MARK: - 扫描目录中的应用
-    private func scanAppsInDirectory(_ path: String) async -> [AppInfo] {
+
+        // 2. 每个应用：真实大小、上次使用时间、关联文件（占进度的大头）
         var apps: [AppInfo] = []
-        
-        guard let contents = try? fileManager.contentsOfDirectory(atPath: path) else {
-            return apps
+        for (offset, bundle) in bundles.enumerated() {
+            if Task.isCancelled { return nil }
+            progress(0.05 + 0.7 * Double(offset) / Double(max(bundles.count, 1)), bundle.name)
+
+            let groups = (groupsByApp[bundle.path] ?? []).filter { groupClaims[$0] == 1 }
+            let related = bundle.bundleID.isEmpty ? [] : AppLeftovers.associatedFiles(
+                bundleID: bundle.bundleID, appName: bundle.name, appGroups: groups, home: homePath, index: index
+            )
+            apps.append(AppInfo(
+                name: bundle.name,
+                bundleIdentifier: bundle.bundleID,
+                path: bundle.path,
+                version: bundle.shortVersion ?? String(localized: "未知"),
+                buildVersion: bundle.buildVersion,
+                size: CleanupManager.allocatedSize(atPath: bundle.path),
+                lastUsedDate: lastUsedDate(path: bundle.path),
+                isFromAppStore: FileManager.default.fileExists(atPath: bundle.path + "/Contents/_MASReceipt/receipt"),
+                feedURL: bundle.feedURL,
+                relatedFiles: related
+            ))
         }
-        
-        for item in contents {
-            if item.hasSuffix(".app") {
-                let appPath = path + "/" + item
-                if let appInfo = await getAppInfo(at: appPath) {
-                    apps.append(appInfo)
-                }
-            }
-        }
-        
-        return apps.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        apps.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+
+        // 3. 已卸载应用的残留
+        if Task.isCancelled { return nil }
+        progress(0.78, String(localized: "正在查找已卸载应用的残留文件…"))
+        var leftovers = AppLeftovers.trashedAppLeftovers(home: homePath, index: index)
+        if Task.isCancelled { return nil }
+        let claimed = Set(leftovers.map(\.path))
+        leftovers += AppLeftovers.orphanedFiles(home: homePath, index: index).filter { !claimed.contains($0.path) }
+
+        // 4. 安装包
+        if Task.isCancelled { return nil }
+        progress(0.95, String(localized: "正在检查下载文件夹中的安装包…"))
+        let installers = scanInstallers(in: homePath + "/Downloads")
+
+        progress(1, "")
+        log.info("App scan: \(apps.count) apps, \(leftovers.count) leftovers, \(installers.count) installers")
+        return AppScanResult(apps: apps, leftoverFiles: leftovers, installers: installers, scannedAt: Date())
     }
-    
-    // MARK: - 获取应用信息
-    private func getAppInfo(at path: String) async -> AppInfo? {
-        let url = URL(fileURLWithPath: path)
-        
-        guard let bundle = Bundle(url: url) else { return nil }
-        
-        let name = bundle.object(forInfoDictionaryKey: "CFBundleName") as? String
-            ?? bundle.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
-            ?? url.deletingPathExtension().lastPathComponent
-        
-        let bundleIdentifier = bundle.bundleIdentifier ?? ""
-        let version = bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "未知"
-        
-        // 获取应用大小
-        let size = calculateDirectorySize(at: path)
-        
-        // 获取图标
-        let icon = await MainActor.run {
-            workspace.icon(forFile: path)
+
+    // MARK: - 安装包
+
+    nonisolated static func scanInstallers(in directory: String) -> [InstallerFile] {
+        let url = URL(fileURLWithPath: directory)
+        let keys: [URLResourceKey] = [.contentModificationDateKey, .isSymbolicLinkKey]
+        guard let contents = try? FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles]) else {
+            return []
         }
-        
-        // 获取最后使用时间
-        let lastUsedDate = getLastUsedDate(for: path)
-        
-        // 判断是否来自 App Store
-        let isFromAppStore = checkIfFromAppStore(bundleIdentifier: bundleIdentifier, path: path)
-        
-        // 获取关联文件
-        var relatedFiles: [RelatedFile] = []
-        if !bundleIdentifier.isEmpty {
-            relatedFiles = await findRelatedFiles(for: bundleIdentifier, appName: name)
+        return contents.compactMap { item -> InstallerFile? in
+            guard installerExtensions.contains(item.pathExtension.lowercased()) else { return nil }
+            let values = try? item.resourceValues(forKeys: Set(keys))
+            guard values?.isSymbolicLink != true else { return nil }
+            return InstallerFile(
+                name: item.lastPathComponent,
+                path: item.path,
+                size: CleanupManager.allocatedSize(atPath: item.path),
+                modified: values?.contentModificationDate
+            )
         }
-        
-        return AppInfo(
-            name: name,
-            bundleIdentifier: bundleIdentifier,
-            path: path,
-            version: version,
-            size: size,
-            icon: icon,
-            lastUsedDate: lastUsedDate,
-            isFromAppStore: isFromAppStore,
-            isSelected: false,
-            relatedFiles: relatedFiles
-        )
+        .sorted { $0.size > $1.size }
     }
-    
-    // MARK: - 查找应用关联文件
-    private func findRelatedFiles(for bundleIdentifier: String, appName: String) async -> [RelatedFile] {
-        var files: [RelatedFile] = []
-        let homeDir = NSHomeDirectory()
-        
-        // 偏好设置
-        let prefsPath = homeDir + "/Library/Preferences/\(bundleIdentifier).plist"
-        if fileManager.fileExists(atPath: prefsPath) {
-            let size = getFileSize(at: prefsPath)
-            files.append(RelatedFile(name: "\(appName) 偏好设置", path: prefsPath, size: size, type: .preferences))
-        }
-        
-        // 缓存
-        let cachePath = homeDir + "/Library/Caches/\(bundleIdentifier)"
-        if fileManager.fileExists(atPath: cachePath) {
-            let size = calculateDirectorySize(at: cachePath)
-            if size > 0 {
-                files.append(RelatedFile(name: "\(appName) 缓存", path: cachePath, size: size, type: .cache))
-            }
-        }
-        
-        // 应用支持
-        let supportPath = homeDir + "/Library/Application Support/\(appName)"
-        if fileManager.fileExists(atPath: supportPath) {
-            let size = calculateDirectorySize(at: supportPath)
-            if size > 0 {
-                files.append(RelatedFile(name: "\(appName) 应用支持", path: supportPath, size: size, type: .applicationSupport))
-            }
-        }
-        
-        // 容器（沙盒应用）
-        let containersPath = homeDir + "/Library/Containers/\(bundleIdentifier)"
-        if fileManager.fileExists(atPath: containersPath) {
-            let size = calculateDirectorySize(at: containersPath)
-            if size > 0 {
-                files.append(RelatedFile(name: "\(appName) 容器数据", path: containersPath, size: size, type: .containers))
-            }
-        }
-        
-        // Group Containers
-        let groupContainersPath = homeDir + "/Library/Group Containers"
-        if fileManager.fileExists(atPath: groupContainersPath) {
-            if let contents = try? fileManager.contentsOfDirectory(atPath: groupContainersPath) {
-                for item in contents {
-                    if item.contains(bundleIdentifier) {
-                        let itemPath = groupContainersPath + "/" + item
-                        let size = calculateDirectorySize(at: itemPath)
-                        if size > 0 {
-                            files.append(RelatedFile(name: "\(appName) 组容器", path: itemPath, size: size, type: .containers))
-                        }
-                    }
-                }
-            }
-        }
-        
-        // 日志
-        let logsPath = homeDir + "/Library/Logs/\(appName)"
-        if fileManager.fileExists(atPath: logsPath) {
-            let size = calculateDirectorySize(at: logsPath)
-            if size > 0 {
-                files.append(RelatedFile(name: "\(appName) 日志", path: logsPath, size: size, type: .logs))
-            }
-        }
-        
-        // 保存的状态
-        let savedStatePath = homeDir + "/Library/Saved Application State/\(bundleIdentifier).savedState"
-        if fileManager.fileExists(atPath: savedStatePath) {
-            let size = calculateDirectorySize(at: savedStatePath)
-            if size > 0 {
-                files.append(RelatedFile(name: "\(appName) 保存状态", path: savedStatePath, size: size, type: .savedState))
-            }
-        }
-        
-        return files
+
+    // MARK: - 上次使用时间
+
+    /// Finder「上次打开日期」对应的 Spotlight 属性；没有记录时返回 nil，不拿修改日期冒充。
+    nonisolated static func lastUsedDate(path: String) -> Date? {
+        guard let item = MDItemCreate(kCFAllocatorDefault, path as CFString),
+              let value = MDItemCopyAttribute(item, kMDItemLastUsedDate) else { return nil }
+        return value as? Date
     }
-    
-    // MARK: - 扫描残留文件
-    private func scanLeftoverFiles() async -> [RelatedFile] {
-        var leftovers: [RelatedFile] = []
-        let homeDir = NSHomeDirectory()
-        
-        // 获取已安装应用的 bundle identifier 列表
-        var installedBundleIds = Set<String>()
-        if let apps = try? fileManager.contentsOfDirectory(atPath: "/Applications") {
-            for app in apps where app.hasSuffix(".app") {
-                if let bundle = Bundle(url: URL(fileURLWithPath: "/Applications/\(app)")),
-                   let bundleId = bundle.bundleIdentifier {
-                    installedBundleIds.insert(bundleId)
-                }
-            }
-        }
-        
-        // 扫描 ~/Library/Application Support
-        let supportPath = homeDir + "/Library/Application Support"
-        if let contents = try? fileManager.contentsOfDirectory(atPath: supportPath) {
-            for item in contents {
-                let itemPath = supportPath + "/" + item
-                var isDir: ObjCBool = false
-                if fileManager.fileExists(atPath: itemPath, isDirectory: &isDir), isDir.boolValue {
-                    // 检查是否为残留文件（不属于任何已安装的应用）
-                    let size = calculateDirectorySize(at: itemPath)
-                    if size > 1_000_000 { // 大于 1MB
-                        // TODO: 更精确的残留检测
-                        // 这里简化处理，实际应该匹配应用名称
-                    }
-                }
-            }
-        }
-        
-        return leftovers
-    }
-    
-    // MARK: - 扫描安装包
-    private func scanInstallers() async -> [InstallerFile] {
-        var installers: [InstallerFile] = []
-        let homeDir = NSHomeDirectory()
-        
-        // 扫描下载文件夹
-        let downloadsPath = homeDir + "/Downloads"
-        if let contents = try? fileManager.contentsOfDirectory(atPath: downloadsPath) {
-            for item in contents {
-                let itemPath = downloadsPath + "/" + item
-                let lowercased = item.lowercased()
-                
-                if lowercased.hasSuffix(".dmg") || lowercased.hasSuffix(".pkg") || lowercased.hasSuffix(".zip") {
-                    let size = getFileSize(at: itemPath)
-                    if size > 1_000_000 { // 大于 1MB
-                        installers.append(InstallerFile(
-                            name: item,
-                            path: itemPath,
-                            size: size
-                        ))
-                    }
-                }
-            }
-        }
-        
-        return installers.sorted { $0.size > $1.size }
-    }
-    
-    // MARK: - 卸载应用
-    func uninstallApp(_ app: AppInfo) async throws {
-        print("开始卸载应用: \(app.name)")
-        
-        // 删除应用本体
-        try fileManager.trashItem(at: URL(fileURLWithPath: app.path), resultingItemURL: nil)
-        print("已删除应用: \(app.path)")
-        
-        // 删除选中的关联文件
-        for file in app.relatedFiles where file.isSelected {
-            do {
-                try fileManager.trashItem(at: URL(fileURLWithPath: file.path), resultingItemURL: nil)
-                print("已删除关联文件: \(file.path)")
-            } catch {
-                print("删除关联文件失败: \(file.path), 错误: \(error)")
-            }
-        }
-        
-        print("应用卸载完成: \(app.name)")
-    }
-    
-    // MARK: - 删除文件
-    func deleteFiles(_ files: [RelatedFile]) async throws {
-        for file in files where file.isSelected {
-            try fileManager.trashItem(at: URL(fileURLWithPath: file.path), resultingItemURL: nil)
-            print("已删除: \(file.path)")
-        }
-    }
-    
-    // MARK: - 删除安装包
-    func deleteInstallers(_ installers: [InstallerFile]) async throws {
-        for installer in installers where installer.isSelected {
-            try fileManager.trashItem(at: URL(fileURLWithPath: installer.path), resultingItemURL: nil)
-            print("已删除安装包: \(installer.path)")
-        }
-    }
-    
-    // MARK: - 辅助方法
-    
-    private func calculateDirectorySize(at path: String) -> Int64 {
-        var totalSize: Int64 = 0
-        
-        guard let enumerator = fileManager.enumerator(
-            at: URL(fileURLWithPath: path),
-            includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        ) else {
-            return 0
-        }
-        
-        var count = 0
-        while let fileURL = enumerator.nextObject() as? URL {
-            count += 1
-            if count > 1000 { break } // 限制遍历数量
-            
-            if let values = try? fileURL.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey]),
-               values.isRegularFile == true,
-               let size = values.fileSize {
-                totalSize += Int64(size)
-            }
-        }
-        
-        return totalSize
-    }
-    
-    private func getFileSize(at path: String) -> Int64 {
-        do {
-            let attrs = try fileManager.attributesOfItem(atPath: path)
-            return attrs[.size] as? Int64 ?? 0
-        } catch {
-            return 0
-        }
-    }
-    
-    private func getLastUsedDate(for path: String) -> Date? {
-        do {
-            let attrs = try fileManager.attributesOfItem(atPath: path)
-            return attrs[.modificationDate] as? Date
-        } catch {
-            return nil
-        }
-    }
-    
-    private func checkIfFromAppStore(bundleIdentifier: String, path: String) -> Bool {
-        // 检查是否有 App Store 收据
-        let receiptPath = path + "/Contents/_MASReceipt/receipt"
-        return fileManager.fileExists(atPath: receiptPath)
+}
+
+// MARK: - 应用包 Info.plist
+
+nonisolated struct AppBundle: Sendable, Hashable {
+    let path: String
+    let bundleID: String
+    let name: String
+    let shortVersion: String?
+    let buildVersion: String?
+    let feedURL: String?
+
+    init?(path: String) {
+        guard let plist = NSDictionary(contentsOfFile: path + "/Contents/Info.plist") as? [String: Any] else { return nil }
+        self.path = path
+        self.bundleID = plist["CFBundleIdentifier"] as? String ?? ""
+        self.name = AppStorageScanner.displayName(plist: plist, path: path)
+        self.shortVersion = plist["CFBundleShortVersionString"] as? String
+        self.buildVersion = plist["CFBundleVersion"] as? String
+        self.feedURL = (plist["SUFeedURL"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

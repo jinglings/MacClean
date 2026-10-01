@@ -1,0 +1,6 @@
+.DS_Store
+.idea/
+xcuserdata/
+build/
+DerivedData/
+*.profraw

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Sparkle 自动更新。发布前：
+	     1. 运行 Sparkle 的 bin/generate_keys 生成 EdDSA 密钥，把公钥填到 SUPublicEDKey；
+	     2. 把 appcast.xml 部署到 SUFeedURL 指向的地址（用 bin/generate_appcast 生成）。
+	     公钥仍为占位值时，应用内更新功能会自动停用。 -->
+	<key>SUFeedURL</key>
+	<string>https://macclean.app/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>REPLACE_WITH_SPARKLE_PUBLIC_ED_KEY</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>86400</integer>
+</dict>
+</plist>

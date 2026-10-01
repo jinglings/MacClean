@@ -1,0 +1,9 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "MacClean";
+
+/* Bluetooth permission prompt */
+"NSBluetoothAlwaysUsageDescription" = "MacClean 需要蓝牙权限，才能在菜单栏显示已连接的蓝牙设备及其电量。";
+
+/* Location permission prompts (Wi-Fi network name) */
+"NSLocationUsageDescription" = "macOS 仅在获得定位权限后才提供 Wi-Fi 网络名称。MacClean 只用它显示当前 Wi-Fi 名称，不读取也不保存你的位置。";
+"NSLocationWhenInUseUsageDescription" = "macOS 仅在获得定位权限后才提供 Wi-Fi 网络名称。MacClean 只用它显示当前 Wi-Fi 名称，不读取也不保存你的位置。";

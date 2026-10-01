@@ -5,333 +5,423 @@
 //  磁盘分析器
 //
 
+import Darwin
 import Foundation
 
 private extension String {
-    func ifEmpty(_ fallback: String) -> String { isEmpty ? fallback : self }
+    nonisolated func ifEmpty(_ fallback: String) -> String { isEmpty ? fallback : self }
 }
 
 actor DiskAnalyzer {
     static let shared = DiskAnalyzer()
-    
+
     private init() {}
-    private var spaceLensScannedItems = 0
-    private let spaceLensVisibleFolderLimit = 10
-    private var spaceLensDirectoryCache: [String: SpaceLensDirectoryCacheEntry] = [:]
-    
-    private struct SpaceLensDirectoryCacheEntry {
-        let signature: String
-        let item: SpaceLensItem
-    }
-    
-    // MARK: - 磁盘分析
-    
-    func analyzeDisk() async throws -> ScanResult {
-        let startTime = Date()
-        
-        print("=== 开始磁盘分析 ===")
-        
-        // 获取磁盘信息
-        let diskInfo = try getDiskInfo()
-        print("磁盘信息: \(diskInfo.volumeName), 总空间: \(diskInfo.totalSpace), 可用: \(diskInfo.freeSpace)")
-        
-        // 扫描可清理项目
-        var cleanableItems: [CleanableItem] = []
-        
-        // 扫描用户缓存
-        print("正在扫描用户缓存...")
-        let userCaches = await scanUserCaches()
-        print("用户缓存: 发现 \(userCaches.count) 个项目")
-        cleanableItems.append(contentsOf: userCaches)
-        
-        // 扫描浏览器缓存
-        print("正在扫描浏览器缓存...")
-        let browserCaches = await scanBrowserCaches()
-        print("浏览器缓存: 发现 \(browserCaches.count) 个项目")
-        cleanableItems.append(contentsOf: browserCaches)
-        
-        // 扫描开发者工具缓存
-        print("正在扫描开发者工具缓存...")
-        let devCaches = await scanDeveloperCaches()
-        print("开发者缓存: 发现 \(devCaches.count) 个项目")
-        cleanableItems.append(contentsOf: devCaches)
-        
-        // 扫描用户日志
-        print("正在扫描用户日志...")
-        let logs = await scanUserLogs()
-        print("用户日志: 发现 \(logs.count) 个项目")
-        cleanableItems.append(contentsOf: logs)
-        
-        let duration = Date().timeIntervalSince(startTime)
-        print("=== 扫描完成，共发现 \(cleanableItems.count) 个项目，耗时 \(duration) 秒 ===")
-        
-        return ScanResult(
-            diskInfo: diskInfo,
-            cleanableItems: cleanableItems,
-            scanDuration: duration
-        )
-    }
-    
-    // macOS Catalina+: user data lives on the APFS data volume.
-    // Firmlinks at / (e.g., /Users, /Applications) lack APFS cached sizes;
-    // directories under /System/Volumes/Data have correct O(1) totalFileAllocatedSize.
+
+    // macOS exposes several synthetic mount points under /System/Volumes.
+    // Space Lens scans the user-facing root and skips those internal volumes to
+    // avoid duplicate Data-volume accounting.
     static let dataVolumeRoot = "/System/Volumes/Data"
 
-    // MARK: - 空间透镜扫描
+    // MARK: - 空间透镜扫描（一次建全树）
+    //
+    // 与旧实现（对每层做一次全树 recursiveUsage 但只保留一层子目录，用户进入子目录时
+    // 重新全树扫描）不同：buildSpaceLensTree 自底向上一次性构建整棵、已按层剪枝的树，
+    // 内存有界，导航到已建好的节点不再触发任何磁盘重扫。
 
-    func scanSpaceLens(
+    /// 空间透镜进度累计器：多个并发的顶层目录扫描任务共享同一个实例，
+    /// 用锁保护累计字节/条目数，达到阈值才回调，避免刷爆 MainActor。
+    final class SpaceLensProgressState: @unchecked Sendable {
+        private let lock = NSLock()
+        private var accumulatedBytes: Int64 = 0
+        private var accumulatedEntries = 0
+        private var lastReportedBytes: Int64 = 0
+        private var lastReportedEntries = 0
+        private var unreadableDirCount = 0
+        private let diskUsedSpace: Int64
+        private let progressCallback: (@Sendable (SpaceLensScanProgress) -> Void)?
+
+        private static let reportEntryThreshold = 8192
+        private static let reportByteThreshold: Int64 = 1_073_741_824 // 1 GB
+
+        init(diskUsedSpace: Int64, progress: (@Sendable (SpaceLensScanProgress) -> Void)?) {
+            self.diskUsedSpace = diskUsedSpace
+            self.progressCallback = progress
+        }
+
+        func markUnreadable() {
+            lock.lock()
+            unreadableDirCount += 1
+            lock.unlock()
+        }
+
+        var unreadableCount: Int {
+            lock.lock()
+            defer { lock.unlock() }
+            return unreadableDirCount
+        }
+
+        func record(bytesDelta: Int64, entriesDelta: Int, currentPath: String) {
+            guard bytesDelta != 0 || entriesDelta != 0 else { return }
+
+            lock.lock()
+            accumulatedBytes += bytesDelta
+            accumulatedEntries += entriesDelta
+            let shouldReport = (accumulatedEntries - lastReportedEntries) >= Self.reportEntryThreshold
+                || (accumulatedBytes - lastReportedBytes) >= Self.reportByteThreshold
+            if shouldReport {
+                lastReportedEntries = accumulatedEntries
+                lastReportedBytes = accumulatedBytes
+            }
+            let bytesSnapshot = accumulatedBytes
+            let itemsSnapshot = accumulatedEntries
+            lock.unlock()
+
+            guard shouldReport else { return }
+            let progressValue = min(Double(bytesSnapshot) / Double(max(diskUsedSpace, 1)), 0.98)
+            progressCallback?(SpaceLensScanProgress(
+                scannedPath: DiskAnalyzer.cleanProgressPath(currentPath),
+                scannedItems: itemsSnapshot,
+                progress: progressValue
+            ))
+        }
+    }
+
+    nonisolated static let spaceLensVisibleFolderLimit = 10
+
+    // 按扩展名判断"包"目录，避免对每个目录都调用代价较高的 isPackageKey 查询。
+    nonisolated private static let spaceLensBundleExtensions: Set<String> = [
+        "app", "bundle", "framework", "appex", "xcarchive",
+        "photoslibrary", "pvm", "vmwarevm",
+    ]
+
+    nonisolated static func scanSpaceLens(
         rootURL: URL = URL(fileURLWithPath: "/"),
         progress: (@Sendable (SpaceLensScanProgress) -> Void)? = nil
     ) async throws -> SpaceLensScanResult {
         let startTime = Date()
-        spaceLensScannedItems = 0
-
         let diskInfo = try getDiskInfo()
-
-        // If caller requests root (/), redirect to the APFS data volume so that
-        // totalFileAllocatedSizeKey returns correct recursive sizes for all directories.
-        let effectiveRoot: URL
-        if rootURL.path == "/" {
-            let dataVol = URL(fileURLWithPath: Self.dataVolumeRoot)
-            effectiveRoot = FileManager.default.fileExists(atPath: dataVol.path) ? dataVol : rootURL
-        } else {
-            effectiveRoot = rootURL
-        }
-
-        let root = try await scanSpaceLensDirectory(at: effectiveRoot.standardizedFileURL, progress: progress)
+        let (root, unreadableCount) = try await scanSpaceLensRoot(
+            at: rootURL.standardizedFileURL,
+            diskUsedSpace: diskInfo.usedSpace,
+            progress: progress
+        )
         let duration = Date().timeIntervalSince(startTime)
 
         return SpaceLensScanResult(
             root: root,
             diskInfo: diskInfo,
-            scanDuration: duration
+            scanDuration: duration,
+            unreadableCount: unreadableCount
         )
     }
 
-    func scanSpaceLensDirectory(
+    /// 兜底重扫单个子树（正常情况下全树已在 scanSpaceLens 中建好，很少被触发）。
+    nonisolated static func scanSpaceLensDirectory(
         at url: URL,
-        progress: (@Sendable (SpaceLensScanProgress) -> Void)? = nil,
-        partialResult: (@Sendable (SpaceLensItem) -> Void)? = nil
+        progress: (@Sendable (SpaceLensScanProgress) -> Void)? = nil
     ) async throws -> SpaceLensItem {
-        try await scanSpaceLensDirectoryLevel(
-            at: url.standardizedFileURL,
-            progress: progress,
-            partialResult: partialResult
+        let diskUsedSpace = (try? getDiskInfo().usedSpace) ?? 1
+        let progressState = SpaceLensProgressState(diskUsedSpace: diskUsedSpace, progress: progress)
+        return try buildSpaceLensTree(
+            at: url.standardizedFileURL.path,
+            visibleFolderLimit: spaceLensVisibleFolderLimit,
+            progressState: progressState
         )
     }
-    
-    // MARK: - 获取磁盘信息
-    
-    private func getDiskInfo() throws -> DiskInfo {
-        let fileManager = FileManager.default
-        let homeURL = fileManager.homeDirectoryForCurrentUser
-        
-        let values = try homeURL.resourceValues(forKeys: [
-            .volumeNameKey,
-            .volumeTotalCapacityKey,
-            .volumeAvailableCapacityForImportantUsageKey
-        ])
-        
-        return DiskInfo(
-            volumeName: values.volumeName ?? "Macintosh HD",
-            totalSpace: Int64(values.volumeTotalCapacity ?? 0),
-            freeSpace: Int64(values.volumeAvailableCapacityForImportantUsage ?? 0)
-        )
-    }
-    
-    private func scanSpaceLensDirectoryLevel(
+
+    // MARK: - 顶层并发扫描
+
+    // 顶层目录并发扫描：每个直属子目录一个 task，共享同一个 progressState。
+    nonisolated private static func scanSpaceLensRoot(
         at url: URL,
-        progress: (@Sendable (SpaceLensScanProgress) -> Void)?,
-        partialResult: (@Sendable (SpaceLensItem) -> Void)?
-    ) async throws -> SpaceLensItem {
+        diskUsedSpace: Int64,
+        progress: (@Sendable (SpaceLensScanProgress) -> Void)?
+    ) async throws -> (item: SpaceLensItem, unreadableCount: Int) {
         try Task.checkCancellation()
 
-        let fileManager = FileManager.default
         let path = url.path
-        let metaKeys: Set<URLResourceKey> = [
-            .isDirectoryKey, .isRegularFileKey, .isSymbolicLinkKey, .isPackageKey,
-            .fileAllocatedSizeKey, .totalFileAllocatedSizeKey,
-            .contentModificationDateKey, .localizedNameKey, .totalFileSizeKey
-        ]
-        let values = try? url.resourceValues(forKeys: metaKeys)
-        let name = displayName(for: url, fallback: values?.localizedName)
-        let lastModified = values?.contentModificationDate
-        let signature = directorySignature(values: values)
+        let progressState = SpaceLensProgressState(diskUsedSpace: diskUsedSpace, progress: progress)
 
-        if let cached = spaceLensDirectoryCache[path], cached.signature == signature {
-            return cached.item
+        var rootInfo = stat()
+        guard lstat(path, &rootInfo) == 0 else {
+            throw NSError(domain: "DiskAnalyzer", code: 1, userInfo: [NSLocalizedDescriptionKey: String(localized: "无法访问 \(path)")])
+        }
+        let ownSize = allocatedSizeFrom(rootInfo)
+        let name = displayNameStatic(atPath: path, isRoot: true)
+        let lastModified = modificationDateFrom(rootInfo)
+
+        guard let directory = opendir(path) else {
+            throw NSError(domain: "DiskAnalyzer", code: 2, userInfo: [NSLocalizedDescriptionKey: String(localized: "无法读取 \(path)")])
         }
 
-        spaceLensScannedItems += 1
-        let progressPath = cleanProgressPath(path)
-        progress?(SpaceLensScanProgress(
-            scannedPath: progressPath,
-            scannedItems: spaceLensScannedItems,
-            progress: scanProgressEstimate(for: spaceLensScannedItems)
-        ))
-
-        if shouldSkipSpaceLensDirectory(path) {
-            return SpaceLensItem(name: name, path: path, size: 0, isDirectory: true,
-                                 children: [], itemCount: 0, isReadable: false,
-                                 isVirtual: false, lastModified: lastModified)
-        }
-
-        let childURLs: [URL]
-        do {
-            childURLs = try fileManager.contentsOfDirectory(
-                at: url, includingPropertiesForKeys: Array(metaKeys),
-                options: [.skipsPackageDescendants])
-        } catch {
-            return SpaceLensItem(name: name, path: path, size: 0, isDirectory: true,
-                                 children: [], itemCount: 0, isReadable: false,
-                                 isVirtual: false, lastModified: lastModified)
-        }
-
-        // Partition children into directories and files
-        var dirEntries: [(url: URL, values: URLResourceValues?)] = []
+        var childDirectoryPaths: [String] = []
         var directFilesSize: Int64 = 0
         var directFilesCount = 0
 
-        for childURL in childURLs {
-            try Task.checkCancellation()
-            let cv = try? childURL.resourceValues(forKeys: metaKeys)
-            if cv?.isDirectory == true && cv?.isSymbolicLink != true && cv?.isPackage != true {
-                let cp = childURL.standardizedFileURL.path
-                if !shouldSkipSpaceLensDirectory(cp) {
-                    dirEntries.append((childURL.standardizedFileURL, cv))
-                }
+        while let entry = readdir(directory) {
+            let entryName = entryFileName(entry)
+            if entryName == "." || entryName == ".." { continue }
+
+            let childPath = joinPath(path, entryName)
+            if shouldSkipPathDuringRecursiveScan(childPath) { continue }
+
+            let (entryType, maybeStat) = resolveEntryType(childPath: childPath, dtype: entry.pointee.d_type)
+            if entryType == UInt8(DT_UNKNOWN) { continue } // lstat 失败，跳过
+            if entryType == UInt8(DT_LNK) { continue } // 符号链接跳过，不跟随
+
+            if entryType == UInt8(DT_DIR) {
+                childDirectoryPaths.append(childPath)
             } else {
-                directFilesSize += Int64(cv?.fileAllocatedSize ?? 0)
+                let info = maybeStat ?? statOrNil(childPath)
+                guard let info else { continue }
+                let size = allocatedSizeFrom(info)
+                directFilesSize += size
                 directFilesCount += 1
+                progressState.record(bytesDelta: size, entriesDelta: 1, currentPath: childPath)
             }
         }
+        closedir(directory)
 
-        // ── Parallel size computation ──────────────────────────────────────────
-        // Each child directory is scanned concurrently via a task group.
-        // Self.recursiveSize is a *static* function — not actor-isolated — so
-        // child tasks run on the cooperative thread pool in true parallel.
-        // Within each task, subdirectories are scanned sequentially to avoid
-        // spawning an unbounded number of nested tasks.
-        var completedFolderChildren: [SpaceLensItem] = []
-        let metadataByPath = Dictionary(uniqueKeysWithValues: dirEntries.map { ($0.url.path, $0) })
-        try await withThrowingTaskGroup(of: (String, Int64).self) { group in
-            for entry in dirEntries {
-                let childPath = entry.url.path
-                let childURL  = entry.url
-                spaceLensScannedItems += 1
-                progress?(SpaceLensScanProgress(
-                    scannedPath: cleanProgressPath(childPath),
-                    scannedItems: spaceLensScannedItems,
-                    progress: scanProgressEstimate(for: spaceLensScannedItems)
-                ))
+        var folderChildren: [SpaceLensItem] = []
+        try await withThrowingTaskGroup(of: SpaceLensItem.self) { group in
+            for childPath in childDirectoryPaths {
                 group.addTask {
-                    let size = try await Self.recursiveSize(at: childURL)
-                    return (childPath, size)
+                    try buildSpaceLensTree(
+                        at: childPath,
+                        visibleFolderLimit: spaceLensVisibleFolderLimit,
+                        progressState: progressState
+                    )
                 }
             }
-            for try await (cp, sz) in group {
-                guard let entry = metadataByPath[cp] else { continue }
-                completedFolderChildren.append(SpaceLensItem(
-                    name: displayName(for: entry.url, fallback: entry.values?.localizedName),
-                    path: cp,
-                    size: sz,
-                    isDirectory: true,
-                    children: [],
-                    itemCount: 0,
-                    isReadable: FileManager.default.isReadableFile(atPath: cp),
-                    isVirtual: false,
-                    lastModified: entry.values?.contentModificationDate
-                ))
-                
-                if let partialResult {
-                    let partialChildren = summarizedChildren(
-                        folderChildren: completedFolderChildren,
-                        directFilesSize: directFilesSize,
-                        directFilesCount: directFilesCount,
-                        parentPath: path
-                    )
-                    partialResult(SpaceLensItem(
-                        name: name,
-                        path: path,
-                        size: max(Int64(values?.fileAllocatedSize ?? 0), partialChildren.reduce(0) { $0 + $1.size }),
-                        isDirectory: true,
-                        children: partialChildren,
-                        itemCount: childURLs.count,
-                        isReadable: true,
-                        isVirtual: false,
-                        lastModified: lastModified
-                    ))
-                }
+            for try await item in group {
+                folderChildren.append(item)
             }
         }
 
-        let visibleChildren = summarizedChildren(
-            folderChildren: completedFolderChildren,
+        let totalItemCount = folderChildren.reduce(0) { $0 + 1 + $1.itemCount } + directFilesCount
+        let visibleChildren = pruneChildren(
+            folderChildren: folderChildren,
             directFilesSize: directFilesSize,
             directFilesCount: directFilesCount,
-            parentPath: path
+            parentPath: path,
+            visibleFolderLimit: spaceLensVisibleFolderLimit
         )
-
         let childrenTotalSize = visibleChildren.reduce(0) { $0 + $1.size }
-        let totalSize = max(Int64(values?.fileAllocatedSize ?? 0), childrenTotalSize)
 
-        let item = SpaceLensItem(
-            name: name, path: path, size: totalSize, isDirectory: true,
+        let rootItem = SpaceLensItem(
+            name: name,
+            path: path,
+            size: ownSize + childrenTotalSize,
+            isDirectory: true,
             children: visibleChildren.sorted { $0.size > $1.size },
-            itemCount: childURLs.count, isReadable: true, isVirtual: false,
+            itemCount: totalItemCount,
+            isReadable: true,
+            isVirtual: false,
             lastModified: lastModified
         )
-        spaceLensDirectoryCache[path] = SpaceLensDirectoryCacheEntry(signature: signature, item: item)
-        return item
+        return (rootItem, progressState.unreadableCount)
     }
 
-    // ── Static recursive size scanner ──────────────────────────────────────────
-    // Static (not actor-isolated) so multiple task-group children run in TRUE
-    // parallel on Swift's cooperative thread pool — not serialised through the actor.
-    // Subdirectories within one task are traversed sequentially to bound concurrency.
-    private static func recursiveSize(at url: URL) async throws -> Int64 {
+    // MARK: - 单个子树构建（自底向上，按层剪枝）
+
+    nonisolated static func buildSpaceLensTree(
+        at path: String,
+        visibleFolderLimit: Int,
+        progressState: SpaceLensProgressState
+    ) throws -> SpaceLensItem {
         try Task.checkCancellation()
 
-        let keys: Set<URLResourceKey> = [
-            .isDirectoryKey, .isSymbolicLinkKey, .isPackageKey, .fileAllocatedSizeKey
-        ]
-        guard let children = try? FileManager.default.contentsOfDirectory(
-            at: url, includingPropertiesForKeys: Array(keys),
-            options: [.skipsPackageDescendants]
-        ) else { return 0 }
+        let name = displayNameStatic(atPath: path)
 
-        var total: Int64 = 0
-        for child in children {
-            try Task.checkCancellation()
-            let cv = try? child.resourceValues(forKeys: keys)
-            if cv?.isDirectory == true && cv?.isSymbolicLink != true && cv?.isPackage != true {
-                let cp = child.standardizedFileURL.path
-                // Skip virtual/loop paths even inside recursive traversal
-                if cp.hasPrefix("/System/Volumes/") && !cp.hasPrefix("/System/Volumes/Data/") { continue }
-                if cp == "/dev" || cp == "/proc" || cp.hasPrefix("/private/var/vm") { continue }
-                total += try await recursiveSize(at: child.standardizedFileURL)
+        if shouldSkipPathDuringRecursiveScan(path) {
+            return SpaceLensItem(name: name, path: path, size: 0, isDirectory: true, children: [],
+                                  itemCount: 0, isReadable: false, isVirtual: false, lastModified: nil)
+        }
+
+        guard let selfInfo = statOrNil(path) else {
+            progressState.markUnreadable()
+            return SpaceLensItem(name: name, path: path, size: 0, isDirectory: true, children: [],
+                                  itemCount: 0, isReadable: false, isVirtual: false, lastModified: nil)
+        }
+
+        let lastModified = modificationDateFrom(selfInfo)
+
+        if (selfInfo.st_mode & S_IFMT) == S_IFLNK {
+            // 符号链接不跟随、不计入大小，作为不可进入的文件型节点呈现。
+            return SpaceLensItem(name: name, path: path, size: 0, isDirectory: false, children: [],
+                                  itemCount: 0, isReadable: false, isVirtual: false, lastModified: lastModified)
+        }
+
+        let ownSize = allocatedSizeFrom(selfInfo)
+
+        guard (selfInfo.st_mode & S_IFMT) == S_IFDIR else {
+            progressState.record(bytesDelta: ownSize, entriesDelta: 1, currentPath: path)
+            return SpaceLensItem(name: name, path: path, size: ownSize, isDirectory: false, children: [],
+                                  itemCount: 0, isReadable: true, isVirtual: false, lastModified: lastModified)
+        }
+
+        // "包"目录（.app/.framework 等）整体作为一个不可进入的节点，大小仍全树统计。
+        if isBundlePath(path) {
+            let usage = try packageUsage(atPath: path, progressState: progressState)
+            return SpaceLensItem(name: name, path: path, size: usage.size, isDirectory: false, children: [],
+                                  itemCount: usage.itemCount, isReadable: false, isVirtual: false, lastModified: lastModified)
+        }
+
+        guard let directory = opendir(path) else {
+            progressState.markUnreadable()
+            return SpaceLensItem(name: name, path: path, size: ownSize, isDirectory: true, children: [],
+                                  itemCount: 0, isReadable: false, isVirtual: false, lastModified: lastModified)
+        }
+        defer { closedir(directory) }
+
+        var folderChildren: [SpaceLensItem] = []
+        var directFilesSize: Int64 = 0
+        var directFilesCount = 0
+        var totalItemCount = 0
+        var processedSinceCheck = 0
+
+        while let entry = readdir(directory) {
+            processedSinceCheck += 1
+            if processedSinceCheck >= 4096 {
+                try Task.checkCancellation()
+                processedSinceCheck = 0
+            }
+
+            let entryName = entryFileName(entry)
+            if entryName == "." || entryName == ".." { continue }
+
+            let childPath = joinPath(path, entryName)
+            if shouldSkipPathDuringRecursiveScan(childPath) { continue }
+
+            let (entryType, maybeStat) = resolveEntryType(childPath: childPath, dtype: entry.pointee.d_type)
+            if entryType == UInt8(DT_UNKNOWN) { continue }
+            if entryType == UInt8(DT_LNK) { continue }
+
+            if entryType == UInt8(DT_DIR) {
+                if isBundlePath(childPath) {
+                    let usage = try packageUsage(atPath: childPath, progressState: progressState)
+                    folderChildren.append(SpaceLensItem(
+                        name: displayNameStatic(atPath: childPath), path: childPath, size: usage.size,
+                        isDirectory: false, children: [], itemCount: usage.itemCount,
+                        isReadable: false, isVirtual: false,
+                        lastModified: maybeStat.map(modificationDateFrom)
+                    ))
+                    totalItemCount += 1 + usage.itemCount
+                } else {
+                    let childItem = try buildSpaceLensTree(
+                        at: childPath, visibleFolderLimit: visibleFolderLimit, progressState: progressState
+                    )
+                    folderChildren.append(childItem)
+                    totalItemCount += 1 + childItem.itemCount
+                }
             } else {
-                total += Int64(cv?.fileAllocatedSize ?? 0)
+                let info = maybeStat ?? statOrNil(childPath)
+                guard let info else { continue }
+                let size = allocatedSizeFrom(info)
+                directFilesSize += size
+                directFilesCount += 1
+                totalItemCount += 1
+                progressState.record(bytesDelta: size, entriesDelta: 1, currentPath: childPath)
             }
         }
-        return total
+
+        let visibleChildren = pruneChildren(
+            folderChildren: folderChildren,
+            directFilesSize: directFilesSize,
+            directFilesCount: directFilesCount,
+            parentPath: path,
+            visibleFolderLimit: visibleFolderLimit
+        )
+        let childrenTotalSize = visibleChildren.reduce(0) { $0 + $1.size }
+        progressState.record(bytesDelta: ownSize, entriesDelta: 0, currentPath: path)
+
+        return SpaceLensItem(
+            name: name, path: path, size: ownSize + childrenTotalSize, isDirectory: true,
+            children: visibleChildren.sorted { $0.size > $1.size },
+            itemCount: totalItemCount, isReadable: true, isVirtual: false, lastModified: lastModified
+        )
     }
-    
-    private func summarizedChildren(
+
+    /// 仅统计大小/条目数的快速遍历，供"包"目录使用——不构建内部子树。
+    nonisolated private static func packageUsage(
+        atPath path: String,
+        progressState: SpaceLensProgressState
+    ) throws -> (size: Int64, itemCount: Int) {
+        try Task.checkCancellation()
+        if shouldSkipPathDuringRecursiveScan(path) { return (0, 0) }
+
+        guard let info = statOrNil(path) else {
+            progressState.markUnreadable()
+            return (0, 0)
+        }
+        if (info.st_mode & S_IFMT) == S_IFLNK { return (0, 0) }
+
+        let ownSize = allocatedSizeFrom(info)
+        guard (info.st_mode & S_IFMT) == S_IFDIR else {
+            progressState.record(bytesDelta: ownSize, entriesDelta: 1, currentPath: path)
+            return (ownSize, 0)
+        }
+
+        guard let directory = opendir(path) else {
+            progressState.markUnreadable()
+            return (ownSize, 0)
+        }
+        defer { closedir(directory) }
+
+        var total = ownSize
+        var itemCount = 0
+        var processedSinceCheck = 0
+
+        while let entry = readdir(directory) {
+            processedSinceCheck += 1
+            if processedSinceCheck >= 4096 {
+                try Task.checkCancellation()
+                processedSinceCheck = 0
+            }
+
+            let entryName = entryFileName(entry)
+            if entryName == "." || entryName == ".." { continue }
+            let childPath = joinPath(path, entryName)
+            if shouldSkipPathDuringRecursiveScan(childPath) { continue }
+
+            let (entryType, maybeStat) = resolveEntryType(childPath: childPath, dtype: entry.pointee.d_type)
+            if entryType == UInt8(DT_UNKNOWN) { continue }
+            if entryType == UInt8(DT_LNK) { continue }
+
+            itemCount += 1
+            if entryType == UInt8(DT_DIR) {
+                let childUsage = try packageUsage(atPath: childPath, progressState: progressState)
+                total += childUsage.size
+                itemCount += childUsage.itemCount
+            } else {
+                let info = maybeStat ?? statOrNil(childPath)
+                guard let info else { continue }
+                let size = allocatedSizeFrom(info)
+                total += size
+                progressState.record(bytesDelta: size, entriesDelta: 1, currentPath: childPath)
+            }
+        }
+        return (total, itemCount)
+    }
+
+    // MARK: - 剪枝：每层只保留 size 最大的前 N 个子目录，其余聚合为"其他"
+
+    nonisolated private static func pruneChildren(
         folderChildren: [SpaceLensItem],
         directFilesSize: Int64,
         directFilesCount: Int,
-        parentPath: String
+        parentPath: String,
+        visibleFolderLimit: Int
     ) -> [SpaceLensItem] {
         let sortedFolders = folderChildren.sorted { $0.size > $1.size }
-        var visibleChildren = Array(sortedFolders.prefix(spaceLensVisibleFolderLimit))
-        let hiddenFolders = Array(sortedFolders.dropFirst(spaceLensVisibleFolderLimit))
+        var visibleChildren = Array(sortedFolders.prefix(visibleFolderLimit))
+        let hiddenFolders = Array(sortedFolders.dropFirst(visibleFolderLimit))
         let otherSize = directFilesSize + hiddenFolders.reduce(0) { $0 + $1.size }
         let otherCount = directFilesCount + hiddenFolders.reduce(0) { $0 + 1 + $1.itemCount }
-        
+
         if otherSize > 0 || otherCount > 0 {
             visibleChildren.append(SpaceLensItem(
-                name: "其他",
+                name: String(localized: "其他"),
                 path: parentPath + "/.space-lens-other",
                 size: otherSize,
                 isDirectory: true,
@@ -342,339 +432,104 @@ actor DiskAnalyzer {
                 lastModified: nil
             ))
         }
-        
+
         return visibleChildren.sorted { $0.size > $1.size }
     }
 
-    private func cleanProgressPath(_ path: String) -> String {
-        path.hasPrefix(Self.dataVolumeRoot)
-            ? String(path.dropFirst(Self.dataVolumeRoot.count)).ifEmpty("/")
-            : path
+    // MARK: - readdir/lstat 辅助
+
+    nonisolated private static func entryFileName(_ entry: UnsafeMutablePointer<dirent>) -> String {
+        withUnsafePointer(to: entry.pointee.d_name) {
+            $0.withMemoryRebound(to: CChar.self, capacity: Int(entry.pointee.d_namlen) + 1) {
+                String(cString: $0)
+            }
+        }
     }
 
-    private func shouldSkipSpaceLensDirectory(_ path: String) -> Bool {
-        // Exact paths to skip (virtual fs, loop-causing mounts, inaccessible)
-        let exactSkip: Set<String> = [
-            "/dev", "/Volumes", "/Network", "/net", "/proc", "/private/var/vm",
-            "/System/Volumes/Data/dev",
-            "/System/Volumes/Data/Volumes",
-            "/System/Volumes/Data/private/var/vm",
-        ]
-        if exactSkip.contains(path) { return true }
+    nonisolated private static func joinPath(_ parent: String, _ name: String) -> String {
+        parent == "/" ? "/\(name)" : "\(parent)/\(name)"
+    }
 
-        // Skip non-data system volumes (Preboot, Recovery, VM, etc.)
-        // but NOT the data volume itself or paths under it.
-        let systemVolumeSkipPrefixes = [
-            "/System/Volumes/Preboot",
-            "/System/Volumes/Recovery",
-            "/System/Volumes/VM",
-            "/System/Volumes/xarts",
-            "/System/Volumes/iSCPreboot",
-            "/System/Volumes/Hardware",
-        ]
-        for prefix in systemVolumeSkipPrefixes {
-            if path == prefix || path.hasPrefix(prefix + "/") { return true }
-        }
+    nonisolated private static func statOrNil(_ path: String) -> stat? {
+        var info = stat()
+        guard lstat(path, &info) == 0 else { return nil }
+        return info
+    }
 
-        // Prevent recursion back into volumes from within the data volume
-        if path == "/System/Volumes/Data/System/Volumes" ||
-            path.hasPrefix("/System/Volumes/Data/System/Volumes/") { return true }
+    /// d_type == DT_UNKNOWN 时才 lstat；返回解析后的类型（DT_DIR/DT_REG/DT_LNK）与已取得的 stat（若有）。
+    /// 返回 DT_UNKNOWN 表示 lstat 失败，调用方应跳过该条目。
+    nonisolated private static func resolveEntryType(childPath: String, dtype: UInt8) -> (type: UInt8, stat: stat?) {
+        if dtype == UInt8(DT_DIR) || dtype == UInt8(DT_REG) || dtype == UInt8(DT_LNK) {
+            return (dtype, nil)
+        }
+        guard let info = statOrNil(childPath) else { return (UInt8(DT_UNKNOWN), nil) }
+        switch info.st_mode & S_IFMT {
+        case S_IFDIR: return (UInt8(DT_DIR), info)
+        case S_IFLNK: return (UInt8(DT_LNK), info)
+        default: return (UInt8(DT_REG), info)
+        }
+    }
 
-        return false
+    nonisolated private static func allocatedSizeFrom(_ info: stat) -> Int64 {
+        let allocated = Int64(info.st_blocks) * 512
+        return allocated > 0 ? allocated : Int64(info.st_size)
     }
-    
-    private func scanProgressEstimate(for scannedFolders: Int) -> Double {
-        1.0 - (1.0 / sqrt(Double(max(scannedFolders, 1)) + 1.0))
+
+    nonisolated private static func modificationDateFrom(_ info: stat) -> Date {
+        Date(timeIntervalSince1970: TimeInterval(info.st_mtimespec.tv_sec)
+             + TimeInterval(info.st_mtimespec.tv_nsec) / 1_000_000_000)
     }
-    
-    private func allocatedSize(from values: URLResourceValues?, fallback: Int64 = 0) -> Int64 {
-        if let totalFileAllocatedSize = values?.totalFileAllocatedSize, totalFileAllocatedSize > 0 {
-            return Int64(totalFileAllocatedSize)
-        }
-        if let fileAllocatedSize = values?.fileAllocatedSize, fileAllocatedSize > 0 {
-            return Int64(fileAllocatedSize)
-        }
-        if let totalFileSize = values?.totalFileSize, totalFileSize > 0 {
-            return Int64(totalFileSize)
-        }
-        if let fileSize = values?.fileSize, fileSize > 0 {
-            return Int64(fileSize)
-        }
-        return fallback
+
+    nonisolated private static func isBundlePath(_ path: String) -> Bool {
+        let ext = (path as NSString).pathExtension.lowercased()
+        return !ext.isEmpty && spaceLensBundleExtensions.contains(ext)
     }
-    
-    
-    private func directorySignature(values: URLResourceValues?) -> String {
-        let modified = values?.contentModificationDate?.timeIntervalSince1970 ?? 0
-        let allocated = values?.totalFileAllocatedSize ?? values?.fileAllocatedSize ?? 0
-        let size = values?.totalFileSize ?? values?.fileSize ?? 0
-        return "\(modified)-\(allocated)-\(size)"
-    }
-    
-    private func displayName(for url: URL, fallback: String?) -> String {
-        let path = url.path
-        if path == "/" || path == Self.dataVolumeRoot {
+
+    nonisolated private static func displayNameStatic(atPath path: String, isRoot: Bool = false) -> String {
+        if isRoot || path == "/" || path == dataVolumeRoot {
             let home = FileManager.default.homeDirectoryForCurrentUser
             return (try? home.resourceValues(forKeys: [.volumeNameKey]).volumeName) ?? "Macintosh HD"
         }
-        if let fallback, !fallback.isEmpty { return fallback }
-        return url.lastPathComponent.isEmpty ? path : url.lastPathComponent
+        let name = (path as NSString).lastPathComponent
+        return name.isEmpty ? path : name
     }
-    
-    // MARK: - 扫描用户缓存
-    
-    private func scanUserCaches() async -> [CleanableItem] {
-        var items: [CleanableItem] = []
-        let cachesPath = NSHomeDirectory() + "/Library/Caches"
-        
-        print("  扫描路径: \(cachesPath)")
-        
-        guard let contents = try? FileManager.default.contentsOfDirectory(atPath: cachesPath) else {
-            print("  ❌ 无法读取缓存目录")
-            return items
-        }
-        
-        print("  找到 \(contents.count) 个子目录")
-        
-        for folder in contents {
-            let folderPath = cachesPath + "/" + folder
-            let size = calculateDirectorySize(at: folderPath)
-            
-            // 降低阈值到 1MB 以便测试
-            if size > 1_000_000 {
-                print("  ✓ \(folder): \(ByteCountFormatter.string(fromByteCount: size, countStyle: .file))")
-                items.append(CleanableItem(
-                    name: folder,
-                    path: folderPath,
-                    size: size,
-                    category: .userCache,
-                    isSelected: true,
-                    description: NSLocalizedString("cache_safe_to_delete", comment: "")
-                ))
-            }
-        }
-        
-        return items.sorted { $0.size > $1.size }
+
+    nonisolated private static func cleanProgressPath(_ path: String) -> String {
+        path.hasPrefix(dataVolumeRoot)
+            ? String(path.dropFirst(dataVolumeRoot.count)).ifEmpty("/")
+            : path
     }
-    
-    // MARK: - 扫描浏览器缓存
-    
-    private func scanBrowserCaches() async -> [CleanableItem] {
-        var items: [CleanableItem] = []
-        let homeDir = NSHomeDirectory()
-        
-        // Chrome
-        let chromeCachePath = homeDir + "/Library/Caches/Google/Chrome"
-        if FileManager.default.fileExists(atPath: chromeCachePath) {
-            let size = calculateDirectorySize(at: chromeCachePath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "Google Chrome",
-                    path: chromeCachePath,
-                    size: size,
-                    category: .browserCache,
-                    isSelected: true,
-                    description: NSLocalizedString("browser_cache_description", comment: "")
-                ))
-            }
-        }
-        
-        // Firefox
-        let firefoxCachePath = homeDir + "/Library/Caches/Firefox"
-        if FileManager.default.fileExists(atPath: firefoxCachePath) {
-            let size = calculateDirectorySize(at: firefoxCachePath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "Firefox",
-                    path: firefoxCachePath,
-                    size: size,
-                    category: .browserCache,
-                    isSelected: true,
-                    description: NSLocalizedString("browser_cache_description", comment: "")
-                ))
-            }
-        }
-        
-        // Edge
-        let edgeCachePath = homeDir + "/Library/Caches/Microsoft Edge"
-        if FileManager.default.fileExists(atPath: edgeCachePath) {
-            let size = calculateDirectorySize(at: edgeCachePath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "Microsoft Edge",
-                    path: edgeCachePath,
-                    size: size,
-                    category: .browserCache,
-                    isSelected: true,
-                    description: NSLocalizedString("browser_cache_description", comment: "")
-                ))
-            }
-        }
-        
-        return items
-    }
-    
-    // MARK: - 扫描开发者缓存
-    
-    private func scanDeveloperCaches() async -> [CleanableItem] {
-        var items: [CleanableItem] = []
-        let homeDir = NSHomeDirectory()
-        
-        // Xcode DerivedData
-        let derivedDataPath = homeDir + "/Library/Developer/Xcode/DerivedData"
-        if FileManager.default.fileExists(atPath: derivedDataPath) {
-            let size = calculateDirectorySize(at: derivedDataPath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "Xcode DerivedData",
-                    path: derivedDataPath,
-                    size: size,
-                    category: .developerTools,
-                    isSelected: true,
-                    description: NSLocalizedString("xcode_derived_data_description", comment: "")
-                ))
-            }
-        }
-        
-        // Xcode Archives
-        let archivesPath = homeDir + "/Library/Developer/Xcode/Archives"
-        if FileManager.default.fileExists(atPath: archivesPath) {
-            let size = calculateDirectorySize(at: archivesPath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "Xcode Archives",
-                    path: archivesPath,
-                    size: size,
-                    category: .developerTools,
-                    isSelected: false, // 默认不选中，可能包含重要归档
-                    description: NSLocalizedString("xcode_archives_description", comment: "")
-                ))
-            }
-        }
-        
-        // Homebrew
-        let homebrewCachePath = homeDir + "/Library/Caches/Homebrew"
-        if FileManager.default.fileExists(atPath: homebrewCachePath) {
-            let size = calculateDirectorySize(at: homebrewCachePath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "Homebrew Cache",
-                    path: homebrewCachePath,
-                    size: size,
-                    category: .developerTools,
-                    isSelected: true,
-                    description: NSLocalizedString("homebrew_cache_description", comment: "")
-                ))
-            }
-        }
-        
-        // npm
-        let npmCachePath = homeDir + "/.npm/_cacache"
-        if FileManager.default.fileExists(atPath: npmCachePath) {
-            let size = calculateDirectorySize(at: npmCachePath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "npm Cache",
-                    path: npmCachePath,
-                    size: size,
-                    category: .developerTools,
-                    isSelected: true,
-                    description: NSLocalizedString("npm_cache_description", comment: "")
-                ))
-            }
-        }
-        
-        // CocoaPods
-        let podsCachePath = homeDir + "/Library/Caches/CocoaPods"
-        if FileManager.default.fileExists(atPath: podsCachePath) {
-            let size = calculateDirectorySize(at: podsCachePath)
-            if size > 0 {
-                items.append(CleanableItem(
-                    name: "CocoaPods Cache",
-                    path: podsCachePath,
-                    size: size,
-                    category: .developerTools,
-                    isSelected: true,
-                    description: NSLocalizedString("cocoapods_cache_description", comment: "")
-                ))
-            }
-        }
-        
-        return items
-    }
-    
-    // MARK: - 扫描用户日志
-    
-    private func scanUserLogs() async -> [CleanableItem] {
-        var items: [CleanableItem] = []
-        let logsPath = NSHomeDirectory() + "/Library/Logs"
-        
-        let size = calculateDirectorySize(at: logsPath)
-        if size > 10_000_000 { // 大于 10MB
-            items.append(CleanableItem(
-                name: "User Logs",
-                path: logsPath,
-                size: size,
-                category: .systemLogs,
-                isSelected: true,
-                description: NSLocalizedString("user_logs_description", comment: "")
-            ))
-        }
-        
-        return items
-    }
-    
-    // MARK: - 计算目录大小（优化版本，限制遍历深度和数量）
-    
-    private func calculateDirectorySize(at path: String, maxDepth: Int = 5, maxFiles: Int = 5000) -> Int64 {
+
+    // MARK: - 获取磁盘信息
+
+    nonisolated private static func getDiskInfo() throws -> DiskInfo {
         let fileManager = FileManager.default
-        var totalSize: Int64 = 0
-        var fileCount = 0
-        
-        // 使用 URL 方式获取，更高效
-        let url = URL(fileURLWithPath: path)
-        
-        // 尝试使用系统 API 快速获取大小
-        if let values = try? url.resourceValues(forKeys: [.totalFileAllocatedSizeKey, .isDirectoryKey]) {
-            if let size = values.totalFileAllocatedSize {
-                return Int64(size)
-            }
+        let homeURL = fileManager.homeDirectoryForCurrentUser
+
+        let values = try homeURL.resourceValues(forKeys: [
+            .volumeNameKey,
+            .volumeTotalCapacityKey,
+            .volumeAvailableCapacityForImportantUsageKey
+        ])
+
+        return DiskInfo(
+            volumeName: values.volumeName ?? "Macintosh HD",
+            totalSpace: Int64(values.volumeTotalCapacity ?? 0),
+            freeSpace: Int64(values.volumeAvailableCapacityForImportantUsage ?? 0)
+        )
+    }
+
+    /// 伪文件系统、交换文件与 /System/Volumes 下的合成挂载点不参与统计（避免重复计算 Data 卷）。
+    nonisolated private static func shouldSkipPathDuringRecursiveScan(_ path: String) -> Bool {
+        if path == "/dev" || path == "/Volumes" || path == "/Network" || path == "/net" || path == "/proc" {
+            return true
         }
-        
-        // 降级到手动遍历，但限制深度和数量
-        guard let enumerator = fileManager.enumerator(
-            at: url,
-            includingPropertiesForKeys: [.fileSizeKey, .isRegularFileKey],
-            options: [.skipsHiddenFiles, .skipsPackageDescendants]
-        ) else {
-            return 0
+        if path == "/private/var/vm" || path.hasPrefix("/private/var/vm/") {
+            return true
         }
-        
-        while let fileURL = enumerator.nextObject() as? URL {
-            // 限制文件数量，避免过长遍历
-            fileCount += 1
-            if fileCount > maxFiles {
-                // 估算剩余大小
-                let avgSize = totalSize / Int64(fileCount)
-                // 假设剩余文件大小与当前平均值相同
-                totalSize += avgSize * 100  // 粗略估算
-                break
-            }
-            
-            // 限制深度
-            let depth = fileURL.pathComponents.count - url.pathComponents.count
-            if depth > maxDepth {
-                enumerator.skipDescendants()
-                continue
-            }
-            
-            if let values = try? fileURL.resourceValues(forKeys: [.fileSizeKey, .isRegularFileKey]),
-               values.isRegularFile == true,
-               let size = values.fileSize {
-                totalSize += Int64(size)
-            }
+        if path == "/System/Volumes" || path.hasPrefix("/System/Volumes/") {
+            return true
         }
-        
-        return totalSize
+        return false
     }
 }

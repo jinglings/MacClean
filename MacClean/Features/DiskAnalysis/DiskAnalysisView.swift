@@ -10,11 +10,11 @@ import Combine
 import SwiftUI
 
 struct DiskAnalysisView: View {
-    @StateObject private var viewModel = SpaceLensViewModel()
+    @ObservedObject private var viewModel = PageModelStore.shared.spaceLens
     
     var body: some View {
         ZStack {
-            SpaceLensBackground()
+            AppBackdrop()
             
             switch viewModel.phase {
             case .intro:
@@ -35,7 +35,23 @@ struct DiskAnalysisView: View {
                 viewModel.deleteSelectedItems()
             }
         } message: {
-            Text("将 \(viewModel.selectedItems.count) 个项目移到废纸篓，释放约 \(viewModel.selectedSizeText)。")
+            Text("将 \(viewModel.selectedItems.count) 个项目移到废纸篓，释放约 \(viewModel.selectedSizeText)。可在「清理记录」中恢复。")
+        }
+        .sheet(isPresented: $viewModel.showCompletion) {
+            let result = viewModel.lastCleanResult
+            CleanupCompletionView(
+                cleanedSize: result?.freedSpace ?? 0,
+                cleanedCount: result?.cleanedItems ?? 0,
+                permanentlyFreed: result?.permanentlyFreed ?? 0,
+                failedCount: result?.errors.count ?? 0,
+                onUndo: result?.historySessionID == nil ? nil : {
+                    Task {
+                        await viewModel.undoLastClean()
+                        viewModel.showCompletion = false
+                    }
+                },
+                onDismiss: { viewModel.showCompletion = false }
+            )
         }
     }
 }
@@ -61,6 +77,14 @@ final class SpaceLensViewModel: ObservableObject {
     @Published var isLoadingDirectory = false
     @Published var errorMessage: String?
     @Published var showDeleteConfirmation = false
+    @Published var showCompletion = false
+    @Published var lastCleanResult: CleanResult?
+    @Published var lastRestoreResult: RestoreResult?
+    @Published var unreadableCount: Int = 0
+
+    /// 最近一次删除前的整棵树，撤销时直接换回，免得为几个文件重扫整盘。
+    private var treeBeforeLastClean: SpaceLensItem?
+    private var lastCleanedIDs: [SpaceLensItem.ID: String] = [:]
 
     private static let maxRecentPaths = 7
     
@@ -103,10 +127,15 @@ final class SpaceLensViewModel: ObservableObject {
         scanProgress = 0
         recentScannedPaths = []
         errorMessage = nil
+        unreadableCount = 0
+        lastCleanResult = nil
+        lastRestoreResult = nil
+        treeBeforeLastClean = nil
+        lastCleanedIDs = [:]
 
         scanTask = Task {
             do {
-                let result = try await DiskAnalyzer.shared.scanSpaceLens(rootURL: URL(fileURLWithPath: "/")) { progress in
+                let result = try await DiskAnalyzer.scanSpaceLens(rootURL: URL(fileURLWithPath: "/")) { progress in
                     Task { @MainActor in
                         self.scannedPath = progress.scannedPath
                         self.scannedItems = progress.scannedItems
@@ -116,15 +145,16 @@ final class SpaceLensViewModel: ObservableObject {
                         self.recentScannedPaths = Array(paths.prefix(SpaceLensViewModel.maxRecentPaths))
                     }
                 }
-                
+
                 rootItem = result.root
                 diskInfo = result.diskInfo
+                unreadableCount = result.unreadableCount
                 scanProgress = 1
                 phase = .results
             } catch is CancellationError {
                 phase = .intro
             } catch {
-                errorMessage = "扫描失败：\(error.localizedDescription)"
+                errorMessage = String(localized: "扫描失败：\(error.localizedDescription)")
                 phase = .intro
             }
         }
@@ -171,78 +201,101 @@ final class SpaceLensViewModel: ObservableObject {
     
     func requestDeleteSelected() {
         guard !selectedItems.isEmpty, !isDeleting else { return }
+        guard ProGate.allowAction() else { return }
         showDeleteConfirmation = true
     }
     
+    /// 走 CleanupManager（PathGuard 的 SpaceLens 规则 + 清理记录），删除后可在完成页或「清理记录」中撤销。
     func deleteSelectedItems() {
         let itemsToDelete = selectedItems.filter { !$0.isVirtual }
-        guard !itemsToDelete.isEmpty else { return }
-        
+        guard !itemsToDelete.isEmpty, !isDeleting else { return }
+
         isDeleting = true
+        errorMessage = nil
+        lastRestoreResult = nil
+        let cleanables = itemsToDelete.map { item -> CleanableItem in
+            var cleanable = CleanableItem(
+                name: item.name,
+                path: item.path,
+                size: item.size,
+                category: .spaceLens,
+                isSelected: true,
+                description: nil,
+                lastModified: nil
+            )
+            cleanable.removesContainer = true
+            return cleanable
+        }
+
         Task {
-            var deletedIDs: Set<SpaceLensItem.ID> = []
-            for item in itemsToDelete {
-                do {
-                    try await moveToTrash(path: item.path)
-                    deletedIDs.insert(item.id)
-                } catch {
-                    errorMessage = "无法删除 \(item.name)：\(error.localizedDescription)"
-                }
+            let snapshot = rootItem
+            do {
+                lastCleanResult = try await CleanupManager.shared.clean(items: cleanables)
+            } catch {
+                lastCleanResult = nil
+                errorMessage = String(localized: "删除失败：\(error.localizedDescription)")
             }
-            
+
+            // 只把确实已离开原位置的节点从树里摘掉，受保护或失败的保留。
+            let fileManager = FileManager.default
+            let deleted = itemsToDelete.filter { !fileManager.fileExists(atPath: $0.path) }
+            let deletedIDs = Set(deleted.map(\.id))
             if !deletedIDs.isEmpty, var rootItem {
+                treeBeforeLastClean = snapshot
+                lastCleanedIDs = Dictionary(uniqueKeysWithValues: deleted.map { ($0.id, $0.path) })
                 removeItems(deletedIDs, from: &rootItem)
                 self.rootItem = rootItem
                 selectedIDs.subtract(deletedIDs)
             }
             isDeleting = false
-        }
-    }
-    
-    private func moveToTrash(path: String) async throws {
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            NSWorkspace.shared.recycle([URL(fileURLWithPath: path)]) { _, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                } else {
-                    continuation.resume()
-                }
+            if lastCleanResult != nil {
+                showCompletion = true
             }
         }
     }
+
+    func undoLastClean() async {
+        guard let sessionID = lastCleanResult?.historySessionID else { return }
+        lastRestoreResult = await CleanupManager.shared.restore(sessionID: sessionID)
+        lastCleanResult = nil
+
+        // 换回删除前的树；没能放回原处的节点再摘掉一次，保证占用数字与磁盘一致。
+        if var restored = treeBeforeLastClean {
+            let fileManager = FileManager.default
+            let stillMissing = Set(lastCleanedIDs.filter { !fileManager.fileExists(atPath: $0.value) }.keys)
+            if !stillMissing.isEmpty {
+                removeItems(stillMissing, from: &restored)
+            }
+            rootItem = restored
+        }
+        treeBeforeLastClean = nil
+        lastCleanedIDs = [:]
+        selectedIDs = []
+    }
     
+    /// 兜底重扫：全树已在 startScan 中建好，正常情况下 children 不为空，这里很少被触发。
     private func loadDirectory(_ item: SpaceLensItem) {
         isLoadingDirectory = true
         scannedPath = item.path
         let targetID = item.id
         let targetPath = item.path
-        
+
         Task {
             do {
-                var loadedItem = try await DiskAnalyzer.shared.scanSpaceLensDirectory(at: URL(fileURLWithPath: targetPath), progress: { progress in
+                var loadedItem = try await DiskAnalyzer.scanSpaceLensDirectory(at: URL(fileURLWithPath: targetPath)) { progress in
                     Task { @MainActor in
                         self.scannedPath = progress.scannedPath
                         self.scanProgress = progress.progress
                     }
-                }, partialResult: { partialItem in
-                    Task { @MainActor in
-                        var updatedItem = partialItem
-                        updatedItem.id = targetID
-                        if var rootItem = self.rootItem {
-                            self.replaceItem(updatedItem, in: &rootItem)
-                            self.rootItem = rootItem
-                        }
-                    }
                 }
-                )
                 loadedItem.id = targetID
-                
+
                 if var rootItem {
                     replaceItem(loadedItem, in: &rootItem)
                     self.rootItem = rootItem
                 }
             } catch {
-                errorMessage = "无法读取 \(item.name)：\(error.localizedDescription)"
+                errorMessage = String(localized: "无法读取 \(item.name)：\(error.localizedDescription)")
             }
             isLoadingDirectory = false
         }
@@ -262,23 +315,37 @@ final class SpaceLensViewModel: ObservableObject {
         return false
     }
     
+    /// 从树中移除已删除的节点，并把被删数据从各层祖先的 size/itemCount 中扣除。
+    /// 注意：不能用 `children.reduce(0) { $0 + $1.size }` 重算 size ——
+    /// 每层还聚合了未建模为子节点的直属文件（"其他"节点之外的部分），
+    /// 用 children 求和重算会把这部分大小丢掉。正确做法是从原 size 中减去被删子项 size 之和。
     @discardableResult
-    private func removeItems(_ ids: Set<SpaceLensItem.ID>, from item: inout SpaceLensItem) -> Bool {
-        let beforeCount = item.children.count
-        item.children.removeAll { ids.contains($0.id) }
-        var changed = beforeCount != item.children.count
-        
+    private func removeItems(_ ids: Set<SpaceLensItem.ID>, from item: inout SpaceLensItem) -> (size: Int64, count: Int) {
+        var removedSize: Int64 = 0
+        var removedCount = 0
+
+        var directRemovedIndices: [Int] = []
+        for (index, child) in item.children.enumerated() where ids.contains(child.id) {
+            removedSize += child.size
+            removedCount += 1 + child.itemCount
+            directRemovedIndices.append(index)
+        }
+        for index in directRemovedIndices.reversed() {
+            item.children.remove(at: index)
+        }
+
         for index in item.children.indices {
-            if removeItems(ids, from: &item.children[index]) {
-                changed = true
-            }
+            let removedBelow = removeItems(ids, from: &item.children[index])
+            removedSize += removedBelow.size
+            removedCount += removedBelow.count
         }
-        
-        if changed {
-            item.size = item.children.reduce(0) { $0 + $1.size }
-            item.itemCount = item.children.count + item.children.reduce(0) { $0 + $1.itemCount }
+
+        if removedSize != 0 || removedCount != 0 {
+            item.size -= removedSize
+            item.itemCount -= removedCount
         }
-        return changed
+
+        return (removedSize, removedCount)
     }
     
     private func node(in root: SpaceLensItem, path: [SpaceLensItem.ID]) -> SpaceLensItem? {
@@ -290,72 +357,28 @@ final class SpaceLensViewModel: ObservableObject {
 
 private struct SpaceLensBackground: View {
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    Color(hex: 0x120834),
-                    Color(hex: 0x260A55),
-                    Color(hex: 0x4A0D78),
-                    Color(hex: 0x0D092A)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            RadialGradient(
-                colors: [Color(hex: 0x7E2EFF).opacity(0.48), Color.clear],
-                center: UnitPoint(x: 0.34, y: 0.50),
-                startRadius: 30,
-                endRadius: 620
-            )
-            RadialGradient(
-                colors: [Color(hex: 0xB16BFF).opacity(0.28), Color.clear],
-                center: UnitPoint(x: 0.60, y: 0.93),
-                startRadius: 20,
-                endRadius: 340
-            )
-        }
-        .ignoresSafeArea()
+        AppTheme.primaryGradient
+            .ignoresSafeArea()
     }
 }
 
 private struct SpaceLensTopBar: View {
-    @EnvironmentObject var appState: AppState
     let leading: AnyView?
-    
+
     init<Leading: View>(@ViewBuilder leading: () -> Leading) {
         self.leading = AnyView(leading())
     }
-    
+
     init() {
         self.leading = nil
     }
-    
+
     var body: some View {
-        ZStack {
-            HStack {
-                if let leading {
-                    leading
-                }
-                Spacer()
-                if !appState.isLicensed {
-                    Button(action: { appState.showLicenseActivation = true }) {
-                        Text("解锁完整版")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(Color(hex: 0x211A02))
-                            .padding(.horizontal, 28)
-                            .frame(height: 48)
-                            .background(Capsule().fill(Color(hex: 0xFFD23F)))
-                    }
-                    .buttonStyle(.plain)
-                }
+        PageHeader(title: String(localized: "存储地图"), subtitle: String(localized: "可视化整盘占用，找到吃掉空间的目录")) {
+            if let leading {
+                leading
             }
-            
-            Text("空间透镜")
-                .font(.system(size: 17, weight: .bold))
-                .foregroundColor(Color.white.opacity(0.74))
         }
-        .padding(.horizontal, 34)
-        .padding(.top, 20)
     }
 }
 
@@ -365,67 +388,33 @@ private struct SpaceLensIntroView: View {
     var body: some View {
         VStack(spacing: 0) {
             SpaceLensTopBar()
-            
-            HStack(alignment: .center, spacing: 78) {
-                SpaceLensHeroIcon()
-                    .frame(width: 430, height: 430)
-                    .padding(.leading, 46)
-                
-                VStack(alignment: .leading, spacing: 34) {
-                    VStack(alignment: .leading, spacing: 14) {
-                        Text("空间透镜")
-                            .font(.system(size: 54, weight: .regular))
-                            .foregroundColor(.white)
-                        Text("直观地查看磁盘空间占用详情，快速清理存储。")
-                            .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(Color.white.opacity(0.64))
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 22) {
-                        SpaceLensFeatureRow(icon: "internaldrive", title: "存储空间可视化分布图")
-                        SpaceLensFeatureRow(icon: "doc.text.magnifyingglass", title: "显示被隐藏的文件")
-                        SpaceLensFeatureRow(icon: "folder.fill", title: "大文件夹概览")
-                    }
-                    
-                    HStack(spacing: 12) {
-                        Image(systemName: "internaldrive")
-                            .font(.system(size: 24))
-                            .foregroundColor(Color.white.opacity(0.70))
-                            .frame(width: 38, height: 38)
-                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.14)))
-                        Text("Macintosh HD")
-                            .font(.system(size: 19, weight: .bold))
-                            .foregroundColor(.white)
-                        Spacer()
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(Color.white.opacity(0.62))
-                    }
-                    .padding(.horizontal, 16)
-                    .frame(width: 330, height: 62)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(Color.white.opacity(0.16))
-                            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.18), lineWidth: 1))
-                    )
-                }
-                .frame(maxWidth: 560, alignment: .leading)
+
+            ScrollView(showsIndicators: false) {
+                ScanIntroView(
+                    icon: "chart.pie",
+                    title: String(localized: "看清每一 GB 去了哪里"),
+                    message: String(localized: "扫描整盘目录占用，按大小层层浏览，找到真正吃掉空间的文件夹并安全清理。"),
+                    points: [String(localized: "存储占用可视化分布"), String(localized: "包含隐藏文件与系统目录"), String(localized: "删除先入废纸篓，可随时恢复"), String(localized: "支持逐层钻取与多选")],
+                    action: { viewModel.startScan() }
+                )
+                .padding(.horizontal, CosmicSizes.pagePadding)
+                .padding(.top, 24)
+                .padding(.bottom, 24)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            SpaceLensBottomButton(title: "扫描", isLoading: false, action: viewModel.startScan)
-                .padding(.bottom, 18)
         }
         .overlay(alignment: .bottomLeading) {
             if let errorMessage = viewModel.errorMessage {
                 Text(errorMessage)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color(hex: 0xFFD2EA))
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 10)
-                    .background(Capsule().fill(Color.black.opacity(0.24)))
-                    .padding(.leading, 34)
-                    .padding(.bottom, 34)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppTheme.danger)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: CosmicSizes.controlRadius)
+                            .fill(AppTheme.danger.opacity(0.12))
+                    )
+                    .padding(.leading, CosmicSizes.pagePadding)
+                    .padding(.bottom, 28)
             }
         }
     }
@@ -441,31 +430,40 @@ private struct SpaceLensScanningView: View {
             Spacer()
 
             VStack(spacing: 32) {
-                SpaceLensHeroIcon(isLarge: true)
-                    .frame(width: 500, height: 390)
+                ZStack {
+                    Circle()
+                        .stroke(AppTheme.ink(0.08), lineWidth: 4)
+                        .frame(width: 132, height: 132)
+                    Circle()
+                        .trim(from: 0, to: max(0.02, min(viewModel.scanProgress, 0.98)))
+                        .stroke(AppTheme.accent, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                        .frame(width: 132, height: 132)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeOut(duration: 0.2), value: viewModel.scanProgress)
+                    Text("\(Int(viewModel.scanProgress * 100))%")
+                        .font(.system(size: 26, weight: .semibold, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundColor(AppTheme.textPrimary)
+                }
 
-                VStack(spacing: 18) {
-                    Text("正在可视化存储空间...")
-                        .font(.system(size: 46, weight: .regular))
-                        .foregroundColor(.white)
+                VStack(spacing: 16) {
+                    Text("正在扫描存储空间...")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary)
 
                     SpaceLensPathTicker(
                         paths: viewModel.recentScannedPaths,
                         scannedItems: viewModel.scannedItems
                     )
-                    .frame(maxWidth: 860)
+                    .frame(maxWidth: 720)
                 }
             }
 
             Spacer()
 
-            SpaceLensBottomButton(
-                title: "停止",
-                isLoading: true,
-                progress: viewModel.scanProgress,
-                action: viewModel.stopScan
-            )
-            .padding(.bottom, 18)
+            Button("停止扫描", action: viewModel.stopScan)
+                .buttonStyle(NeonOutlineButtonStyle())
+                .padding(.bottom, 32)
         }
     }
 }
@@ -486,7 +484,7 @@ private struct SpaceLensPathTicker: View {
                     let fontSize = index < Self.sizes.count ? Self.sizes[index] : 10
                     Text(displayName(for: path))
                         .font(.system(size: fontSize, weight: index == 0 ? .semibold : .regular, design: .monospaced))
-                        .foregroundColor(.white.opacity(opacity))
+                        .foregroundColor(AppTheme.ink(opacity))
                         .lineLimit(1)
                         .truncationMode(.middle)
                         .frame(maxWidth: .infinity)
@@ -504,7 +502,7 @@ private struct SpaceLensPathTicker: View {
 
             Text("已扫描 \(scannedItems) 个文件夹")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color.white.opacity(0.36))
+                .foregroundColor(AppTheme.ink(0.36))
                 .padding(.top, 10)
         }
     }
@@ -527,23 +525,22 @@ private struct SpaceLensResultsView: View {
         VStack(spacing: 0) {
             SpaceLensTopBar {
                 Button(action: viewModel.restart) {
-                    HStack(spacing: 9) {
+                    HStack(spacing: 6) {
                         Image(systemName: "arrow.counterclockwise")
-                        Text("重新开始")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("重新扫描")
                     }
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color.white.opacity(0.72))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(NeonOutlineButtonStyle())
             }
-            
+
             navigationBar
                 .padding(.top, 20)
             
-            HStack(alignment: .top, spacing: 28) {
+            HStack(alignment: .top, spacing: 20) {
                 directoryList
-                    .frame(width: 430)
-                
+                    .frame(width: 400)
+
                 SpaceLensBubbleMap(
                     items: Array(viewModel.currentChildren.prefix(10)),
                     totalSize: max(viewModel.currentItem?.size ?? 1, 1),
@@ -552,104 +549,142 @@ private struct SpaceLensResultsView: View {
                     enterAction: viewModel.enter
                 )
             }
-            .padding(.horizontal, 34)
-            .padding(.top, 24)
+            .padding(.horizontal, CosmicSizes.pagePadding)
+            .padding(.top, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            
+
+            if let errorMessage = viewModel.errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppTheme.danger)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, CosmicSizes.pagePadding)
+                    .padding(.top, 8)
+            } else if let restore = viewModel.lastRestoreResult {
+                (restore.failedPaths.isEmpty
+                     ? Text("已恢复 \(restore.restoredCount) 项")
+                     : Text("已恢复 \(restore.restoredCount) 项，\(restore.failedPaths.count) 项未能恢复"))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, CosmicSizes.pagePadding)
+                    .padding(.top, 8)
+            }
+
+            if viewModel.unreadableCount > 0 {
+                HStack(spacing: 10) {
+                    Text("有 \(viewModel.unreadableCount) 个目录因系统权限未纳入统计，授权后重新扫描即可看到完整占用")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.textMuted)
+                        .lineLimit(2)
+                    Spacer(minLength: 8)
+                    Button("授予完全磁盘访问权限") {
+                        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }
+                    .buttonStyle(NeonOutlineButtonStyle())
+                    .controlSize(.small)
+                }
+                .padding(.horizontal, CosmicSizes.pagePadding)
+                .padding(.vertical, 8)
+            }
+
             resultFooter
         }
     }
     
     private var navigationBar: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 8) {
             Button(action: viewModel.goBack) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 20, weight: .bold))
-                    .frame(width: 42, height: 42)
+                    .font(.system(size: 14, weight: .semibold))
+                    .frame(width: 32, height: 32)
             }
             .buttonStyle(.plain)
-            .frame(width: 52, height: 52)
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-            .foregroundColor(viewModel.canNavigateBack ? .white.opacity(0.78) : .white.opacity(0.22))
-            .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.10)))
+            .contentShape(RoundedRectangle(cornerRadius: CosmicSizes.controlRadius))
+            .foregroundColor(viewModel.canNavigateBack ? AppTheme.textPrimary : AppTheme.textMuted.opacity(0.5))
+            .background(RoundedRectangle(cornerRadius: CosmicSizes.controlRadius).fill(AppTheme.ink(0.07)))
             .disabled(!viewModel.canNavigateBack)
-            
+
             Button(action: viewModel.goRoot) {
-                Image(systemName: "house.fill")
-                    .font(.system(size: 17, weight: .bold))
-                    .frame(width: 42, height: 42)
+                Image(systemName: "house")
+                    .font(.system(size: 13, weight: .semibold))
+                    .frame(width: 32, height: 32)
             }
             .buttonStyle(.plain)
-            .frame(width: 52, height: 52)
-            .contentShape(RoundedRectangle(cornerRadius: 12))
-            .foregroundColor(.white.opacity(0.70))
-            .background(RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.10)))
-            
-            HStack(spacing: 10) {
+            .contentShape(RoundedRectangle(cornerRadius: CosmicSizes.controlRadius))
+            .foregroundColor(AppTheme.textSecondary)
+            .background(RoundedRectangle(cornerRadius: CosmicSizes.controlRadius).fill(AppTheme.ink(0.07)))
+
+            HStack(spacing: 8) {
                 Image(systemName: "internaldrive")
-                    .foregroundColor(Color.white.opacity(0.62))
+                    .font(.system(size: 12))
+                    .foregroundColor(AppTheme.textSecondary)
                 Text(viewModel.currentItem?.name ?? "Macintosh HD")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(AppTheme.textPrimary)
                     .lineLimit(1)
                     .truncationMode(.middle)
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 54)
+            .frame(height: 32)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.13))
-                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.13), lineWidth: 1))
+                RoundedRectangle(cornerRadius: CosmicSizes.controlRadius)
+                    .fill(AppTheme.ink(0.05))
+                    .overlay(RoundedRectangle(cornerRadius: CosmicSizes.controlRadius).stroke(AppTheme.surfaceBorder, lineWidth: 1))
             )
         }
-        .padding(.horizontal, 34)
+        .padding(.horizontal, CosmicSizes.pagePadding)
     }
     
     private var directoryList: some View {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 16) {
             if let item = viewModel.currentItem {
-                HStack(spacing: 16) {
-                    Image(systemName: item.path == "/" ? "internaldrive" : "folder.fill")
-                        .font(.system(size: 38))
-                        .foregroundColor(Color(hex: 0x59C7EE))
-                        .frame(width: 58, height: 58)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 12) {
+                    Image(systemName: item.path == "/" ? "internaldrive" : "folder")
+                        .font(.system(size: 22, weight: .medium))
+                        .foregroundColor(AppTheme.textSecondary)
+                        .frame(width: 40, height: 40)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(AppTheme.ink(0.06)))
+
+                    VStack(alignment: .leading, spacing: 3) {
                         Text(item.name)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundColor(.white)
-                        Text("\(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file))  |  \(item.children.count) 项")
                             .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color.white.opacity(0.58))
+                            .foregroundColor(AppTheme.textPrimary)
+                        Text("\(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file)) · \(item.children.count) 项")
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.textMuted)
                     }
                 }
             }
-            
+
             HStack {
-                Text("选择：\(viewModel.selectedItems.isEmpty ? "无" : "\(viewModel.selectedItems.count) 项")")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundColor(Color.white.opacity(0.80))
+                (viewModel.selectedItems.isEmpty ? Text("未选择项目") : Text("已选 \(viewModel.selectedItems.count) 项"))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
                 Spacer()
                 Text(viewModel.selectedSizeText)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(Color.white.opacity(0.54))
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundColor(AppTheme.textMuted)
             }
-            
+
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 10) {
-                    if viewModel.isLoadingDirectory {
-                        HStack(spacing: 12) {
+                LazyVStack(spacing: 4) {
+                    if viewModel.isLoadingDirectory && viewModel.currentChildren.isEmpty {
+                        HStack(spacing: 10) {
                             ProgressView()
-                                .scaleEffect(0.78)
-                                .tint(.white)
+                                .scaleEffect(0.6)
+                                .tint(AppTheme.textSecondary)
                             Text("正在读取当前文件夹...")
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(Color.white.opacity(0.62))
+                                .font(.system(size: 13))
+                                .foregroundColor(AppTheme.textSecondary)
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 18)
+                        .padding(.vertical, 16)
                     }
-                    
+
                     ForEach(viewModel.currentChildren) { item in
                         SpaceLensListRow(
                             item: item,
@@ -659,74 +694,68 @@ private struct SpaceLensResultsView: View {
                         )
                     }
                 }
-                .padding(.bottom, 20)
+                .padding(.bottom, 16)
             }
         }
-        .padding(22)
+        .padding(18)
         .frame(maxHeight: .infinity, alignment: .top)
-        .background(
-            RoundedRectangle(cornerRadius: 18)
-                .fill(Color.white.opacity(0.11))
-                .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.15), lineWidth: 1))
-        )
+        .themeCard()
     }
     
     private var resultFooter: some View {
-        HStack(spacing: 18) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.diskInfo?.volumeName ?? "Macintosh HD")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.white)
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 6) {
+                if let diskInfo = viewModel.diskInfo {
+                    Text("\(diskInfo.volumeName) · 已用 \(ByteCountFormatter.string(fromByteCount: diskInfo.usedSpace, countStyle: .file)) / \(ByteCountFormatter.string(fromByteCount: diskInfo.totalSpace, countStyle: .file))")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(AppTheme.textSecondary)
+                }
                 GeometryReader { proxy in
                     ZStack(alignment: .leading) {
-                        Capsule().fill(Color.black.opacity(0.25))
+                        Capsule().fill(AppTheme.ink(0.10))
                         Capsule()
-                            .fill(Color.white.opacity(0.72))
+                            .fill(AppTheme.accent)
                             .frame(width: proxy.size.width * CGFloat(viewModel.diskInfo?.usedPercentage ?? 0))
                     }
                 }
-                .frame(width: 340, height: 8)
+                .frame(width: 260, height: 5)
             }
-            
-            if let diskInfo = viewModel.diskInfo {
-                Text("已用空间：\(ByteCountFormatter.string(fromByteCount: diskInfo.usedSpace, countStyle: .file))（共 \(ByteCountFormatter.string(fromByteCount: diskInfo.totalSpace, countStyle: .file))）")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(Color.white.opacity(0.68))
-            }
-            
+
             Spacer()
-            
-            HStack(spacing: 10) {
-                Image(systemName: "info.circle.fill")
-                    .foregroundColor(Color.white.opacity(0.48))
-                Text("已勾选 \(viewModel.selectedItems.count) 项  |  \(viewModel.selectedSizeText)")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(Color.white.opacity(0.84))
-            }
-            
+
+            Text("已勾选 \(viewModel.selectedItems.count) 项 · \(viewModel.selectedSizeText)")
+                .font(.system(size: 13, weight: .medium))
+                .monospacedDigit()
+                .foregroundColor(AppTheme.textSecondary)
+
             Button(action: viewModel.requestDeleteSelected) {
-                HStack(spacing: 8) {
+                HStack(spacing: 6) {
                     if viewModel.isDeleting {
-                        ProgressView().scaleEffect(0.72).tint(.white)
+                        ProgressView().scaleEffect(0.6).tint(AppTheme.onAccent)
                     } else {
-                        Image(systemName: "trash.fill")
+                        Image(systemName: "trash")
                     }
                     Text("移到废纸篓")
                 }
-                .font(.system(size: 15, weight: .bold))
-                .foregroundColor(viewModel.selectedItems.isEmpty ? Color.white.opacity(0.32) : .white)
-                .padding(.horizontal, 24)
-                .frame(height: 52)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(viewModel.selectedItems.isEmpty ? AppTheme.textMuted : AppTheme.onAccent)
+                .padding(.horizontal, 18)
+                .frame(height: 34)
                 .background(
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(viewModel.selectedItems.isEmpty ? Color.white.opacity(0.10) : Color(hex: 0xB51E9D).opacity(0.78))
+                    RoundedRectangle(cornerRadius: CosmicSizes.controlRadius)
+                        .fill(viewModel.selectedItems.isEmpty ? AppTheme.ink(0.08) : AppTheme.danger)
                 )
             }
             .buttonStyle(.plain)
             .disabled(viewModel.selectedItems.isEmpty || viewModel.isDeleting)
         }
-        .padding(.horizontal, 34)
-        .padding(.vertical, 20)
+        .padding(.horizontal, CosmicSizes.pagePadding)
+        .padding(.vertical, 16)
+        .background(
+            Rectangle()
+                .fill(AppTheme.sidebarColor.opacity(0.92))
+                .overlay(Rectangle().fill(AppTheme.divider).frame(height: 1), alignment: .top)
+        )
     }
 }
 
@@ -737,55 +766,80 @@ private struct SpaceLensListRow: View {
     let enterAction: () -> Void
     
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 10) {
             Button(action: selectAction) {
-                Image(systemName: item.isVirtual ? "ellipsis.circle.fill" : (isSelected ? "checkmark.square.fill" : "info.square.fill"))
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(item.isVirtual ? Color.white.opacity(0.36) : (isSelected ? Color(hex: 0xFFD23F) : Color.white.opacity(0.54)))
-                    .frame(width: 28)
+                Image(systemName: item.isVirtual ? "ellipsis.circle" : (isSelected ? "checkmark.square.fill" : "square"))
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(item.isVirtual ? AppTheme.textMuted : (isSelected ? AppTheme.accent : AppTheme.textMuted))
+                    .frame(width: 22)
             }
             .buttonStyle(.plain)
             .disabled(item.isVirtual)
-            
+
             Button(action: enterAction) {
-                HStack(spacing: 14) {
-                    Image(systemName: item.isDirectory ? "folder.fill" : "doc.fill")
-                        .font(.system(size: 26))
-                        .foregroundColor(item.isReadable ? Color(hex: 0x55C4EB) : Color.white.opacity(0.30))
-                        .frame(width: 36)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 10) {
+                    Image(systemName: item.isDirectory ? "folder" : "doc")
+                        .font(.system(size: 15))
+                        .foregroundColor(item.isReadable ? AppTheme.textSecondary : AppTheme.textMuted.opacity(0.6))
+                        .frame(width: 24)
+
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(item.name)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(item.isReadable ? .white : Color.white.opacity(0.44))
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(item.isReadable ? AppTheme.textPrimary : AppTheme.textMuted)
                             .lineLimit(1)
                         Text(SpaceLensItem.cleanPath(item.path))
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.white.opacity(0.34))
+                            .font(.system(size: 11))
+                            .foregroundColor(AppTheme.textMuted)
                             .lineLimit(1)
                             .truncationMode(.middle)
                     }
-                    
+
                     Spacer()
-                    
+
                     Text(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file))
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(Color.white.opacity(0.68))
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundColor(AppTheme.textSecondary)
                         .monospacedDigit()
                 }
-                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .disabled(!item.isDirectory || !item.isReadable || item.isVirtual)
         }
-        .padding(.horizontal, 10)
-        .frame(height: 58)
+        .padding(.horizontal, 8)
+        .frame(height: 46)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isSelected ? Color.white.opacity(0.16) : Color.clear)
+            RoundedRectangle(cornerRadius: CosmicSizes.controlRadius)
+                .fill(isSelected ? AppTheme.ink(0.08) : Color.clear)
         )
+        .contextMenu {
+            if !item.isVirtual {
+                Button {
+                    SpaceLensFinderOpener.open(item)
+                } label: {
+                    Label("在 Finder 中打开", systemImage: "folder")
+                }
+                Button(isSelected ? String(localized: "取消选择") : String(localized: "选择")) { selectAction() }
+                if item.isDirectory && item.isReadable {
+                    Button("进入目录") { enterAction() }
+                }
+            }
+        }
+    }
+}
+
+/// 在 Finder 中打开空间透镜节点：目录直接进入其内部，文件则在父目录中选中定位。
+enum SpaceLensFinderOpener {
+    static func open(_ item: SpaceLensItem) {
+        let url = URL(fileURLWithPath: item.path)
+        if item.isDirectory {
+            NSWorkspace.shared.open(url)
+        } else {
+            // 文件与包（.app 等）：在父目录中定位选中，避免误启动
+            NSWorkspace.shared.activateFileViewerSelecting([url])
+        }
     }
 }
 
@@ -855,33 +909,27 @@ private struct SpaceLensBubble: View {
         Button(action: item.isDirectory && item.isReadable && !item.isVirtual ? enterAction : selectAction) {
             ZStack {
                 Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [
-                                Color.white.opacity(isSelected ? 0.34 : 0.22),
-                                Color(hex: 0x8E4BEF).opacity(0.50),
-                                Color(hex: 0x2B0E63).opacity(0.80)
-                            ],
-                            center: .top,
-                            startRadius: 8,
-                            endRadius: diameter
+                    .fill(isSelected ? AppTheme.accent.opacity(0.16) : AppTheme.ink(0.06))
+                    .overlay(
+                        Circle().stroke(
+                            isSelected ? AppTheme.accent : AppTheme.ink(0.14),
+                            lineWidth: isSelected ? 2 : 1
                         )
                     )
-                    .overlay(Circle().stroke(isSelected ? Color(hex: 0xFFD23F) : Color(hex: 0xB987FF).opacity(0.76), lineWidth: isSelected ? 3 : 2))
-                    .shadow(color: Color(hex: 0x925CFF).opacity(0.35), radius: 18)
-                
-                VStack(spacing: max(6, diameter * 0.035)) {
-                    Image(systemName: item.isVirtual ? "ellipsis.circle.fill" : (item.isDirectory ? "folder.fill" : "doc.fill"))
-                        .font(.system(size: max(24, diameter * 0.20), weight: .medium))
-                        .foregroundStyle(LinearGradient(colors: [Color(hex: 0x72D9FF), Color(hex: 0x2FA5D4)], startPoint: .top, endPoint: .bottom))
+
+                VStack(spacing: max(4, diameter * 0.03)) {
+                    Image(systemName: item.isVirtual ? "ellipsis.circle" : (item.isDirectory ? "folder" : "doc"))
+                        .font(.system(size: max(16, diameter * 0.16), weight: .medium))
+                        .foregroundColor(isSelected ? AppTheme.accent : AppTheme.textSecondary)
                     Text(item.name)
-                        .font(.system(size: max(13, diameter * 0.082), weight: .bold))
-                        .foregroundColor(.white)
+                        .font(.system(size: max(11, diameter * 0.075), weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.58)
+                        .minimumScaleFactor(0.6)
                     Text(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file))
-                        .font(.system(size: max(12, diameter * 0.072), weight: .bold))
-                        .foregroundColor(.white.opacity(0.88))
+                        .font(.system(size: max(10, diameter * 0.065), weight: .medium, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundColor(AppTheme.textSecondary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.62)
                 }
@@ -892,7 +940,12 @@ private struct SpaceLensBubble: View {
         .buttonStyle(.plain)
         .contextMenu {
             if !item.isVirtual {
-                Button(isSelected ? "取消选择" : "选择") { selectAction() }
+                Button {
+                    SpaceLensFinderOpener.open(item)
+                } label: {
+                    Label("在 Finder 中打开", systemImage: "folder")
+                }
+                Button(isSelected ? String(localized: "取消选择") : String(localized: "选择")) { selectAction() }
             }
             if item.isDirectory && item.isReadable && !item.isVirtual {
                 Button("进入目录") { enterAction() }
@@ -901,113 +954,19 @@ private struct SpaceLensBubble: View {
     }
 }
 
-private struct SpaceLensHeroIcon: View {
-    var isLarge = false
-    @State private var glow = false
-    
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: isLarge ? 78 : 64)
-                .fill(
-                    LinearGradient(
-                        colors: [Color(hex: 0x7D54FF), Color(hex: 0x241680)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: isLarge ? 78 : 64)
-                        .stroke(Color.white.opacity(0.20), lineWidth: 3)
-                )
-                .shadow(color: Color(hex: 0x6F48FF).opacity(glow ? 0.80 : 0.44), radius: glow ? 42 : 28)
-                .rotation3DEffect(.degrees(10), axis: (x: 1, y: 0, z: 0))
-            
-            Circle()
-                .stroke(
-                    LinearGradient(colors: [Color.white.opacity(0.92), Color(hex: 0x9D83FF)], startPoint: .top, endPoint: .bottom),
-                    lineWidth: isLarge ? 42 : 34
-                )
-                .frame(width: isLarge ? 160 : 126, height: isLarge ? 160 : 126)
-                .offset(x: -16, y: -22)
-                .shadow(color: Color.white.opacity(0.22), radius: 16)
-            
-            Capsule()
-                .fill(LinearGradient(colors: [Color(hex: 0xDDD5FF), Color(hex: 0x8B78FF)], startPoint: .top, endPoint: .bottom))
-                .frame(width: isLarge ? 58 : 48, height: isLarge ? 90 : 74)
-                .rotationEffect(.degrees(-35))
-                .offset(x: isLarge ? 112 : 88, y: isLarge ? 76 : 58)
-        }
-        .padding(isLarge ? 38 : 46)
-        .onAppear {
-            withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
-                glow = true
-            }
-        }
-    }
-}
-
 private struct SpaceLensFeatureRow: View {
     let icon: String
     let title: String
-    
-    var body: some View {
-        HStack(spacing: 18) {
-            Image(systemName: icon)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(.white)
-                .frame(width: 42, height: 42)
-                .background(RoundedRectangle(cornerRadius: 12).fill(CosmicTheme.accentGradient))
-            Text(title)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundColor(.white.opacity(0.92))
-        }
-    }
-}
 
-private struct SpaceLensBottomButton: View {
-    let title: String
-    let isLoading: Bool
-    var progress: Double = 0
-    let action: () -> Void
-    @State private var rotation: Double = 0
-    
     var body: some View {
-        Button(action: action) {
-            ZStack {
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [Color(hex: 0x8E18FF), Color(hex: 0x4E05C8), Color(hex: 0x26006E)],
-                            center: .top,
-                            startRadius: 4,
-                            endRadius: 72
-                        )
-                    )
-                    .frame(width: 118, height: 118)
-                    .overlay(Circle().stroke(Color.white.opacity(0.62), lineWidth: 2.4).padding(6))
-                    .shadow(color: Color(hex: 0x8D2DFF).opacity(0.75), radius: 32)
-                
-                if isLoading {
-                    Circle()
-                        .trim(from: 0, to: max(0.10, min(progress, 0.96)))
-                        .stroke(Color.white.opacity(0.86), style: StrokeStyle(lineWidth: 5, lineCap: .round))
-                        .frame(width: 112, height: 112)
-                        .rotationEffect(.degrees(rotation - 90))
-                        .animation(.easeInOut(duration: 0.18), value: progress)
-                }
-                
-                Text(title)
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.white)
-            }
-        }
-        .buttonStyle(.plain)
-        .onAppear {
-            if isLoading {
-                withAnimation(.linear(duration: 1.3).repeatForever(autoreverses: false)) {
-                    rotation = 360
-                }
-            }
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(AppTheme.accent)
+                .frame(width: 22)
+            Text(title)
+                .font(.system(size: 13))
+                .foregroundColor(AppTheme.textSecondary)
         }
     }
 }
