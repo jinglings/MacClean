@@ -1,0 +1,92 @@
+{
+	email wjw599330@gmail.com
+	# Caddy answers ACME HTTP-01 on :80 and serves the site on :443.
+	# Nothing else on this box listens on either port (3X-UI is on 2096,
+	# xray on 22392, frps on 7000/17089/6102) — check before changing.
+
+	servers {
+		# 站点在 Cloudflare 后面：只有来自 Cloudflare 的连接才采信 CF-Connecting-IP，
+		# 直连源站的请求无法伪造客户端 IP（{client_ip} 退回真实来源地址）。
+		trusted_proxies static 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32
+		client_ip_headers CF-Connecting-IP
+	}
+}
+
+# www 只做跳转，主域名为 thulem.com
+www.thulem.com {
+	redir https://thulem.com{uri} permanent
+}
+
+thulem.com {
+	# 后端：授权 API、订单、管理后台、appcast、下载与上传的文件
+	@backend path /api/* /admin /admin/* /appcast.xml /download/* /files/*
+
+	# 只有发布安装包的上传允许大请求体，其余后端请求保持很小
+	@releaseUpload path /api/admin/releases
+	request_body @releaseUpload {
+		max_size 600MB
+	}
+	@smallBodies {
+		path /api/* /admin /admin/*
+		not path /api/admin/releases
+	}
+	request_body @smallBodies {
+		max_size 4MB
+	}
+
+	handle @backend {
+		reverse_proxy 127.0.0.1:8787 {
+			header_up Host {host}
+			# 后端按 CF-Connecting-IP 限流：这里改写成 Caddy 校验过的真实客户端 IP
+			header_up CF-Connecting-IP {client_ip}
+			header_up X-Forwarded-For {client_ip}
+			flush_interval -1
+			transport http {
+				read_timeout 1h
+				write_timeout 1h
+			}
+		}
+	}
+
+	handle {
+		root * /var/www/thulem.com
+		encode zstd gzip
+
+		# 开发用文件不对外
+		@dev path /dev /dev/*
+		respond @dev 404
+
+		header {
+			# 纯静态站点，所有资源同源；'unsafe-inline' 仅因页面内有少量内联脚本/样式
+			Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+			X-Frame-Options "DENY"
+			Referrer-Policy "strict-origin-when-cross-origin"
+			Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+			Cross-Origin-Opener-Policy "same-origin"
+		}
+
+		@assets path /assets/*
+		header @assets Cache-Control "public, max-age=604800"
+		@html path / *.html
+		header @html Cache-Control "public, max-age=0, must-revalidate"
+
+		file_server
+	}
+
+	# 静态站点找不到页面时返回自定义 404
+	handle_errors {
+		@404 expression {err.status_code} == 404
+		handle @404 {
+			root * /var/www/thulem.com
+			rewrite * /404.html
+			file_server
+		}
+	}
+
+	# 后端不压缩：安装包下载依赖 Range 请求与 Content-Length
+	header {
+		-Server
+		X-Content-Type-Options "nosniff"
+		Strict-Transport-Security "max-age=31536000"
+	}
+}

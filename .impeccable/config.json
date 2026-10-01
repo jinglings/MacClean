@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "web/site/assets/css/site.css"
+        ],
+        "createdAt": "2026-10-01T09:43:39.850Z",
+        "reason": "team-lead brief asks for gradient text sparingly; used once on the hero headline (white-to-mint)"
+      }
+    ]
+  }
+}

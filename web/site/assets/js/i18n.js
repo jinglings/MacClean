@@ -1,0 +1,601 @@
+// Bilingual strings (Chinese default, English).
+//
+// How it works
+// - Static copy lives in the HTML in Chinese, tagged with data-i18n="key" (innerHTML)
+//   or data-i18n-attr="attr:key,attr2:key2". On load, those Chinese strings are
+//   snapshotted, so the HTML is the single source of truth for static Chinese copy.
+// - EN below holds the English for every static key, plus strings built in JS.
+// - ZH below holds the Chinese for strings built in JS (they don't exist in the HTML).
+// - t(key, vars) looks up the current language and fills {placeholders}.
+// - The language comes from localStorage("mc.lang"), else navigator.language (zh* → zh, else en).
+//   The inline script in <head> applies the same rule early to avoid a flash.
+// dev/check-i18n.mjs verifies that every key used anywhere has both languages.
+
+export const EN = {
+  /* nav & footer */
+  'nav.skip': 'Skip to content',
+  'nav.features': 'Features',
+  'nav.safety': 'Safety',
+  'nav.pricing': 'Pricing',
+  'nav.download': 'Download',
+  'nav.support': 'Support',
+  'nav.langShort': '中文',
+  'nav.langLabel': '切换到中文',
+  'nav.cta': 'Download free',
+  'nav.menu': 'Menu',
+  'foot.tag': 'Safe, transparent, undoable cleaning for your Mac. All on device.',
+  'foot.product': 'Product',
+  'foot.buy': 'Buy',
+  'foot.help': 'Help',
+  'foot.faq': 'FAQ',
+  'foot.order': 'Find my order',
+  'foot.contact': 'Contact us',
+  'foot.legal': 'Legal',
+  'foot.privacy': 'Privacy policy',
+  'foot.terms': 'Terms & refunds',
+  'foot.mac': 'macOS is a trademark of Apple Inc. MacClean is not affiliated with Apple.',
+  'cta.download': 'Download free',
+  'cta.buy': 'Buy a license',
+
+  /* home */
+  'home.title': 'MacClean: safe, transparent, undoable Mac cleaning',
+  'home.desc': 'MacClean scans your Mac locally for caches, logs, duplicates and developer leftovers. Everything you clean goes to the Trash first and can be restored in one click. For macOS 14 and later, Apple silicon and Intel.',
+  'hero.h1a': 'See it all. Pick what goes.',
+  'hero.h1b': 'Undo anything.',
+  'hero.sub': 'MacClean scans your Mac on device for caches, logs, duplicates and developer leftovers, and shows you where your space went. Everything you clean goes to the Trash first, and Cleanup History puts it back in one click.',
+  'hero.meta': 'macOS 14+ · Apple silicon & Intel · 7-day free trial',
+  'hero.shotAlt': 'MacClean Checkup screen',
+  'chip.freed': '12.4 GB freed',
+  'chip.freedSub': 'This cleanup',
+  'chip.privacy': '0 privacy traces',
+  'chip.privacySub': 'Browsing history cleared',
+  'chip.undo': 'Undo anytime',
+  'chip.undoSub': 'Everything waits in the Trash',
+  'trust.label': 'Our promises',
+  'trust.local': '100% on device',
+  'trust.localSub': 'Nothing about your files is uploaded',
+  'trust.trash': 'Trash first',
+  'trust.trashSub': 'Never erased outright',
+  'trust.undo': 'One-click undo',
+  'trust.undoSub': 'Restore from Cleanup History',
+  'trust.account': 'No account',
+  'trust.accountSub': 'Download and go, no sign-up',
+
+  'ring.label': 'Storage Map example',
+  'ring.hint': 'Hover the ring to explore',
+  'ring.h2': 'See where every gigabyte went.',
+  'ring.p': 'Storage Map draws your whole disk as a map you can drill into: photo libraries, chat history, Xcode caches, forgotten downloads. Look first, then decide what to delete.',
+  'ring.note': 'Sample data from a developer’s Mac.',
+
+  'sc.h2': 'One app to keep your Mac in order.',
+  'sc.p': 'Start with a Checkup, then go as deep as you like. Each feature does exactly what it says, and scans only read. They never change anything.',
+  'f.checkup': 'Checkup',
+  'f.storage': 'Storage Map',
+  'f.reclaim': 'Reclaim Space',
+  'f.large': 'Large & Old Files',
+  'f.photos': 'Similar Photos',
+  'f.dev': 'Dev Caches',
+  'f.privacy': 'Privacy',
+  'f.login': 'Login Items',
+  'f.maint': 'Maintenance',
+  'f.appstorage': 'App Storage',
+  'f.appmgr': 'App Manager',
+  'f.search': 'File Search',
+  'f.menubar': 'Menu bar panel',
+  'sc.checkup.p': 'One scan shows junk, duplicates, large files and broken login items side by side.',
+  'sc.checkup.b1': 'Four kinds of results, cleaned together once you tick them',
+  'sc.checkup.b2': 'Large files are listed for review and never preselected',
+  'sc.checkup.b3': 'Finds login items that point to apps you deleted',
+  'sc.storage.p': 'Scan the whole disk, browse by size level by level, and find the folders that really take up space.',
+  'sc.storage.b1': 'Includes hidden files and system folders',
+  'sc.storage.b2': 'Drill down, select several at once',
+  'sc.storage.b3': 'Deletions go to the Trash, ready to restore',
+  'sc.reclaim.p': 'App and browser caches, logs older than 7 days, installers, Mail attachments, iPhone backups and firmware, and the Trash.',
+  'sc.reclaim.b1': 'Every category says where it comes from and what deleting it means',
+  'sc.reclaim.b2': 'Device backups are never preselected',
+  'sc.reclaim.b3': 'Protected paths are skipped automatically',
+  'sc.privacy.p': 'Clears history, cookies, sessions and download lists from Safari, Chrome, Edge, Brave and Firefox.',
+  'sc.privacy.b1': 'Nothing is selected until you choose',
+  'sc.privacy.b2': 'Bookmarks and saved passwords are never touched',
+  'sc.privacy.b3': 'Waits while a browser is running, so its databases stay intact',
+  'sc.login.p': 'Lists apps that open at login and the launch agents and daemons running in the background.',
+  'sc.login.b1': 'Flags broken leftovers from apps you uninstalled',
+  'sc.login.b2': 'Checking only reads settings and changes nothing',
+  'sc.login.b3': 'Anything you turn off can be turned back on',
+  'sc.maint.p': 'Runs the maintenance commands built into macOS to fix specific annoyances.',
+  'sc.maint.b1': 'Flush DNS, rebuild Spotlight and the Open With database',
+  'sc.maint.b2': 'Delete Time Machine local snapshots, restart Dock and Finder',
+  'sc.maint.b3': 'Each command explains what it does and what it costs before you run it',
+  'sc.appmgr.p': 'Takes stock of your apps and fully removes the ones you no longer use, leftovers included.',
+  'sc.appmgr.b1': 'Real size of every app, plus the ones untouched for 30 days',
+  'sc.appmgr.b2': 'Checks apps that use Sparkle for updates',
+  'sc.appmgr.b3': 'Finds orphaned files and installers from apps already gone',
+  'sc.search.p': 'Spotlight plus MacClean’s own index, so files Spotlight misses still turn up.',
+  'sc.search.b1': 'Filter by name, size and date modified',
+  'sc.search.b2': 'Search right from the menu bar panel too',
+
+  'bento.h2': 'Twelve tools, each with one job.',
+  'bento.p': 'Plus a menu bar panel that’s always one click away.',
+  'b.checkup': 'Junk, duplicates, large files and broken login items, all in one scan.',
+  'b.checkup.t1': 'Junk',
+  'b.checkup.t2': 'Duplicates',
+  'b.checkup.t3': 'Large files',
+  'b.checkup.t4': 'Broken login items',
+  'b.storage': 'A visual map of the whole disk you can drill into.',
+  'b.reclaim': 'Caches, old logs, installers, Mail attachments, device backups.',
+  'b.large': 'Big files you haven’t opened in a long time, sorted by size and last use.',
+  'b.photos': 'Bursts, re-exports, lightly cropped or compressed copies. Keeps the best shot.',
+  'b.dev': 'Xcode DerivedData and simulators, npm / pip / Gradle / Cargo caches, and node_modules in idle projects.',
+  'b.privacy': 'History, cookies and sessions from five browsers. Bookmarks and passwords stay.',
+  'b.login': 'Login items, launch agents, daemons and broken leftovers.',
+  'b.maint': 'Flush DNS, rebuild indexes, delete local snapshots, restart the Dock.',
+  'b.appstorage': 'The real size of every app, including WeChat and QQ chat data and Docker disks.',
+  'b.appmgr': 'Full uninstall, update checks, orphaned leftovers.',
+  'b.search': 'Spotlight plus its own index.',
+  'b.menubar': 'Disk, memory, battery health, CPU, network speed test and Bluetooth device batteries, one click from the menu bar.',
+  'mb.disk': 'Disk',
+  'mb.mem': 'Memory',
+  'mb.battery': 'Battery',
+  'mb.net': 'Speed test',
+  'mb.bt': 'Bluetooth batteries',
+
+  'dev.h2': 'For developers: tens of gigabytes of caches, deleted with care.',
+  'dev.p': 'Xcode, simulators, package managers and node_modules in stalled projects are often the biggest thing on a Mac. MacClean knows them and tells you what your next build will have to regenerate.',
+  'dev.termTitle': 'Dev Caches: scan results',
+  'dev.termLabel': 'Example Dev Caches scan results',
+
+  'safe.h2': 'At every step, you know what’s happening.',
+  'safe.p': 'The scary part of a cleaner isn’t deleting too little. It’s deleting the wrong thing for good. MacClean puts “I can take that back” first.',
+  'safe.s1n': 'Step 1',
+  'safe.s1': 'Scans only read',
+  'safe.s1p': 'A scan reads file information. It never moves or changes anything.',
+  'safe.s2n': 'Step 2',
+  'safe.s2': 'You choose',
+  'safe.s2p': 'Every item says where it comes from. Risky items start unselected.',
+  'safe.s3n': 'Step 3',
+  'safe.s3': 'To the Trash',
+  'safe.s3p': 'Cleaning moves files to the Trash. Nothing is erased outright.',
+  'safe.s4n': 'Step 4',
+  'safe.s4': 'One-click restore',
+  'safe.s4p': 'Changed your mind? Open Cleanup History and put the whole batch back.',
+  'safe.pg': 'An allowlist of protected paths. System folders and your personal folders are never treated as junk.',
+  'safe.optin': 'Risky means unselected',
+  'safe.optinp': 'Large files, device backups and private data, anything you might miss, stays unticked until you tick it.',
+  'safe.pw': 'Bookmarks and passwords: off-limits',
+  'safe.pwp': 'Privacy cleaning handles history, cookies and sessions only. Bookmarks, saved passwords and the keychain are out of scope.',
+
+  'mb.h2': 'Your Mac’s status, right in the menu bar.',
+  'mb.p': 'No need to open the main window. One click shows free disk space, memory pressure and battery health, and you can search for a file while you’re there.',
+  'mb.alt': 'MacClean menu bar panel (sample data)',
+  'mbp.status': 'Mac status: Good',
+  'mbp.search': 'Quick file search',
+  'mbp.diskFree': '156.8 GB available',
+  'mbp.memP': 'Pressure 28%',
+  'mbp.memUsed': '11.6 of 32 GB used',
+  'mbp.batSrc': 'On battery',
+  'mbp.batHealth': 'Health 92% · 214 cycles',
+  'mbp.cpuOk': 'Normal',
+  'mbp.cpuLoad': 'Load 18%',
+  'mbp.test': 'Test',
+  'mbp.devices': 'Connected devices',
+  'mbp.mouse': 'Mouse · 84%',
+  'mbp.phones': 'Headphones · 70%',
+  'mbp.open': 'Open MacClean',
+  'mb.diskSub': 'Free space, freed in a click',
+  'mb.memSub': 'Pressure and usage',
+  'mb.batterySub': 'Health and cycle count',
+  'mb.netSub': 'Upload and download speed',
+  'mb.btSub': 'Mice, headphones and more',
+  'mb.cpuSub': 'Load and thermal state',
+
+  'cmp.h2': 'How is it different from typical cleaners?',
+  'cmp.p': 'We didn’t compete on who deletes the most. Only on the things you care about more.',
+  'cmp.item': 'Feature',
+  'cmp.typical': 'Typical cleaners',
+  'cmp.yes': 'Yes',
+  'cmp.r1': '100% on device, nothing about your files uploaded',
+  'cmp.r1c': 'Not always; some scan online',
+  'cmp.r2': 'Trash first, one-click undo',
+  'cmp.r2c': 'Most delete outright',
+  'cmp.r3': 'Recognizes developer caches',
+  'cmp.r3c': 'Rarely covered',
+  'cmp.r4': 'Shows WeChat and QQ chat data size',
+  'cmp.r4c': 'Rarely covered',
+  'cmp.r5': 'Chinese and English interface',
+  'cmp.r5c': 'Varies',
+  'cmp.r6': 'Pay once, keep using it',
+  'cmp.r6c': 'Mostly subscriptions',
+  'cmp.r7': 'No account required',
+  'cmp.r7c': 'Often requires sign-in',
+
+  'price.h2': 'Buy once. Keep it.',
+  'price.p': 'Try every feature free for 7 days. Scanning is always free.',
+  'price.note': 'Pay with WeChat Pay or Alipay. Full refund within 30 days, no questions asked.',
+
+  'faq.h2': 'Questions',
+  'faq.q1': 'Is MacClean safe? Could it delete the wrong thing?',
+  'faq.a1': 'Scans only read file information. Cleaning moves files to the Trash instead of erasing them, and system and personal folders are protected by the PathGuard allowlist, so they never show up as cleanable. If you remove something by mistake, restore it from Cleanup History in one click.',
+  'faq.q2': 'What exactly does it delete?',
+  'faq.a2': 'Only what you tick: app and browser caches, logs older than 7 days, old installers, local copies of Mail attachments, device backups you select, developer caches and so on. Each category explains where it comes from and what deleting it means (caches, for example, are rebuilt when needed).',
+  'faq.q3': 'How do I undo a cleanup?',
+  'faq.a3': 'Open Cleanup History in MacClean, pick a cleanup and click Restore. The files go back where they were. This works as long as you haven’t emptied the Trash.',
+  'faq.q4': 'What are the trial limits?',
+  'faq.a4': 'Every feature works for 7 days after the first launch. After that, scanning and viewing results stay free; cleaning needs a license.',
+  'faq.q5': 'Can I get a refund?',
+  'faq.a5': 'Yes. Within 30 days of purchase, email us your order number for a full refund, no reason needed. The license is deactivated after the refund.',
+  'faq.q6': 'How many Macs can one license be used on?',
+  'faq.a6': 'Lifetime activates 2 Macs; Family activates 5. When you switch computers, click “Deactivate on this Mac” in the old Mac’s settings to free the slot.',
+  'faq.q7': 'Why does it need Full Disk Access?',
+  'faq.a7': 'macOS protects the data folders of apps like Mail and Safari. Without this permission MacClean can’t see the caches and history stored there. It still works without it, just with some files missing from scans. See the <a href="/download.html#fda">download page</a> for how to grant it.',
+  'faq.q8': 'macOS says it can’t verify the developer. What now?',
+  'faq.a8': 'MacClean isn’t notarized by Apple yet, so macOS stops it the first time you open it. In Applications, Control-click MacClean and choose Open, or go to System Settings › Privacy & Security and click Open Anyway. <a href="/download.html#install">See the illustrated guide</a>.',
+  'faq.q9': 'Does MacClean collect my data?',
+  'faq.a9': 'No. Every scan runs on your Mac; file names, paths and browsing history never leave it. It only goes online to activate a license and check for updates. Details are in the <a href="/privacy.html">privacy policy</a>.',
+  'faq.q10': 'Will it make my Mac faster?',
+  'faq.a10': 'We don’t promise that. MacClean helps you see and reclaim disk space, tidy login items and run maintenance commands. Freeing space helps when your disk is nearly full, but we won’t scare you with “speed-up” claims.',
+
+  'final.h2': 'Give your Mac a cleanup you can trust.',
+  'final.p': 'Download free and use every feature for 7 days. Scanning is always free.',
+
+  /* download */
+  'dl.title': 'Download MacClean',
+  'dl.desc': 'Download MacClean for macOS 14 and later, on Apple silicon and Intel. Includes install steps, first-launch help and Full Disk Access setup.',
+  'dl.h1': 'Download MacClean',
+  'dl.sub': 'Free to download, every feature for 7 days. No account needed.',
+  'dl.btn': 'Download DMG',
+  'dl.started': 'Your download has started. Nothing happening?',
+  'dl.retry': 'Try again',
+  'dl.reqH': 'System requirements',
+  'dl.req1': 'macOS 14 Sonoma or later',
+  'dl.req1s': 'Newer versions supported too',
+  'dl.req2': 'Apple silicon & Intel',
+  'dl.req2s': 'Universal app, runs natively',
+  'dl.req3': 'Chinese & English',
+  'dl.req3s': 'Follows your system language',
+  'dl.req4': 'Works offline',
+  'dl.req4s': 'Online only to activate and check updates',
+  'dl.instH': 'Install in three steps',
+  'dl.instP': 'Just like any other Mac app, with one extra click the first time you open it.',
+  'dl.s1': 'Open the DMG',
+  'dl.s1p': 'Double-click <b>MacClean.dmg</b> in your Downloads folder. A window with MacClean in it appears.',
+  'dl.downloads': 'Downloads',
+  'dl.other': 'Other files',
+  'dl.s2': 'Drag to Applications',
+  'dl.s2p': 'Drag the MacClean icon onto the Applications folder on the right. Once it’s copied, you can eject the DMG.',
+  'dl.apps': 'Applications',
+  'dl.s3': 'Open it the first time',
+  'dl.s3p': 'MacClean isn’t notarized by Apple yet, so the first time you open it macOS may say it can’t verify the developer. That’s expected. Open it once as shown below and macOS won’t ask again.',
+  'dl.s3a': '<b>macOS 14:</b> In Applications, hold <span class="kbd">Control</span> and click MacClean (or right-click), choose Open, then click Open again in the dialog.',
+  'dl.dlgT': 'macOS cannot verify the developer of “MacClean”. Are you sure you want to open it?',
+  'dl.dlgP': 'By opening this app, you will be overriding system security.',
+  'dl.open': 'Open',
+  'dl.cancel': 'Cancel',
+  'dl.showPkg': 'Show Package Contents',
+  'dl.trash': 'Move to Trash',
+  'dl.info': 'Get Info',
+  'dl.s3b': 'macOS 15 or later',
+  'dl.s3bp': 'Newer macOS no longer offers Open in the right-click menu. Double-click MacClean and click Done when warned. Then open <b>System Settings › Privacy & Security</b>, scroll to Security, click <b>Open Anyway</b> next to MacClean and confirm with your password.',
+  'dl.s3bn': 'You only do this once. If you don’t see Open Anyway, double-click MacClean once more and come back.',
+  'dl.privSec': 'Privacy & Security',
+  'dl.security': 'Security',
+  'dl.allowFrom': 'Allow applications from',
+  'dl.appStoreDev': 'App Store & Known Developers',
+  'dl.blocked': '“MacClean” was blocked to protect your Mac.',
+  'dl.openAnyway': 'Open Anyway',
+  'dl.fdaH': 'Grant Full Disk Access',
+  'dl.fdaP': 'macOS protects the data folders of apps like Mail and Safari. With access, MacClean can scan them; without it, MacClean still works but some results will be missing.',
+  'dl.fda1': 'Open System Settings › Privacy & Security › Full Disk Access',
+  'dl.fda2': 'Turn on the switch next to MacClean (not listed? Click “+” and choose MacClean in Applications)',
+  'dl.fda3': 'Quit and reopen MacClean when asked',
+  'dl.fdaNote': 'The Grant button at the bottom of MacClean’s sidebar takes you straight there.',
+  'dl.fda': 'Full Disk Access',
+  'dl.logH': 'What’s new',
+
+  /* buy */
+  'buy.title': 'Buy MacClean',
+  'buy.desc': 'Buy a MacClean license: Lifetime or Family, pay once with WeChat Pay or Alipay, refundable within 30 days.',
+  'buy.h1': 'Buy MacClean',
+  'buy.sub': 'Pay once, keep it. Scan to pay, and we issue your license as soon as the payment is confirmed.',
+  'buy.yours': 'Your orders',
+  'buy.yoursP': 'Orders created on this device. Open one to see its payment status and license.',
+  'buy.step1': 'Choose a plan and enter your email',
+  'buy.step1p': 'We use your email to look up your order and recover your license. No marketing emails.',
+  'buy.planLabel': 'Plan',
+  'buy.email': 'Email',
+  'buy.payLabel': 'Pay with',
+  'buy.wechat': 'WeChat Pay',
+  'buy.alipay': 'Alipay',
+  'buy.submit': 'Create order and pay',
+  'buy.summary': 'Order summary',
+  'buy.devicesLabel': 'Macs',
+  'buy.total': 'Total',
+  'buy.n1': 'Full refund within 30 days, no questions asked',
+  'buy.n2': 'One payment. No subscription, no automatic charges',
+  'buy.n3': 'Payments are checked by hand; licenses usually arrive within 24 hours',
+  'buy.n4': 'Haven’t tried it yet? <a href="/download.html">Download it free</a> for a 7-day trial',
+  'buy.another': 'Buy another license',
+
+  /* order */
+  'order.title': 'Find your order · MacClean',
+  'order.desc': 'Check your MacClean order status and get your license.',
+  'order.h1': 'Find your order',
+  'order.sub': 'Enter your order number and the email you used to see the payment status and license.',
+  'order.lookupH': 'Look up an order',
+  'order.lookupP': 'Order numbers start with MC and are shown on the payment page after you order.',
+  'order.noLabel': 'Order number',
+  'order.lookupBtn': 'Look up',
+  'order.lost': 'Lost your order number?',
+  'order.mailUs': 'Email us',
+  'order.another': 'Look up another order',
+
+  /* privacy */
+  'pv.title': 'Privacy policy · MacClean',
+  'pv.desc': 'MacClean’s privacy policy: scanning happens on your Mac, and nothing about your files is uploaded.',
+  'pv.h1': 'Privacy policy',
+  'pv.sub': 'In short: your files stay on your Mac.',
+  'doc.updated': 'Last updated: October 1, 2026',
+  'pv.h.app': 'The MacClean app',
+  'pv.app1': 'MacClean scans, analyzes and cleans entirely on your Mac. File names, paths, file contents, photos, browsing history and scan results never leave your computer. The app has no ads and no third-party analytics or crash-reporting SDKs.',
+  'pv.app2': 'The app goes online only in these cases:',
+  'pv.net1': '<b>Activating, validating and deactivating a license</b>: it sends the license key, your Mac’s model and computer name (so you can tell your devices apart in the activation list), a randomly generated instance ID and the MacClean version.',
+  'pv.net2': '<b>Checking for MacClean updates</b>: it asks thulem.com for update information, including the current version number.',
+  'pv.net3': '<b>Checking other apps for updates</b> (only when you use this in App Manager): it contacts the update URLs those apps’ developers publish, the same request those apps make themselves.',
+  'pv.h.site': 'The website and purchases',
+  'pv.site1': '<b>Orders</b>: we store your email, plan, payment method, payment code and order time to match payments, issue licenses and help you find your order. We don’t send marketing email, and we never sell or share it.',
+  'pv.site2': '<b>Payment</b>: you pay inside WeChat Pay or Alipay. We only see the amount received, the note you wrote and the payer nickname the platform shows us, never your payment account details.',
+  'pv.site3': '<b>Access logs</b>: the server briefly records IP addresses to prevent abuse (such as limiting how often orders can be placed) and to count downloads.',
+  'pv.site4': '<b>Browser storage</b>: the site uses no tracking cookies. Your language choice and orders created on this device are kept in your browser’s local storage, readable only by your browser. Clearing site data removes them.',
+  'pv.h.rights': 'Your rights',
+  'pv.rights': 'Email us anytime to see, correct or delete order information about you. To handle refunds and prevent license abuse, we keep the minimum fields needed for licenses already issued.',
+  'pv.h.contact': 'Contact',
+  'pv.contact': 'Questions about privacy? Email',
+
+  /* terms */
+  'tm.title': 'Terms & refund policy · MacClean',
+  'tm.desc': 'MacClean terms of use, license terms and 30-day refund policy.',
+  'tm.h1': 'Terms & refund policy',
+  'tm.sub': 'By using or buying MacClean you agree to these terms.',
+  'tm.h.license': 'License',
+  'tm.license1': 'Buying MacClean gives you a non-transferable license: Lifetime activates on 2 Macs and Family on 5, for you or your household. You can deactivate an old Mac to move its slot to a new one.',
+  'tm.license2': 'Please don’t resell or publicly share license keys or try to bypass activation. We may deactivate licenses that are abused.',
+  'tm.h.trial': 'Free trial',
+  'tm.trial': 'Every feature works for 7 days after the first launch. After that, scanning and viewing results stay free; cleaning needs a license.',
+  'tm.h.refund': '30-day refund policy',
+  'tm.refundBox': 'Within 30 days of purchase you can get a full refund, for any reason.',
+  'tm.refund1': 'Email us your order number (starting with MC) and the email you ordered with. No reason needed.',
+  'tm.refund2': 'Refunds go back to the WeChat Pay or Alipay account you paid from. We usually process them within 3 business days.',
+  'tm.refund3': 'Once refunded, the license is deactivated.',
+  'tm.refund4': 'Past 30 days? Write to us anyway and we’ll do our best to work something out.',
+  'tm.h.use': 'Using MacClean',
+  'tm.use1': 'MacClean moves the files it cleans to the Trash, and you can restore them from Cleanup History. These actions can’t be undone by MacClean, so read the in-app notes before running them: emptying the Trash, deleting Time Machine local snapshots and the other Maintenance commands.',
+  'tm.use2': 'We work hard to make MacClean safe and reliable, but it is provided “as is”. Always keep backups of important data. To the extent permitted by law, we aren’t liable for indirect damages from using the software, and our total liability is limited to what you paid for it.',
+  'tm.h.changes': 'Changes',
+  'tm.changes': 'If these terms change in a meaningful way, we’ll update the date on this page and note it on the site. Changes never affect licenses you’ve already bought.',
+  'tm.h.contact': 'Contact',
+  'tm.contact': 'For refunds or anything else, email',
+
+  /* support */
+  'sp.title': 'Support · MacClean',
+  'sp.desc': 'MacClean FAQ, install help, licenses and refunds, and how to reach us.',
+  'sp.h1': 'How can we help?',
+  'sp.sub': 'Start with the questions below. Didn’t find the answer? Email us; we usually reply within one business day.',
+  'sp.mail': 'Email us',
+  'sp.order': 'Find your order & license',
+  'sp.orderSub': 'Recover your license with order number and email',
+  'sp.install': 'Install & first launch',
+  'sp.installSub': 'Illustrated help for “can’t verify the developer”',
+  'sp.q.empty': 'Can I restore files after emptying the Trash?',
+  'sp.a.empty': 'No. Emptying the Trash is a macOS action that MacClean can’t undo. The same goes for the Trash item in Reclaim Space. If you use Time Machine, you can restore from a backup.',
+  'sp.q.after': 'How soon do I get my license after paying?',
+  'sp.a.after': 'We check payments by hand and usually issue licenses within 24 hours. Please write the payment code in the payment note so we can match it to your order. Once confirmed, the license appears on your order page; open your order link or <a href="/order.html">look it up</a> with your order number and email.',
+  'sp.q.nocode': 'I forgot to write the payment note. What now?',
+  'sp.a.nocode': 'No problem. Email us your order number, the payment time and the amount, and we’ll match it by hand.',
+  'sp.q.activate': 'How do I activate my license?',
+  'sp.a.activate': 'Open MacClean, click Upgrade at the top of the sidebar, choose Enter License, paste your license key (it starts with MCLN-) and click Activate. Activation needs an internet connection once.',
+  'sp.q.limit': 'It says the activation limit is reached.',
+  'sp.a.limit': 'On the Mac you no longer use, open MacClean’s settings, go to License and click “Deactivate on this Mac”. If you no longer have that Mac, email us your license key and we’ll free the slot.',
+  'sp.q.admin': 'Why do some actions ask for an administrator password?',
+  'sp.a.admin': 'Maintenance commands like flushing DNS, rebuilding the Spotlight index and deleting local snapshots need administrator rights; macOS requires it. Each one is marked “Requires admin password” and only asks when you click Run.',
+  'sp.q.uninstall': 'How do I uninstall MacClean?',
+  'sp.a.uninstall': 'If it’s activated, first click “Deactivate on this Mac” under License in settings so the slot can go to another Mac. Then quit MacClean and drag it from Applications to the Trash.',
+
+  /* 404 */
+  'nf.title': 'Page not found · MacClean',
+  'nf.h1': 'This page has been cleaned up.',
+  'nf.p': 'Don’t worry, it isn’t in your Trash. Head back from here:',
+  'nf.home': 'Back to home',
+};
+
+// Built in JS (no HTML source). Both languages required.
+const DYNAMIC = {
+  'common.loading': ['加载中…', 'Loading…'],
+  'common.copy': ['复制', 'Copy'],
+  'common.copied': ['已复制', 'Copied'],
+
+  'ring.c.photos': ['照片与影片', 'Photos & video'],
+  'ring.c.dev': ['开发者', 'Developer'],
+  'ring.c.docs': ['文稿与下载', 'Documents & downloads'],
+  'ring.c.apps': ['应用程序', 'Applications'],
+  'ring.c.system': ['系统', 'System'],
+  'ring.c.chat': ['聊天数据', 'Chat data'],
+  'ring.c.caches': ['缓存与日志', 'Caches & logs'],
+  'ring.c.free': ['可用空间', 'Free space'],
+  'ring.k.photoLib': ['照片图库', 'Photos library'],
+  'ring.k.movies': ['影片', 'Movies'],
+  'ring.k.derived': ['Xcode DerivedData', 'Xcode DerivedData'],
+  'ring.k.sims': ['iOS 模拟器', 'iOS simulators'],
+  'ring.k.nodeModules': ['node_modules', 'node_modules'],
+  'ring.k.docker': ['Docker 磁盘', 'Docker disk'],
+  'ring.k.documents': ['文稿', 'Documents'],
+  'ring.k.downloads': ['下载', 'Downloads'],
+  'ring.k.xcode': ['Xcode', 'Xcode'],
+  'ring.k.creative': ['设计与剪辑应用', 'Design & video apps'],
+  'ring.k.otherApps': ['其他应用', 'Other apps'],
+  'ring.k.macos': ['macOS', 'macOS'],
+  'ring.k.snapshots': ['Time Machine 本地快照', 'Time Machine local snapshots'],
+  'ring.k.wechat': ['微信', 'WeChat'],
+  'ring.k.qq': ['QQ', 'QQ'],
+  'ring.k.appCache': ['应用缓存', 'App caches'],
+  'ring.k.browserCache': ['浏览器缓存', 'Browser caches'],
+  'ring.k.logs': ['日志', 'Logs'],
+  'ring.hint': ['移到圆环上查看', 'Hover the ring to explore'],
+
+  'dev.l0': ['# 示例：开发缓存扫描（只读，未删除任何文件）', '# Example: Dev Caches scan (read-only, nothing deleted)'],
+  'dev.idle210': ['闲置 210 天', 'idle 210 days'],
+  'dev.idle94': ['闲置 94 天', 'idle 94 days'],
+  'dev.total': ['已选 8 项，共 44.1 GB', '8 items selected, 44.1 GB'],
+  'dev.done': ['✓ 已移入废纸篓，可在「清理记录」中恢复', '✓ Moved to the Trash. Restore anytime from Cleanup History'],
+
+  'price.badge': ['推荐', 'Recommended'],
+  'price.devices': ['可激活 {n} 台 Mac', 'Activate {n} Macs'],
+  'price.once': ['一次付费', 'one-time'],
+  'price.buy': ['购买{name}', 'Buy {name}'],
+  'price.lifetime.f1': ['全部 12 项功能与菜单栏面板', 'All 12 tools and the menu bar panel'],
+  'price.lifetime.f2': ['一次付费，没有订阅', 'One payment, no subscription'],
+  'price.lifetime.f3': ['换电脑时可转移激活', 'Move activations when you change Macs'],
+  'price.family.f1': ['适合家人或多台 Mac', 'For your household or several Macs'],
+  'price.family.f2': ['全部 12 项功能与菜单栏面板', 'All 12 tools and the menu bar panel'],
+  'price.family.f3': ['一次付费，没有订阅', 'One payment, no subscription'],
+  'price.f.devices': ['可激活 {n} 台 Mac', 'Activate {n} Macs'],
+  'price.f.refund': ['30 天内无理由退款', 'Full refund within 30 days'],
+
+  'dl.btnVer': ['下载 MacClean {v}', 'Download MacClean {v}'],
+  'dl.version': ['版本 {v}', 'Version {v}'],
+  'dl.minOS': ['需要 macOS {v} 或更新', 'Requires macOS {v} or later'],
+  'dl.soon': ['即将发布', 'Coming soon'],
+  'dl.soonSub': ['第一个版本正在准备中，很快就能下载。', 'The first release is being prepared and will be available soon.'],
+  'dl.noNotes': ['暂无更新日志。', 'No release notes yet.'],
+  'dl.notesFail': ['暂时无法加载版本信息。下载按钮仍然可以使用。', 'Couldn’t load release details right now. The download button still works.'],
+
+  'buy.planLabel': ['版本', 'Plan'],
+  'buy.wechat': ['微信支付', 'WeChat Pay'],
+  'buy.alipay': ['支付宝', 'Alipay'],
+  'buy.pickPlan': ['请选择一个版本。', 'Choose a plan.'],
+  'buy.emailEmpty': ['请填写邮箱，用来查询订单和找回许可证。', 'Enter your email so you can look up your order and recover your license.'],
+  'buy.emailBad': ['这个邮箱格式不对，请检查一下。', 'That email address doesn’t look right. Please check it.'],
+  'cta.download': ['免费下载', 'Download free'],
+
+  'order.no': ['订单 {no}', 'Order {no}'],
+  'order.noLabel': ['订单号', 'Order number'],
+  'order.st.pending': ['等待付款确认', 'Awaiting payment'],
+  'order.st.paid': ['已付款', 'Paid'],
+  'order.st.cancelled': ['已取消', 'Cancelled'],
+  'order.payExact': ['请支付准确金额', 'Pay this exact amount'],
+  'order.codeLabel': ['付款码', 'Payment code'],
+  'order.codeNote': ['付款时请在备注中填写 {code}，我们靠它对上你的订单。', 'Write {code} in the payment note. It’s how we match the payment to your order.'],
+  'order.notify': ['我已付款', 'I’ve paid'],
+  'order.notified': ['已通知，等待确认', 'Notified, awaiting confirmation'],
+  'order.notifiedMsg': ['收到！我们核对到账后会发放许可证，这个页面会自动更新。', 'Got it! We’ll issue your license once the payment is confirmed. This page updates by itself.'],
+  'order.refresh': ['刷新状态', 'Refresh status'],
+  'order.stillPending': ['还没有确认到账。核对通常在 24 小时内完成。', 'Payment not confirmed yet. Checks usually finish within 24 hours.'],
+  'order.polling': ['页面打开时，每 10 秒自动检查一次付款状态。', 'While this page is open, it checks the payment status every 10 seconds.'],
+  'order.bookmark': ['请收藏这个订单链接，随时回来查看状态和许可证：', 'Bookmark this order link to come back for the status and license anytime:'],
+  'order.scanWechat': ['用微信扫码付款', 'Scan with WeChat to pay'],
+  'order.scanAlipay': ['用支付宝扫码付款', 'Scan with Alipay to pay'],
+  'order.qrAlt': ['{m}收款码', '{m} payment QR code'],
+  'order.qrMissing': ['收款码配置中，请联系 {email} 完成付款。', 'The payment QR code is being set up. Please contact {email} to complete payment.'],
+  'order.steps': ['扫码后输入金额 {amount}，在备注中填写 {code}，完成付款后点「我已付款」。', 'Scan, enter {amount}, write {code} in the note, then click “I’ve paid”.'],
+  'order.paidH': ['付款已确认，这是你的许可证', 'Payment confirmed. Here’s your license'],
+  'order.paidP': ['{plan} · 可激活 {n} 台 Mac', '{plan} · activate {n} Macs'],
+  'order.copyKey': ['复制许可证', 'Copy license'],
+  'order.how1': ['打开 MacClean', 'Open MacClean'],
+  'order.how2': ['点侧边栏顶部的「升级」', 'Click Upgrade at the top of the sidebar'],
+  'order.how3': ['选择「输入许可证」，粘贴上面的许可证', 'Choose Enter License and paste the license above'],
+  'order.how4': ['点「激活」，完成', 'Click Activate. Done'],
+  'order.keepKey': ['请妥善保存许可证。忘记时，可以用订单号和邮箱在「查询订单」页找回。', 'Keep your license somewhere safe. If you lose it, look it up with your order number and email.'],
+  'order.amount': ['金额', 'Amount'],
+  'order.paidAt': ['付款确认时间', 'Confirmed'],
+  'order.cancelledH': ['订单 {no} 已取消', 'Order {no} was cancelled'],
+  'order.cancelledP': ['如果你已经付款，请写信到 {email}，我们会尽快处理。', 'If you already paid, email {email} and we’ll sort it out quickly.'],
+  'order.newOrder': ['重新下单', 'Place a new order'],
+  'order.needBoth': ['请填写订单号和邮箱。', 'Enter both the order number and email.'],
+
+  'err.network': ['网络连接失败，请检查网络后重试。', 'Couldn’t connect. Check your internet connection and try again.'],
+  'err.timeout': ['服务器响应太慢，请稍后重试。', 'The server took too long to respond. Please try again.'],
+  'err.rate': ['操作太频繁了，请稍等几分钟再试。', 'Too many attempts. Please wait a few minutes and try again.'],
+  'err.rateOrders': ['短时间内创建的订单太多了，请一小时后再试。已经下过单的话，可以直接在上方「你的订单」里继续付款。', 'Too many orders in a short time. Please try again in an hour. If you already ordered, continue from “Your orders” above.'],
+  'err.notfound': ['没有找到相关内容。', 'Nothing was found.'],
+  'err.orderNotFound': ['没有找到这个订单。请检查订单号和邮箱是否与下单时一致。', 'No matching order. Check that the order number and email match what you used.'],
+  'err.orderLinkBad': ['这个订单链接无效或已过期。请用订单号和邮箱查询。', 'This order link is invalid. Look up your order with the order number and email instead.'],
+  'err.invalid': ['提交的信息有误，请检查后重试。', 'Something in the form isn’t valid. Please check and try again.'],
+  'err.invalidMsg': ['提交的信息有误：{msg}', 'Please check the form: {msg}'],
+  'err.code.invalid_plan': ['这个版本暂时无法购买，请刷新页面后重新选择。', 'That plan isn’t available. Reload the page and choose again.'],
+  'err.code.invalid_email': ['这个邮箱格式不对，请检查一下。', 'That email address doesn’t look right. Please check it.'],
+  'err.code.invalid_pay_method': ['请选择微信支付或支付宝。', 'Choose WeChat Pay or Alipay.'],
+  'err.server': ['服务器暂时出了点问题，请稍后再试。如果一直不行，请写信给我们。', 'The server ran into a problem. Please try again later, or email us if it keeps happening.'],
+  'err.http': ['请求失败（{status}），请稍后再试。', 'Request failed ({status}). Please try again later.'],
+  'err.unknown': ['出了点问题，请刷新页面后重试。', 'Something went wrong. Please reload the page and try again.'],
+};
+
+export const ZH = {};
+for (const [k, [zh, en]] of Object.entries(DYNAMIC)) {
+  ZH[k] = zh;
+  EN[k] ??= en;
+}
+
+/* ---------------- engine ---------------- */
+
+const STORE = 'mc.lang';
+const snapshot = new Map();   // key -> Chinese string taken from the HTML
+const listeners = new Set();
+let lang = detect();
+
+function detect() {
+  let saved = null;
+  try { saved = localStorage.getItem(STORE); } catch { /* storage blocked */ }
+  if (saved === 'zh' || saved === 'en') return saved;
+  return /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+}
+
+export const getLang = () => lang;
+
+export function t(key, vars) {
+  let s = lang === 'en' ? EN[key] : (ZH[key] ?? snapshot.get(key));
+  if (s == null) s = ZH[key] ?? snapshot.get(key) ?? EN[key] ?? key;
+  if (vars) s = s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] ?? m));
+  return s;
+}
+
+function take(root) {
+  root.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (!snapshot.has(k)) snapshot.set(k, el.innerHTML);
+  });
+  root.querySelectorAll('[data-i18n-attr]').forEach(el => {
+    for (const [attr, k] of pairs(el)) if (!snapshot.has(k)) snapshot.set(k, el.getAttribute(attr) ?? '');
+  });
+}
+
+function pairs(el) {
+  return el.dataset.i18nAttr.split(',').map(p => p.split(':').map(s => s.trim())).filter(p => p.length === 2);
+}
+
+export function apply(root = document) {
+  root.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = lang === 'en' ? EN[el.dataset.i18n] : snapshot.get(el.dataset.i18n);
+    if (v != null && el.innerHTML !== v) el.innerHTML = v;
+  });
+  root.querySelectorAll('[data-i18n-attr]').forEach(el => {
+    for (const [attr, k] of pairs(el)) {
+      const v = lang === 'en' ? EN[k] : snapshot.get(k);
+      if (v != null) el.setAttribute(attr, v);
+    }
+  });
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.classList.remove('i18n-pending');
+}
+
+export function setLang(next) {
+  if (next !== 'zh' && next !== 'en' || next === lang) return;
+  lang = next;
+  try { localStorage.setItem(STORE, next); } catch { /* storage blocked */ }
+  apply();
+  listeners.forEach(fn => fn(lang));
+}
+
+export function onLangChange(fn) { listeners.add(fn); }
+
+export function initI18n() {
+  take(document);
+  apply();
+}

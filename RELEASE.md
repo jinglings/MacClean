@@ -6,8 +6,8 @@ MacClean 走官网直销：Developer ID 签名 + 公证，不上 Mac App Store�
 
 | 位置 | 内容 |
 |---|---|
-| `MacClean/Core/Licensing/LicenseConfig.swift` | `purchaseURL` 购买页；`lemonSqueezyStoreID` / `lemonSqueezyProductID`（为 0 时不校验产品归属，其他产品的 key 也能激活）；`pricingHeadline` / `pricingDetail` 定价文案 |
-| `MacClean/Features/About/AboutView.swift` → `AppLinks` | 官网、隐私政策、支持页地址 |
+| `MacClean/Core/Licensing/LicenseConfig.swift` | `purchaseURL` 购买页（目前为 nil，按钮置灰）；`lemonSqueezyStoreID` / `lemonSqueezyProductID`（为 0 时不校验产品归属，其他产品的 key 也能激活）；`pricingHeadline` / `pricingDetail` 定价文案 |
+| `MacClean/Features/About/AboutView.swift` → `AppLinks` | 官网、隐私政策、支持页地址（目前为 nil，不显示） |
 | `MacClean-Info.plist` | `SUPublicEDKey`（Sparkle 公钥，见第 3 步）、`SUFeedURL`（appcast 地址） |
 | `project.pbxproj` | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` 每次发布递增 |
 

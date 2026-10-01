@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="home.title">MacClean：安全、透明、可撤销的 Mac 清理工具</title>
+  <meta name="description" content="MacClean 在你的 Mac 本地扫描缓存、日志、重复文件与开发缓存。清理的每一项都先移入废纸篓，可以一键恢复。适用于 macOS 14 及以上，Apple 芯片与 Intel。" data-i18n-attr="content:home.desc">
+  <meta property="og:title" content="MacClean">
+  <meta property="og:description" content="安全、透明、可撤销的 Mac 本地清理工具。" data-i18n-attr="content:foot.tag">
+  <!-- @head -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F8F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#040D0C" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <meta property="og:site_name" content="MacClean">
+  <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    (function () {
+      var d = document.documentElement, l = null;
+      d.className += ' js';
+      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+      d.lang = l === 'zh' ? 'zh-CN' : 'en';
+      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+    })();
+  </script>
+  <!-- /@head -->
+</head>
+<body data-page="home">
+  <!-- @nav -->
+  <a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+  <div class="announce" id="announce" hidden></div>
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="MacClean">
+        <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+        <span>MacClean</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+        <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+        <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+        <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+      </ul>
+      <div class="nav-end">
+        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+        </button>
+        <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-magnetic data-i18n="nav.cta">免费下载</a>
+        <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- /@nav -->
+
+  <main id="main">
+    <!-- ============ HERO ============ -->
+    <section class="hero force-dark" id="hero">
+      <div class="aurora" aria-hidden="true"><i></i><span class="grid"></span><b></b></div>
+      <canvas class="sparkles" id="sparkles" aria-hidden="true"></canvas>
+      <div class="wrap">
+        <div class="hero-copy">
+          <img class="hero-icon" src="/assets/img/icon-256.webp" width="84" height="84" alt="" data-seq style="--seq:0">
+          <h1 data-seq style="--seq:1">
+            <span class="line" data-i18n="hero.h1a">看得清，选得准，</span>
+            <span class="line" data-i18n="hero.h1b">随时撤得回。</span>
+          </h1>
+          <p class="hero-sub" data-seq style="--seq:2" data-i18n="hero.sub">MacClean 在你的 Mac 本地扫描缓存、日志、重复文件与开发缓存，告诉你空间去了哪里。清理的每一项都先移入废纸篓，在「清理记录」里一键恢复。</p>
+          <div class="hero-cta" data-seq style="--seq:3">
+            <a class="btn btn-primary btn-glow btn-lg" href="/download.html" data-magnetic>
+              <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#download"/></svg><span data-i18n="cta.download">免费下载</span>
+            </a>
+            <a class="btn btn-ghost btn-lg" href="/buy.html" data-magnetic data-i18n="cta.buy">购买许可证</a>
+          </div>
+          <p class="hero-meta" data-seq style="--seq:4" data-i18n="hero.meta">macOS 14+ · Apple 芯片与 Intel · 7 天免费试用</p>
+        </div>
+
+        <div class="hero-stage" data-seq style="--seq:5">
+          <div class="tilt" id="hero-tilt">
+            <div class="window-wrap">
+              <div class="window reflect">
+                <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+                <img data-shot="smart_care" data-scheme="dark" src="/assets/img/screens/dark-zh-smart_care.webp" width="1600" height="1030" alt="MacClean 一键体检界面" data-i18n-attr="alt:hero.shotAlt" fetchpriority="high" decoding="async">
+              </div>
+            </div>
+          </div>
+          <div class="chip chip-1" data-depth="0.6" aria-hidden="true">
+            <span class="ci g-reclaim" style="background:var(--g)"><svg class="i"><use href="/assets/img/icons.svg#reclaim"/></svg></span>
+            <span><b data-i18n="chip.freed">已释放 12.4 GB</b><small data-i18n="chip.freedSub">本次清理</small></span>
+          </div>
+          <div class="chip chip-2" data-depth="1.1" aria-hidden="true">
+            <span class="ci g-privacy" style="background:var(--g)"><svg class="i"><use href="/assets/img/icons.svg#privacy"/></svg></span>
+            <span><b data-i18n="chip.privacy">隐私痕迹 0</b><small data-i18n="chip.privacySub">浏览记录已清除</small></span>
+          </div>
+          <div class="chip chip-3" data-depth="0.85" aria-hidden="true">
+            <span class="ci g-checkup" style="background:var(--g)"><svg class="i"><use href="/assets/img/icons.svg#undo"/></svg></span>
+            <span><b data-i18n="chip.undo">可随时撤销</b><small data-i18n="chip.undoSub">文件都在废纸篓里</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TRUST ============ -->
+    <section class="trust" aria-label="核心承诺" data-i18n-attr="aria-label:trust.label">
+      <div class="wrap">
+        <ul>
+          <li><span class="ti"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#cloudoff"/></svg></span><span><b data-i18n="trust.local">100% 本地运行</b><span data-i18n="trust.localSub">文件信息从不上传</span></span></li>
+          <li><span class="ti"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#trash"/></svg></span><span><b data-i18n="trust.trash">先进废纸篓</b><span data-i18n="trust.trashSub">从不直接抹掉文件</span></span></li>
+          <li><span class="ti"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#undo"/></svg></span><span><b data-i18n="trust.undo">一键撤销</b><span data-i18n="trust.undoSub">在「清理记录」里恢复</span></span></li>
+          <li><span class="ti"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#user"/></svg></span><span><b data-i18n="trust.account">无需账户</b><span data-i18n="trust.accountSub">下载即用，不用注册</span></span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ STORAGE RING ============ -->
+    <section class="section" id="map">
+      <div class="wrap ring-grid">
+        <div class="ring-box" id="ring" data-reveal>
+          <svg viewBox="-210 -210 420 420" role="group" aria-label="存储地图示例" data-i18n-attr="aria-label:ring.label" id="ring-svg"></svg>
+          <div class="ring-center" aria-live="polite">
+            <div>
+              <div class="rc-size" id="rc-size">994.7 GB</div>
+              <div class="rc-name" id="rc-name">Macintosh HD</div>
+              <div class="rc-hint" id="rc-hint" data-i18n="ring.hint">移到圆环上查看</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-head">
+            <h2 data-i18n="ring.h2">每一 GB 去了哪里，一目了然。</h2>
+            <p data-i18n="ring.p">存储地图把整块磁盘画成一张可以逐层深入的地图：照片图库、聊天记录、Xcode 缓存、被遗忘的下载……先看清楚，再决定删什么。</p>
+          </div>
+          <ul class="legend" id="ring-legend"></ul>
+          <p class="ring-note" data-i18n="ring.note">示例数据，取自一台开发者的 Mac。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHOWCASE ============ -->
+    <section class="section" id="features" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 data-i18n="sc.h2">一个 App，把 Mac 打理清楚。</h2>
+          <p data-i18n="sc.p">从一次体检开始，再深入到每一个角落。每个功能都只做它写明的事，扫描只读取，不会改动任何东西。</p>
+        </div>
+        <div class="showcase">
+          <ol class="sc-steps" id="sc-steps">
+            <li class="sc-step g-checkup" data-tab="smart_care">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#checkup"/></svg></span>
+              <h3 data-i18n="f.checkup">一键体检</h3>
+              <p data-i18n="sc.checkup.p">一次扫描，同时看清冗余文件、重复文件、大文件和失效启动项。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.checkup.b1">四类结果并排列出，勾选后统一清理</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.checkup.b2">大文件只做盘点，默认不选中</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.checkup.b3">找出指向已删除程序的失效登录项</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="smart_care" src="/assets/img/screens/light-zh-smart_care.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-storage" data-tab="disk_analysis">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#storage"/></svg></span>
+              <h3 data-i18n="f.storage">存储地图</h3>
+              <p data-i18n="sc.storage.p">扫描整块磁盘，按大小逐层浏览，找到真正占用空间的文件夹。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b1">包含隐藏文件与系统目录</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b2">逐层下钻，支持多选</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b3">删除先移入废纸篓，随时恢复</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="disk_analysis" src="/assets/img/screens/light-zh-disk_analysis.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-reclaim" data-tab="cache_cleanup">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#reclaim"/></svg></span>
+              <h3 data-i18n="f.reclaim">释放空间</h3>
+              <p data-i18n="sc.reclaim.p">应用与浏览器缓存、7 天前的日志、安装包、邮件附件、iPhone 备份与固件、废纸篓。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.reclaim.b1">每一类都写明来源，以及删掉后会怎样</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.reclaim.b2">设备备份默认不勾选</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.reclaim.b3">受保护路径自动跳过</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="cache_cleanup" src="/assets/img/screens/light-zh-cache_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-privacy" data-tab="privacy_cleanup">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#privacy"/></svg></span>
+              <h3 data-i18n="f.privacy">隐私清理</h3>
+              <p data-i18n="sc.privacy.p">清除 Safari、Chrome、Edge、Brave、Firefox 的浏览历史、Cookie、会话与下载记录。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.privacy.b1">默认一项都不勾选，由你决定</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.privacy.b2">从不触碰书签与保存的密码</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.privacy.b3">浏览器运行时自动锁定，避免损坏数据库</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="privacy_cleanup" src="/assets/img/screens/light-zh-privacy_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-login" data-tab="login_items">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span>
+              <h3 data-i18n="f.login">启动项</h3>
+              <p data-i18n="sc.login.p">找出登录时自动打开的应用、后台常驻的启动代理与守护进程。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.login.b1">标出卸载后残留的失效项</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.login.b2">检查只读取配置，不改动任何启动项</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.login.b3">关掉之后，随时可以重新开启</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="login_items" src="/assets/img/screens/light-zh-login_items.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-maint" data-tab="maintenance">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#maint"/></svg></span>
+              <h3 data-i18n="f.maint">系统维护</h3>
+              <p data-i18n="sc.maint.p">调用 macOS 自带的维护命令，解决具体的小毛病。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b1">刷新 DNS、重建 Spotlight 索引与「打开方式」数据库</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b2">删除 Time Machine 本地快照，重启程序坞与访达</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b3">每条命令都写明用途和代价，再由你运行</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="maintenance" src="/assets/img/screens/light-zh-maintenance.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-appmgr" data-tab="app_uninstaller">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appmgr"/></svg></span>
+              <h3 data-i18n="f.appmgr">应用管家</h3>
+              <p data-i18n="sc.appmgr.p">盘点已安装的应用，彻底卸载不再使用的软件，连同残留文件一起清走。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.appmgr.b1">真实占用，以及 30 天没打开过的应用</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.appmgr.b2">检查使用 Sparkle 的应用是否有更新</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.appmgr.b3">找出已卸载应用留下的孤立文件与安装包</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="app_uninstaller" src="/assets/img/screens/light-zh-app_uninstaller.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-search" data-tab="file_search">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg></span>
+              <h3 data-i18n="f.search">文件搜索</h3>
+              <p data-i18n="sc.search.p">Spotlight 加上 MacClean 自己的索引，Spotlight 漏掉的文件也能找到。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.search.b1">按名称、大小、修改时间筛选</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.search.b2">在菜单栏面板里也能直接搜索</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="file_search" src="/assets/img/screens/light-zh-file_search.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+          </ol>
+          <div class="sc-stage" aria-hidden="true">
+            <div class="window-wrap" id="sc-wrap">
+              <div class="window">
+                <span class="lights"><i></i><i></i><i></i></span>
+                <div class="shot-stack" id="sc-stack"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BENTO ============ -->
+    <section class="section tight" id="all-features" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 data-i18n="bento.h2">十二个工具，各管一件事。</h2>
+          <p data-i18n="bento.p">再加一个随时待命的菜单栏面板。</p>
+        </div>
+        <div class="bento">
+          <article class="cell wide g-checkup"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#checkup"/></svg></span><h3 data-i18n="f.checkup">一键体检</h3><p data-i18n="b.checkup">冗余、重复、大文件和失效启动项，一次扫描全部看到。</p><div class="meta"><span class="tag" data-i18n="b.checkup.t1">冗余文件</span><span class="tag" data-i18n="b.checkup.t2">重复文件</span><span class="tag" data-i18n="b.checkup.t3">大文件</span><span class="tag" data-i18n="b.checkup.t4">失效启动项</span></div></article>
+          <article class="cell g-storage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#storage"/></svg></span><h3 data-i18n="f.storage">存储地图</h3><p data-i18n="b.storage">整块磁盘的可视化地图，逐层下钻。</p></article>
+          <article class="cell g-reclaim"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#reclaim"/></svg></span><h3 data-i18n="f.reclaim">释放空间</h3><p data-i18n="b.reclaim">缓存、旧日志、安装包、邮件附件、设备备份。</p></article>
+          <article class="cell g-large"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#large"/></svg></span><h3 data-i18n="f.large">大型与陈旧文件</h3><p data-i18n="b.large">按大小和上次打开时间，找出很久没碰过的大文件。</p></article>
+          <article class="cell g-photos"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#photos"/></svg></span><h3 data-i18n="f.photos">相似照片</h3><p data-i18n="b.photos">连拍、重复导出、轻微裁剪或压缩的副本，保留最好的一张。</p></article>
+          <article class="cell wide g-dev"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dev"/></svg></span><h3 data-i18n="f.dev">开发缓存</h3><p data-i18n="b.dev">Xcode DerivedData 与模拟器、npm / pip / Gradle / Cargo 缓存，以及闲置项目里的 node_modules。</p><div class="meta"><span class="tag">DerivedData</span><span class="tag">Simulators</span><span class="tag">node_modules</span><span class="tag">Gradle</span><span class="tag">Cargo</span></div></article>
+          <article class="cell g-privacy"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#privacy"/></svg></span><h3 data-i18n="f.privacy">隐私清理</h3><p data-i18n="b.privacy">五款浏览器的历史、Cookie 与会话。书签和密码不碰。</p></article>
+          <article class="cell g-login"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span><h3 data-i18n="f.login">启动项</h3><p data-i18n="b.login">登录项、启动代理、守护进程，以及失效残留。</p></article>
+          <article class="cell g-maint"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#maint"/></svg></span><h3 data-i18n="f.maint">系统维护</h3><p data-i18n="b.maint">刷新 DNS、重建索引、删除本地快照、重启程序坞。</p></article>
+          <article class="cell g-appstorage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appstorage"/></svg></span><h3 data-i18n="f.appstorage">应用占用</h3><p data-i18n="b.appstorage">每个应用的真实大小，包括微信、QQ 聊天数据和 Docker 磁盘。</p></article>
+          <article class="cell g-appmgr"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appmgr"/></svg></span><h3 data-i18n="f.appmgr">应用管家</h3><p data-i18n="b.appmgr">彻底卸载、检查更新、清理孤立残留。</p></article>
+          <article class="cell g-search"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg></span><h3 data-i18n="f.search">文件搜索</h3><p data-i18n="b.search">Spotlight 加上自建索引。</p></article>
+          <article class="cell wide g-menubar"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg></span><h3 data-i18n="f.menubar">菜单栏面板</h3><p data-i18n="b.menubar">磁盘、内存、电池健康度、CPU、网络测速与蓝牙设备电量，点一下菜单栏就能看到。</p><div class="meta"><span class="tag" data-i18n="mb.disk">磁盘</span><span class="tag" data-i18n="mb.mem">内存</span><span class="tag" data-i18n="mb.battery">电池</span><span class="tag">CPU</span><span class="tag" data-i18n="mb.net">网络测速</span><span class="tag" data-i18n="mb.bt">蓝牙电量</span></div></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DEVELOPERS ============ -->
+    <section class="section force-dark" id="developers">
+      <div class="wrap dev-grid">
+        <div>
+          <div class="sec-head" style="margin-bottom:0">
+            <h2 data-i18n="dev.h2">给开发者：几十 GB 的缓存，心里有数地删。</h2>
+            <p data-i18n="dev.p">Xcode、模拟器、包管理器和停工项目里的 node_modules，往往是 Mac 上最大的一块。MacClean 认得它们，告诉你删掉后下次构建需要重新生成什么。</p>
+          </div>
+          <ul class="dev-list">
+            <li>DerivedData</li><li>CoreSimulator</li><li>Xcode Archives</li><li>node_modules</li><li>npm</li><li>pnpm</li><li>pip</li><li>Gradle</li><li>Cargo</li><li>CocoaPods</li><li>Docker</li>
+          </ul>
+        </div>
+        <div class="term" data-reveal>
+          <div class="term-bar"><i></i><i></i><i></i><span data-i18n="dev.termTitle">开发缓存：扫描结果</span></div>
+          <div class="term-body" id="term" aria-label="开发缓存扫描结果示例" data-i18n-attr="aria-label:dev.termLabel" role="img"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SAFETY ============ -->
+    <section class="section" id="safety">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 data-i18n="safe.h2">每一步，你都知道发生了什么。</h2>
+          <p data-i18n="safe.p">清理工具最可怕的不是删得少，而是删错了找不回。MacClean 把「可以反悔」放在了第一位。</p>
+        </div>
+        <ol class="flow">
+          <li data-reveal style="--d:0">
+            <span class="dot"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#eye"/></svg></span>
+            <span class="n" data-i18n="safe.s1n">第 1 步</span>
+            <h3 data-i18n="safe.s1">扫描只读</h3>
+            <p data-i18n="safe.s1p">扫描只读取文件信息，不移动、不修改任何东西。</p>
+          </li>
+          <li data-reveal style="--d:1">
+            <span class="dot"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#hand"/></svg></span>
+            <span class="n" data-i18n="safe.s2n">第 2 步</span>
+            <h3 data-i18n="safe.s2">你来勾选</h3>
+            <p data-i18n="safe.s2p">每一项都写明来源。有风险的项目默认不选，由你决定。</p>
+          </li>
+          <li data-reveal style="--d:2">
+            <span class="dot"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#trash"/></svg></span>
+            <span class="n" data-i18n="safe.s3n">第 3 步</span>
+            <h3 data-i18n="safe.s3">移入废纸篓</h3>
+            <p data-i18n="safe.s3p">清理就是把文件移到废纸篓，不会直接抹掉。</p>
+          </li>
+          <li data-reveal style="--d:3">
+            <span class="dot"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#undo"/></svg></span>
+            <span class="n" data-i18n="safe.s4n">第 4 步</span>
+            <h3 data-i18n="safe.s4">一键恢复</h3>
+            <p data-i18n="safe.s4p">后悔了？打开「清理记录」，整批放回原处。</p>
+          </li>
+        </ol>
+        <div class="guards">
+          <div class="guard big">
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#shield"/></svg>
+            <h3>PathGuard</h3>
+            <p data-i18n="safe.pg">一份受保护路径的白名单，系统目录和你的个人文件夹永远不会被当成垃圾。</p>
+            <div class="pathguard" aria-hidden="true">
+              <div><svg class="i"><use href="/assets/img/icons.svg#lock"/></svg>/System</div>
+              <div><svg class="i"><use href="/assets/img/icons.svg#lock"/></svg>~/Documents</div>
+              <div><svg class="i"><use href="/assets/img/icons.svg#lock"/></svg>~/Desktop</div>
+              <div><svg class="i"><use href="/assets/img/icons.svg#lock"/></svg>~/Pictures</div>
+            </div>
+          </div>
+          <div class="guard">
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#hand"/></svg>
+            <h3 data-i18n="safe.optin">有风险的，默认不选</h3>
+            <p data-i18n="safe.optinp">大文件、设备备份、隐私数据这类删了可能会心疼的东西，都要你亲手勾上。</p>
+          </div>
+          <div class="guard">
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#lock"/></svg>
+            <h3 data-i18n="safe.pw">书签和密码，碰都不碰</h3>
+            <p data-i18n="safe.pwp">隐私清理只处理历史、Cookie 和会话。浏览器书签、保存的密码和钥匙串不在范围内。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MENU BAR ============ -->
+    <section class="section tight" id="menubar" style="padding-top:0">
+      <div class="wrap mb-grid">
+        <div class="mb-scene" data-reveal>
+          <div class="mb-bar" aria-hidden="true">
+            <span class="apple"><span>MacClean</span></span>
+            <span class="sel"><img src="/assets/img/favicon-32.png" width="16" height="16" alt=""></span>
+            <span id="mb-clock">10:24</span>
+          </div>
+          <div class="mb-panel" role="img" aria-label="MacClean 菜单栏面板（示例数据）" data-i18n-attr="aria-label:mb.alt">
+            <div class="mbp-head">
+              <div><b><span data-i18n="mbp.status">Mac 状态：良好</span></b><small>MacBook Pro</small></div>
+              <span class="mbp-mac" aria-hidden="true"></span>
+            </div>
+            <div class="mbp-search"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg><span data-i18n="mbp.search">快速搜索文件</span></div>
+            <div class="mbp-grid">
+              <div class="mbp-card"><b>Macintosh HD</b><span data-i18n="mbp.diskFree">可用 156.8 GB</span><span class="mbp-bar" style="--w:84%"><i></i></span></div>
+              <div class="mbp-card"><b><span data-i18n="mb.mem">内存</span></b><span data-i18n="mbp.memP">压力 28%</span><span data-i18n="mbp.memUsed">已用 11.6 / 32 GB</span><span class="mbp-bar" style="--w:28%"><i></i></span></div>
+              <div class="mbp-card"><b><span data-i18n="mb.battery">电池</span><span>86%</span></b><span data-i18n="mbp.batSrc">使用电池供电</span><em data-i18n="mbp.batHealth">健康度 92% · 循环 214 次</em></div>
+              <div class="mbp-card"><b>CPU<em data-i18n="mbp.cpuOk">正常</em></b><span data-i18n="mbp.cpuLoad">负载 18%</span></div>
+              <div class="mbp-card"><b>Wi-Fi<em data-i18n="mbp.test">测速</em></b><span>↑ 41 Mbps</span><span>↓ 312 Mbps</span></div>
+              <div class="mbp-card"><b><span data-i18n="mbp.devices">已连接的设备</span></b><span data-i18n="mbp.mouse">鼠标 · 84%</span><span data-i18n="mbp.phones">耳机 · 70%</span></div>
+            </div>
+            <div class="mbp-foot"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg><span data-i18n="mbp.open">打开 MacClean</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec-head" style="margin-bottom:0">
+            <h2 data-i18n="mb.h2">Mac 的状态，就在菜单栏里。</h2>
+            <p data-i18n="mb.p">不用打开主窗口，点一下就能看到磁盘还剩多少、内存压力、电池健康度，也能顺手搜个文件。</p>
+          </div>
+          <ul class="mb-points">
+            <li><b data-i18n="mb.disk">磁盘</b><span data-i18n="mb.diskSub">可用空间，一键释放</span></li>
+            <li><b data-i18n="mb.mem">内存</b><span data-i18n="mb.memSub">内存压力与已用</span></li>
+            <li><b data-i18n="mb.battery">电池</b><span data-i18n="mb.batterySub">健康度与循环次数</span></li>
+            <li><b data-i18n="mb.net">网络测速</b><span data-i18n="mb.netSub">上下行速度</span></li>
+            <li><b data-i18n="mb.bt">蓝牙电量</b><span data-i18n="mb.btSub">鼠标、耳机等设备</span></li>
+            <li><b>CPU</b><span data-i18n="mb.cpuSub">负载与温度状态</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COMPARE ============ -->
+    <section class="section tight" id="compare" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 data-i18n="cmp.h2">和常见的清理工具有什么不同？</h2>
+          <p data-i18n="cmp.p">我们没有去比谁「删得更多」，只比你更在乎的那几件事。</p>
+        </div>
+        <div class="table-scroll">
+          <table class="compare">
+            <thead>
+              <tr>
+                <th scope="col"><span class="sr-only" data-i18n="cmp.item">项目</span></th>
+                <th scope="col" class="us"><span class="brandcell"><img src="/assets/img/icon-256.webp" width="22" height="22" alt="">MacClean</span></th>
+                <th scope="col" data-i18n="cmp.typical">常见清理工具</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row" data-i18n="cmp.r1">100% 本地运行，不上传文件信息</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r1c">不一定，部分需要联网扫描</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r2">先进废纸篓，可一键撤销</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r2c">多数直接删除</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r3">识别开发缓存</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r3c">很少覆盖</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r4">显示微信、QQ 聊天数据占用</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r4c">很少覆盖</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r5">中文与英文界面</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r5c">视产品而定</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r6">一次购买，长期使用</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r6c">多为订阅制</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r7">无需注册账户</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r7c">常要求登录</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRICING ============ -->
+    <section class="section" id="pricing">
+      <div class="wrap">
+        <div class="sec-head center">
+          <h2 data-i18n="price.h2">买一次，一直用。</h2>
+          <p data-i18n="price.p">先免费试用 7 天，所有功能都能用。扫描永远免费。</p>
+        </div>
+        <div class="plans" id="plans"></div>
+        <p class="trial-note" data-i18n="price.note">支持微信支付与支付宝。购买后 30 天内可无理由退款。</p>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section tight" id="faq" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head center">
+          <h2 data-i18n="faq.h2">常见问题</h2>
+        </div>
+        <div class="faq">
+          <details><summary data-i18n="faq.q1">MacClean 安全吗？会不会删错东西？</summary><div class="ans"><p data-i18n="faq.a1">扫描只读取文件信息。清理时文件会被移到废纸篓，而不是直接删除；系统目录和个人文件夹受 PathGuard 白名单保护，不会出现在可清理列表里。万一删错，在「清理记录」里一键恢复即可。</p></div></details>
+          <details><summary data-i18n="faq.q2">它到底会删除什么？</summary><div class="ans"><p data-i18n="faq.a2">只删除你勾选的项目：应用与浏览器缓存、超过 7 天的日志、旧安装包、邮件附件的本地副本、你选中的设备备份、开发缓存等。每一类都写明了来源，以及删掉后会怎样（比如缓存会在需要时重新生成）。</p></div></details>
+          <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。</p></div></details>
+          <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
+          <details><summary data-i18n="faq.q5">可以退款吗？</summary><div class="ans"><p data-i18n="faq.a5">可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。</p></div></details>
+          <details><summary data-i18n="faq.q6">一个许可证能用在几台 Mac 上？</summary><div class="ans"><p data-i18n="faq.a6">终身版可以激活 2 台 Mac，家庭版可以激活 5 台。换电脑时，在旧 Mac 的设置里点「在此 Mac 上停用」，名额就腾出来了。</p></div></details>
+          <details><summary data-i18n="faq.q7">为什么需要「完全磁盘访问权限」？</summary><div class="ans"><p data-i18n="faq.a7">macOS 会保护邮件、Safari 等应用的数据目录，没有这项权限，MacClean 看不到这些位置的缓存和历史记录。不授权也能用，只是部分文件扫描不到。授权方法见<a href="/download.html#fda">下载页</a>。</p></div></details>
+          <details><summary data-i18n="faq.q8">第一次打开时提示「无法验证开发者」怎么办？</summary><div class="ans"><p data-i18n="faq.a8">MacClean 目前还没有经过 Apple 公证，所以 macOS 会在第一次打开时拦一下。在「应用程序」文件夹里按住 Control 点按 MacClean，选择「打开」；或者到「系统设置 › 隐私与安全性」里点「仍要打开」。<a href="/download.html#install">查看图解</a>。</p></div></details>
+          <details><summary data-i18n="faq.q9">MacClean 会收集我的数据吗？</summary><div class="ans"><p data-i18n="faq.a9">不会。所有扫描都在你的 Mac 本地完成，文件名、路径、浏览记录都不会离开你的电脑。只有激活许可证和检查更新时会联网，内容见<a href="/privacy.html">隐私政策</a>。</p></div></details>
+          <details><summary data-i18n="faq.q10">会让我的 Mac 变快吗？</summary><div class="ans"><p data-i18n="faq.a10">我们不这么承诺。MacClean 帮你看清并收回被占用的磁盘空间、整理启动项、运行系统维护命令。磁盘快满时腾出空间会有帮助，但我们不会用「加速」来吓唬你。</p></div></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FINAL CTA ============ -->
+    <section class="cta-band force-dark">
+      <div class="aurora" aria-hidden="true"><i></i><b></b></div>
+      <div class="wrap">
+        <h2 data-i18n="final.h2">给 Mac 来一次放心的清理。</h2>
+        <p data-i18n="final.p">免费下载，7 天内全部功能随便用。扫描永远免费。</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="/download.html" data-magnetic><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#download"/></svg><span data-i18n="cta.download">免费下载</span></a>
+          <a class="btn btn-ghost btn-lg" href="/buy.html" data-magnetic data-i18n="cta.buy">购买许可证</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- @footer -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+        </div>
+        <div>
+          <h4 data-i18n="foot.product">产品</h4>
+          <ul>
+            <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+            <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+            <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+            <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.help">帮助</h4>
+          <ul>
+            <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+            <li><a href="mailto:support@thulem.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.legal">条款</h4>
+          <ul>
+            <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+            <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 MacClean</span>
+        <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+      </div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- /@footer -->
+  <script type="module" src="/assets/js/home.js"></script>
+</body>
+</html>

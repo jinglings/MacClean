@@ -74,7 +74,7 @@ nonisolated protocol LicenseBackend: Sendable {
 
 /// https://docs.lemonsqueezy.com/api/license-api
 nonisolated struct LemonSqueezyLicenseBackend: LicenseBackend {
-    var baseURL = URL(string: "https://api.lemonsqueezy.com/v1/licenses/")!
+    var baseURL = LicenseConfig.licenseAPIBaseURL
     var session: URLSession = .shared
     var expectedStoreID = LicenseConfig.lemonSqueezyStoreID
     var expectedProductID = LicenseConfig.lemonSqueezyProductID

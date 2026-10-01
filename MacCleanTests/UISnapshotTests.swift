@@ -23,11 +23,15 @@ struct UISnapshotTests {
             PageModelStore.shared.reclaim.scanAll()
             PageModelStore.shared.smartCare.scanAll()
             PageModelStore.shared.appUninstaller.startScan()
-            for _ in 0..<240 {
+            PageModelStore.shared.spaceLens.startScan()
+            LoginItemsViewModel.shared.scan()
+            for _ in 0..<480 {
                 try await Task.sleep(for: .milliseconds(500))
                 if PageModelStore.shared.reclaim.hasScanned && !PageModelStore.shared.reclaim.isScanning
                     && !PageModelStore.shared.smartCare.isScanningAny
-                    && PageModelStore.shared.appUninstaller.state == .results { break }
+                    && PageModelStore.shared.appUninstaller.state == .results
+                    && PageModelStore.shared.spaceLens.phase == .results
+                    && LoginItemsViewModel.shared.hasScanned { break }
             }
         }
 
@@ -71,9 +75,26 @@ struct UISnapshotTests {
             host.layoutSubtreeIfNeeded()
             try await Task.sleep(for: .milliseconds(150))
         }
-        guard let rep = host.bitmapImageRepForCachingDisplay(in: host.bounds) else { return }
-        host.cacheDisplay(in: host.bounds, to: rep)
-        try rep.representation(using: .png, properties: [:])?.write(to: url)
+        // 走 layer 渲染到 sRGB 位图：cacheDisplay 会把颜色洗淡，layer.render 颜色准确。
+        host.wantsLayer = true
+        host.layoutSubtreeIfNeeded()
+        let scale: CGFloat = 2
+        let colorSpace = CGColorSpace(name: CGColorSpace.sRGB)!
+        guard let ctx = CGContext(
+            data: nil, width: Int(size.width * scale), height: Int(size.height * scale),
+            bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ), let layer = host.layer else { return }
+        ctx.scaleBy(x: scale, y: scale)
+        // CALayer 坐标系 y 轴向下（NSHostingView 是 flipped），翻转到 CG 坐标
+        if host.isFlipped {
+            ctx.translateBy(x: 0, y: size.height)
+            ctx.scaleBy(x: 1, y: -1)
+        }
+        layer.render(in: ctx)
+        guard let image = ctx.makeImage() else { return }
+        try NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:])?.write(to: url)
         window.orderOut(nil)
     }
 }
+

@@ -74,12 +74,14 @@ struct LicenseActivationView: View {
             .themeCard()
 
             Button {
-                NSWorkspace.shared.open(LicenseConfig.purchaseURL)
+                if let url = LicenseConfig.purchaseURL { NSWorkspace.shared.open(url) }
             } label: {
                 Label("购买许可证", systemImage: "cart.fill")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(NeonButtonStyle(isLarge: true))
+            .disabled(LicenseConfig.purchaseURL == nil)
+            .help(LicenseConfig.purchaseURL == nil ? "购买页尚未开放" : "")
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("已有许可证？")
@@ -169,11 +171,12 @@ struct LicenseStatusView: View {
                 HStack {
                     Spacer()
                     Button {
-                        NSWorkspace.shared.open(LicenseConfig.purchaseURL)
+                        if let url = LicenseConfig.purchaseURL { NSWorkspace.shared.open(url) }
                     } label: {
                         Label("购买许可证", systemImage: "cart.fill")
                     }
                     .buttonStyle(NeonButtonStyle())
+                    .disabled(LicenseConfig.purchaseURL == nil)
                 }
             }
         }

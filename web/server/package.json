@@ -1,0 +1,14 @@
+{
+  "name": "macclean-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MacClean license server, order desk and admin panel for thulem.com (zero dependencies)",
+  "type": "module",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node src/main.js",
+    "dev": "NODE_ENV=development DATA_DIR=./.data node src/main.js",
+    "test": "node --disable-warning=ExperimentalWarning --test \"test/*.test.js\"",
+    "check": "for f in src/*.js src/routes/*.js admin/js/*.js admin/js/pages/*.js; do node --check \"$f\" || exit 1; done"
+  }
+}

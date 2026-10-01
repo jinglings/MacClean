@@ -1086,3 +1086,5 @@
 "路径不存在：%@" = "Path not found: %@";
 "无法读取文件夹：%@" = "Cannot read folder: %@";
 "没有权限：%@" = "Permission denied: %@";
+"购买页尚未开放" = "The store isn't open yet";
+"终身版 2 台 Mac · 家庭版 5 台 Mac · 含后续版本更新" = "Lifetime: 2 Macs · Family: 5 Macs · Includes future updates";

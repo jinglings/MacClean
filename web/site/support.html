@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="sp.title">支持 · MacClean</title>
+  <meta name="description" content="MacClean 常见问题、安装帮助、许可证与退款，以及联系方式。" data-i18n-attr="content:sp.desc">
+  <!-- @head -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F8F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#040D0C" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <meta property="og:site_name" content="MacClean">
+  <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    (function () {
+      var d = document.documentElement, l = null;
+      d.className += ' js';
+      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+      d.lang = l === 'zh' ? 'zh-CN' : 'en';
+      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+    })();
+  </script>
+  <!-- /@head -->
+</head>
+<body data-page="support">
+  <!-- @nav -->
+  <a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+  <div class="announce" id="announce" hidden></div>
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="MacClean">
+        <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+        <span>MacClean</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+        <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+        <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+        <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+      </ul>
+      <div class="nav-end">
+        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+        </button>
+        <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-magnetic data-i18n="nav.cta">免费下载</a>
+        <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- /@nav -->
+  <main id="main">
+    <section class="page-hero">
+      <div class="aurora" aria-hidden="true"><i></i><b style="background:radial-gradient(ellipse at 50% 120%, transparent 0%, var(--bg) 70%),linear-gradient(to bottom, transparent 60%, var(--bg) 100%)"></b></div>
+      <div class="wrap">
+        <h1 data-i18n="sp.h1">我们能帮上什么？</h1>
+        <p data-i18n="sp.sub">先看看下面的常见问题。没找到答案，就直接写信给我们，通常一个工作日内回复。</p>
+      </div>
+    </section>
+
+    <section class="section tight" style="padding-top:0">
+      <div class="wrap">
+        <div class="contact-cards">
+          <a href="mailto:support@thulem.com" data-contact-email>
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#mail"/></svg>
+            <b data-i18n="sp.mail">发邮件给我们</b>
+            <span data-email-text>support@thulem.com</span>
+          </a>
+          <a href="/order.html">
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg>
+            <b data-i18n="sp.order">查询订单与许可证</b>
+            <span data-i18n="sp.orderSub">用订单号和邮箱找回许可证</span>
+          </a>
+          <a href="/download.html#install">
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#download"/></svg>
+            <b data-i18n="sp.install">安装与首次打开</b>
+            <span data-i18n="sp.installSub">「无法验证开发者」的图解</span>
+          </a>
+        </div>
+
+        <div class="sec-head center"><h2 data-i18n="faq.h2">常见问题</h2></div>
+
+        <div class="faq">
+          <details><summary data-i18n="faq.q1">MacClean 安全吗？会不会删错东西？</summary><div class="ans"><p data-i18n="faq.a1">扫描只读取文件信息。清理时文件会被移到废纸篓，而不是直接删除；系统目录和个人文件夹受 PathGuard 白名单保护，不会出现在可清理列表里。万一删错，在「清理记录」里一键恢复即可。</p></div></details>
+          <details><summary data-i18n="faq.q2">它到底会删除什么？</summary><div class="ans"><p data-i18n="faq.a2">只删除你勾选的项目：应用与浏览器缓存、超过 7 天的日志、旧安装包、邮件附件的本地副本、你选中的设备备份、开发缓存等。每一类都写明了来源，以及删掉后会怎样（比如缓存会在需要时重新生成）。</p></div></details>
+          <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。</p></div></details>
+          <details><summary data-i18n="sp.q.empty">清空废纸篓之后还能恢复吗？</summary><div class="ans"><p data-i18n="sp.a.empty">不能。清空废纸篓是 macOS 的操作，MacClean 无法撤销。「释放空间」里的「废纸篓」一项也是如此。如果你用 Time Machine 备份过，可以从备份中恢复。</p></div></details>
+          <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
+          <details><summary data-i18n="sp.q.after">付款后多久能拿到许可证？</summary><div class="ans"><p data-i18n="sp.a.after">我们人工核对收款，通常在 24 小时内发放。付款时请务必在备注里填写付款码，这样我们才能对上你的订单。核对完成后，订单页面会直接显示许可证，打开订单链接或用订单号和邮箱<a href="/order.html">查询</a>即可。</p></div></details>
+          <details><summary data-i18n="sp.q.nocode">付款时忘了填写备注怎么办？</summary><div class="ans"><p data-i18n="sp.a.nocode">没关系。把订单号、付款时间和金额发邮件给我们，我们会手动核对。</p></div></details>
+          <details><summary data-i18n="sp.q.activate">怎么激活许可证？</summary><div class="ans"><p data-i18n="sp.a.activate">打开 MacClean，点侧边栏顶部的「升级」，选择「输入许可证」，粘贴以 MCLN- 开头的许可证密钥，点「激活」。激活需要联网一次。</p></div></details>
+          <details><summary data-i18n="faq.q6">一个许可证能用在几台 Mac 上？</summary><div class="ans"><p data-i18n="faq.a6">终身版可以激活 2 台 Mac，家庭版可以激活 5 台。换电脑时，在旧 Mac 的设置里点「在此 Mac 上停用」，名额就腾出来了。</p></div></details>
+          <details><summary data-i18n="sp.q.limit">提示「已达到激活上限」怎么办？</summary><div class="ans"><p data-i18n="sp.a.limit">在不再使用的那台 Mac 上打开 MacClean 设置里的「许可证」，点「在此 Mac 上停用」。如果那台 Mac 已经不在手边，写信告诉我们许可证密钥，我们帮你释放名额。</p></div></details>
+          <details><summary data-i18n="faq.q5">可以退款吗？</summary><div class="ans"><p data-i18n="faq.a5">可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。</p></div></details>
+          <details><summary data-i18n="faq.q7">为什么需要「完全磁盘访问权限」？</summary><div class="ans"><p data-i18n="faq.a7">macOS 会保护邮件、Safari 等应用的数据目录，没有这项权限，MacClean 看不到这些位置的缓存和历史记录。不授权也能用，只是部分文件扫描不到。授权方法见<a href="/download.html#fda">下载页</a>。</p></div></details>
+          <details><summary data-i18n="faq.q8">第一次打开时提示「无法验证开发者」怎么办？</summary><div class="ans"><p data-i18n="faq.a8">MacClean 目前还没有经过 Apple 公证，所以 macOS 会在第一次打开时拦一下。在「应用程序」文件夹里按住 Control 点按 MacClean，选择「打开」；或者到「系统设置 › 隐私与安全性」里点「仍要打开」。<a href="/download.html#install">查看图解</a>。</p></div></details>
+          <details><summary data-i18n="sp.q.admin">为什么有些操作要输入管理员密码？</summary><div class="ans"><p data-i18n="sp.a.admin">刷新 DNS、重建 Spotlight 索引、删除本地快照等系统维护命令需要管理员权限，这是 macOS 的要求。每条命令旁都标了「需要管理员密码」，只在你点「运行」时才会询问。</p></div></details>
+          <details><summary data-i18n="faq.q9">MacClean 会收集我的数据吗？</summary><div class="ans"><p data-i18n="faq.a9">不会。所有扫描都在你的 Mac 本地完成，文件名、路径、浏览记录都不会离开你的电脑。只有激活许可证和检查更新时会联网，内容见<a href="/privacy.html">隐私政策</a>。</p></div></details>
+          <details><summary data-i18n="sp.q.uninstall">怎么卸载 MacClean？</summary><div class="ans"><p data-i18n="sp.a.uninstall">如果已经激活，先在设置的「许可证」里点「在此 Mac 上停用」，把名额留给别的 Mac。然后退出 MacClean，把它从「应用程序」拖到废纸篓即可。</p></div></details>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- @footer -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+        </div>
+        <div>
+          <h4 data-i18n="foot.product">产品</h4>
+          <ul>
+            <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+            <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+            <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+            <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.help">帮助</h4>
+          <ul>
+            <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+            <li><a href="mailto:support@thulem.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.legal">条款</h4>
+          <ul>
+            <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+            <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 MacClean</span>
+        <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+      </div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- /@footer -->
+  <script type="module" src="/assets/js/page.js"></script>
+</body>
+</html>

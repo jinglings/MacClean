@@ -1,0 +1,41 @@
+[Unit]
+Description=MacClean license server and admin panel (thulem.com)
+After=network.target
+
+[Service]
+Type=simple
+User=macclean
+Group=macclean
+WorkingDirectory=/opt/macclean-server
+EnvironmentFile=/etc/macclean-server.env
+ExecStart=/usr/local/bin/node src/main.js
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=15
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/macclean
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+UMask=0027
+MemoryMax=300M
+
+[Install]
+WantedBy=multi-user.target

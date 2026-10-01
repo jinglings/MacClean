@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="dl.title">下载 MacClean</title>
+  <meta name="description" content="下载 MacClean，适用于 macOS 14 及以上，Apple 芯片与 Intel。包含安装步骤、首次打开说明与完全磁盘访问权限设置。" data-i18n-attr="content:dl.desc">
+  <!-- @head -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F8F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#040D0C" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <meta property="og:site_name" content="MacClean">
+  <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    (function () {
+      var d = document.documentElement, l = null;
+      d.className += ' js';
+      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+      d.lang = l === 'zh' ? 'zh-CN' : 'en';
+      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+    })();
+  </script>
+  <!-- /@head -->
+</head>
+<body data-page="download">
+  <!-- @nav -->
+  <a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+  <div class="announce" id="announce" hidden></div>
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="MacClean">
+        <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+        <span>MacClean</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+        <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+        <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+        <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+      </ul>
+      <div class="nav-end">
+        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+        </button>
+        <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-magnetic data-i18n="nav.cta">免费下载</a>
+        <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- /@nav -->
+
+  <main id="main">
+    <section class="page-hero force-dark">
+      <div class="aurora" aria-hidden="true"><i></i><span class="grid"></span><b></b></div>
+      <div class="wrap dl-card">
+        <img class="dl-icon" src="/assets/img/icon-512.webp" width="128" height="128" alt="">
+        <h1 data-i18n="dl.h1">下载 MacClean</h1>
+        <p data-i18n="dl.sub">免费下载，7 天内全部功能都能用。无需注册账户。</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" id="dl-btn" href="/download/latest" data-magnetic>
+            <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#download"/></svg><span id="dl-label" data-i18n="dl.btn">下载 DMG</span>
+          </a>
+        </div>
+        <div class="dl-meta" id="dl-meta" aria-live="polite"></div>
+        <p class="hero-meta" id="dl-after" hidden><span data-i18n="dl.started">下载已开始。没有反应？</span> <a class="link" href="/download/latest" data-i18n="dl.retry">重新下载</a></p>
+      </div>
+    </section>
+
+    <section class="section tight">
+      <div class="wrap">
+        <div class="sec-head"><h2 data-i18n="dl.reqH">系统要求</h2></div>
+        <div class="reqs">
+          <div class="req"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg><b data-i18n="dl.req1">macOS 14 Sonoma 或更新</b><span data-i18n="dl.req1s">也支持之后的新版本</span></div>
+          <div class="req"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#chip"/></svg><b data-i18n="dl.req2">Apple 芯片与 Intel</b><span data-i18n="dl.req2s">通用应用，原生运行</span></div>
+          <div class="req"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><b data-i18n="dl.req3">中文与英文</b><span data-i18n="dl.req3s">跟随系统语言</span></div>
+          <div class="req"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#cloudoff"/></svg><b data-i18n="dl.req4">无需联网使用</b><span data-i18n="dl.req4s">仅激活与检查更新时联网</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tight" id="install" style="padding-top:0">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2 data-i18n="dl.instH">三步装好</h2>
+          <p data-i18n="dl.instP">和安装其他 Mac 应用一样，只是第一次打开时要多点一下。</p>
+        </div>
+        <ol class="steps">
+          <li class="step">
+            <div>
+              <span class="num">1</span>
+              <h3 data-i18n="dl.s1">打开下载的 DMG</h3>
+              <p data-i18n="dl.s1p">在「下载」文件夹里双击 <b>MacClean.dmg</b>，会出现一个装有 MacClean 的窗口。</p>
+            </div>
+            <div class="ill" aria-hidden="true">
+              <div class="mwin">
+                <div class="mwin-bar"><i></i><i></i><i></i><span data-i18n="dl.downloads">下载</span></div>
+                <div class="dmg" style="justify-content:flex-start;gap:28px;padding-left:34px">
+                  <figure><img src="/assets/img/icon-256.webp" width="74" height="74" alt="" loading="lazy" style="filter:grayscale(.15)"><span>MacClean.dmg</span></figure>
+                  <figure style="opacity:.45"><div class="folder" style="background:linear-gradient(180deg,#d8dde3,#b8c0ca)"></div><span data-i18n="dl.other">其他文件</span></figure>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="step">
+            <div>
+              <span class="num">2</span>
+              <h3 data-i18n="dl.s2">拖到「应用程序」文件夹</h3>
+              <p data-i18n="dl.s2p">把 MacClean 图标拖到右边的「应用程序」文件夹上。拷贝完成后，就可以推出这个 DMG 了。</p>
+            </div>
+            <div class="ill" aria-hidden="true">
+              <div class="mwin">
+                <div class="mwin-bar"><i></i><i></i><i></i><span>MacClean</span></div>
+                <div class="dmg">
+                  <figure class="drag-ghost"><img src="/assets/img/icon-256.webp" width="74" height="74" alt="" loading="lazy"><span>MacClean</span></figure>
+                  <span class="drag-arrow"></span>
+                  <figure><div class="folder"></div><span data-i18n="dl.apps">应用程序</span></figure>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="step">
+            <div>
+              <span class="num">3</span>
+              <h3 data-i18n="dl.s3">第一次打开</h3>
+              <p data-i18n="dl.s3p">MacClean 目前还没有经过 Apple 公证，所以第一次打开时 macOS 可能会提示「无法验证开发者」。这是正常的，按下面的方法打开一次，以后就不会再问了。</p>
+              <p data-i18n="dl.s3a"><b>macOS 14：</b>在「应用程序」里按住 <span class="kbd">Control</span> 点按 MacClean（或用右键），选择「打开」，在弹出的对话框里再点「打开」。</p>
+            </div>
+            <div class="ill" aria-hidden="true">
+              <div class="dlg">
+                <img src="/assets/img/icon-256.webp" width="56" height="56" alt="" loading="lazy">
+                <b data-i18n="dl.dlgT">macOS 无法验证“MacClean”的开发者。确定要打开吗？</b>
+                <p data-i18n="dl.dlgP">打开此应用将覆盖系统安全性设置。</p>
+                <div class="dlg-btns"><span class="pri ring-pulse" data-i18n="dl.open">打开</span><span data-i18n="dl.cancel">取消</span></div>
+              </div>
+              <div class="ctx">
+                <span class="on" data-i18n="dl.open">打开</span>
+                <span data-i18n="dl.showPkg">显示包内容</span>
+                <hr>
+                <span data-i18n="dl.trash">移到废纸篓</span>
+                <span data-i18n="dl.info">显示简介</span>
+              </div>
+            </div>
+          </li>
+          <li class="step">
+            <div>
+              <h3 data-i18n="dl.s3b">macOS 15 或更新</h3>
+              <p data-i18n="dl.s3bp">新版 macOS 不再在右键菜单里提供「打开」。先双击 MacClean，看到提示后点「完成」；然后打开<b>系统设置 › 隐私与安全性</b>，滚动到「安全性」，在 MacClean 那一行点<b>「仍要打开」</b>，输入密码确认即可。</p>
+              <p class="note" data-i18n="dl.s3bn">只需要做一次。如果没看到「仍要打开」，先再双击一次 MacClean，再回到这里。</p>
+            </div>
+            <div class="ill" aria-hidden="true">
+              <div class="mwin settings">
+                <div class="mwin-bar"><i></i><i></i><i></i><span data-i18n="dl.privSec">隐私与安全性</span></div>
+                <div class="set-side" data-i18n="dl.security">安全性</div>
+                <div class="set-row"><span data-i18n="dl.allowFrom">允许以下来源的应用程序</span><span class="ob" style="font-weight:400" data-i18n="dl.appStoreDev">App Store 与已知开发者</span></div>
+                <div class="set-row hl"><img src="/assets/img/icon-256.webp" width="22" height="22" alt="" loading="lazy"><span data-i18n="dl.blocked">已阻止“MacClean”以保护 Mac。</span><span class="ob ring-pulse" data-i18n="dl.openAnyway">仍要打开</span></div>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section tight" id="fda" style="padding-top:0">
+      <div class="wrap">
+        <div class="step">
+          <div>
+            <div class="sec-head" style="margin-bottom:0">
+              <h2 data-i18n="dl.fdaH">授予完全磁盘访问权限</h2>
+              <p data-i18n="dl.fdaP">邮件、Safari 等应用的数据目录受 macOS 保护。授权后 MacClean 才能扫描到这些位置；不授权也能用，只是部分结果会缺失。</p>
+            </div>
+            <ol class="howto">
+              <li data-i18n="dl.fda1">打开 系统设置 › 隐私与安全性 › 完全磁盘访问权限</li>
+              <li data-i18n="dl.fda2">打开 MacClean 旁边的开关（列表里没有就点「+」，在「应用程序」里选择 MacClean）</li>
+              <li data-i18n="dl.fda3">按提示退出并重新打开 MacClean</li>
+            </ol>
+            <p class="note muted small" style="margin-top:16px" data-i18n="dl.fdaNote">MacClean 侧边栏底部的「授权」按钮会直接带你到这个页面。</p>
+          </div>
+          <div class="ill" aria-hidden="true">
+            <div class="mwin settings">
+              <div class="mwin-bar"><i></i><i></i><i></i><span data-i18n="dl.fda">完全磁盘访问权限</span></div>
+              <div class="set-row"><span class="folder" style="width:22px;height:18px;border-radius:4px"></span><span>Terminal</span><span class="sw"></span></div>
+              <div class="set-row hl"><img src="/assets/img/icon-256.webp" width="22" height="22" alt="" loading="lazy"><span>MacClean</span><span class="sw on" id="fda-sw"></span></div>
+              <div class="set-row"><span class="folder" style="width:22px;height:18px;border-radius:4px;background:linear-gradient(180deg,#d8dde3,#b8c0ca)"></span><span>Backup Utility</span><span class="sw"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tight" id="changelog" style="padding-top:0">
+      <div class="wrap" style="max-width:860px">
+        <div class="sec-head"><h2 data-i18n="dl.logH">更新日志</h2></div>
+        <div class="changelog" id="changelog-box">
+          <p class="muted" data-i18n="common.loading">加载中…</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- @footer -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+        </div>
+        <div>
+          <h4 data-i18n="foot.product">产品</h4>
+          <ul>
+            <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+            <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+            <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+            <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.help">帮助</h4>
+          <ul>
+            <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+            <li><a href="mailto:support@thulem.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.legal">条款</h4>
+          <ul>
+            <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+            <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 MacClean</span>
+        <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+      </div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- /@footer -->
+  <script type="module" src="/assets/js/download.js"></script>
+</body>
+</html>

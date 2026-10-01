@@ -1,0 +1,51 @@
+# Merge into the existing thulem.com site block in /etc/caddy/Caddyfile.
+# Leave the x-ui / xray / frps sites untouched.
+thulem.com {
+	# Backend: license API, orders, admin SPA, appcast, downloads and uploaded files.
+	@backend path /api/* /admin /admin/* /appcast.xml /download/* /files/*
+
+	# Only the release upload may be large; everything else under the backend stays small
+	# (QR images are <= 2 MB, JSON <= 64 KB, the backend enforces its own limits as well).
+	@releaseUpload path /api/admin/releases
+	request_body @releaseUpload {
+		max_size 600MB
+	}
+	@smallBodies {
+		path /api/* /admin /admin/*
+		not path /api/admin/releases
+	}
+	request_body @smallBodies {
+		max_size 4MB
+	}
+
+	handle @backend {
+		reverse_proxy 127.0.0.1:8787 {
+			# Caddy streams request bodies by default (no buffering), so the 500 MB upload goes
+			# straight through to the backend, which streams it to disk.
+			# Keep the client's Host and Cloudflare's CF-Connecting-IP (passed through untouched);
+			# the backend only trusts these headers because the connection comes from 127.0.0.1.
+			header_up Host {host}
+			flush_interval -1
+			transport http {
+				read_timeout 1h
+				write_timeout 1h
+			}
+		}
+	}
+
+	handle {
+		root * /var/www/thulem.com
+		encode zstd gzip
+		file_server
+	}
+
+	# Don't compress the backend: DMG downloads use Range requests and must keep Content-Length.
+	# Keep these response headers from the backend as-is (don't override them here):
+	#   Content-Security-Policy / X-Frame-Options (admin), Set-Cookie (admin session),
+	#   Accept-Ranges / Content-Range / ETag / Last-Modified (files), Cache-Control, Retry-After.
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		-Server
+	}
+}

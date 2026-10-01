@@ -40,7 +40,8 @@ final class AppUpdater: ObservableObject {
 
     private init() {
         let key = Bundle.main.object(forInfoDictionaryKey: "SUPublicEDKey") as? String ?? ""
-        isConfigured = !key.isEmpty && !key.hasPrefix("REPLACE_")
+        let feed = Bundle.main.object(forInfoDictionaryKey: "SUFeedURL") as? String ?? ""
+        isConfigured = !key.isEmpty && !key.hasPrefix("REPLACE_") && feed.hasPrefix("https://")
 
         #if canImport(Sparkle)
         if isConfigured {

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="buy.title">购买 MacClean</title>
+  <meta name="description" content="购买 MacClean 许可证：终身版或家庭版，一次付费，支持微信支付与支付宝，30 天内可退款。" data-i18n-attr="content:buy.desc">
+  <meta name="robots" content="noindex">
+  <!-- @head -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F8F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#040D0C" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <meta property="og:site_name" content="MacClean">
+  <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    (function () {
+      var d = document.documentElement, l = null;
+      d.className += ' js';
+      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+      d.lang = l === 'zh' ? 'zh-CN' : 'en';
+      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+    })();
+  </script>
+  <!-- /@head -->
+</head>
+<body data-page="buy">
+  <!-- @nav -->
+  <a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+  <div class="announce" id="announce" hidden></div>
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="MacClean">
+        <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+        <span>MacClean</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+        <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+        <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+        <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+      </ul>
+      <div class="nav-end">
+        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+        </button>
+        <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-magnetic data-i18n="nav.cta">免费下载</a>
+        <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- /@nav -->
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="aurora" aria-hidden="true"><i></i><b style="background:radial-gradient(ellipse at 50% 120%, transparent 0%, var(--bg) 70%),linear-gradient(to bottom, transparent 60%, var(--bg) 100%)"></b></div>
+      <div class="wrap">
+        <h1 data-i18n="buy.h1">购买 MacClean</h1>
+        <p data-i18n="buy.sub">一次付费，长期使用。扫码付款后，我们核对到账即发放许可证。</p>
+      </div>
+    </section>
+
+    <section class="section tight" style="padding-top:0">
+      <div class="wrap">
+        <div class="panel" id="saved" hidden style="margin-bottom:24px">
+          <h2 data-i18n="buy.yours">你的订单</h2>
+          <p data-i18n="buy.yoursP">在这台设备上创建过的订单，点开查看付款状态和许可证。</p>
+          <div class="my-orders"></div>
+        </div>
+
+        <!-- step 1: choose & create -->
+        <form class="checkout" id="buy-form" novalidate>
+          <div class="panel">
+            <h2 data-i18n="buy.step1">选择版本并填写邮箱</h2>
+            <p data-i18n="buy.step1p">邮箱用来查询订单和找回许可证，我们不会发送营销邮件。</p>
+
+            <fieldset class="fieldset">
+              <legend data-i18n="buy.planLabel">版本</legend>
+              <div class="choices" id="plan-choices"></div>
+            </fieldset>
+
+            <div class="field">
+              <label for="email" data-i18n="buy.email">邮箱</label>
+              <input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com" aria-describedby="email-err">
+              <div class="err-text" id="email-err" hidden></div>
+            </div>
+
+            <fieldset class="fieldset">
+              <legend data-i18n="buy.payLabel">付款方式</legend>
+              <div class="choices">
+                <label class="choice"><input type="radio" name="payMethod" value="wechat" checked><span class="box"><span class="pay-row"><span class="pay-logo wechat" aria-hidden="true">微</span><b data-i18n="buy.wechat">微信支付</b></span></span></label>
+                <label class="choice"><input type="radio" name="payMethod" value="alipay"><span class="box"><span class="pay-row"><span class="pay-logo alipay" aria-hidden="true">支</span><b data-i18n="buy.alipay">支付宝</b></span></span></label>
+              </div>
+            </fieldset>
+
+            <div id="form-msg"></div>
+            <div class="form-actions">
+              <button class="btn btn-primary btn-lg" type="submit" id="submit-btn" data-magnetic><span data-i18n="buy.submit">创建订单并付款</span></button>
+            </div>
+          </div>
+
+          <aside class="panel">
+            <h2 data-i18n="buy.summary">订单摘要</h2>
+            <ul class="summary-list" id="summary">
+              <li><span data-i18n="buy.planLabel">版本</span><span id="sum-plan">—</span></li>
+              <li><span data-i18n="buy.devicesLabel">可激活设备</span><span id="sum-devices">—</span></li>
+              <li class="total"><span data-i18n="buy.total">合计</span><span id="sum-total">—</span></li>
+            </ul>
+            <div class="side-note">
+              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#undo"/></svg><span data-i18n="buy.n1">30 天内无理由退款</span></div>
+              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#lock"/></svg><span data-i18n="buy.n2">一次付费，没有订阅，不会自动扣款</span></div>
+              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#clock"/></svg><span data-i18n="buy.n3">人工核对收款，通常在 24 小时内发放许可证</span></div>
+              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#checkup"/></svg><span data-i18n="buy.n4">还没试过？先<a href="/download.html">免费下载</a>试用 7 天</span></div>
+            </div>
+          </aside>
+        </form>
+
+        <!-- step 2/3: pay, then license -->
+        <div id="order-box" tabindex="-1" hidden></div>
+        <p class="hint" id="restart" hidden style="margin-top:20px;text-align:center"><a class="link" href="/buy.html" data-i18n="buy.another">再买一份</a></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- @footer -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+        </div>
+        <div>
+          <h4 data-i18n="foot.product">产品</h4>
+          <ul>
+            <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+            <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+            <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+            <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.help">帮助</h4>
+          <ul>
+            <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+            <li><a href="mailto:support@thulem.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.legal">条款</h4>
+          <ul>
+            <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+            <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 MacClean</span>
+        <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+      </div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- /@footer -->
+  <script type="module" src="/assets/js/buy.js"></script>
+</body>
+</html>

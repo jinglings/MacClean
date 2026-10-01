@@ -76,7 +76,7 @@ extension CleanGroupDescriptor {
 // MARK: - 跨并发域的弱引用
 
 /// 后台扫描的进度回调需要弱引用 ViewModel；以 let 常量捕获此盒子，避免「捕获可变 weak var」的并发告警。
-final class WeakRef<Object: AnyObject>: @unchecked Sendable {
+nonisolated final class WeakRef<Object: AnyObject>: @unchecked Sendable {
     weak var object: Object?
     init(_ object: Object) { self.object = object }
 }

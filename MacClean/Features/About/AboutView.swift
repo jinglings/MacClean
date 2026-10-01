@@ -8,11 +8,11 @@
 import SwiftUI
 
 /// 对外链接集中在这里。
-// TODO(发布前): 确认域名与页面已上线
+/// 为 nil 的链接不显示。
 enum AppLinks {
-    static let website = URL(string: "https://macclean.app")
-    static let privacy = URL(string: "https://macclean.app/privacy")
-    static let support = URL(string: "https://macclean.app/support")
+    static let website: URL? = URL(string: "https://thulem.com/")
+    static let privacy: URL? = URL(string: "https://thulem.com/privacy.html")
+    static let support: URL? = URL(string: "https://thulem.com/support.html")
 }
 
 enum AppVersionInfo {
@@ -69,13 +69,17 @@ struct AboutView: View {
 struct AboutLinksRow: View {
     var body: some View {
         HStack(spacing: 14) {
-            link("官网", AppLinks.website)
-            dot
-            link("隐私政策", AppLinks.privacy)
-            dot
-            link("支持", AppLinks.support)
+            ForEach(Array(links.enumerated()), id: \.offset) { index, item in
+                if index > 0 { dot }
+                link(item.title, item.url)
+            }
         }
         .font(.system(size: 12, weight: .medium))
+    }
+
+    private var links: [(title: LocalizedStringKey, url: URL)] {
+        [("官网", AppLinks.website), ("隐私政策", AppLinks.privacy), ("支持", AppLinks.support)]
+            .compactMap { title, url in url.map { (title, $0) } }
     }
 
     private var dot: some View {

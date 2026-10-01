@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title data-i18n="order.title">查询订单 · MacClean</title>
+  <meta name="description" content="查询 MacClean 订单状态，获取许可证。" data-i18n-attr="content:order.desc">
+  <meta name="robots" content="noindex">
+  <!-- @head -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F8F7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#040D0C" media="(prefers-color-scheme: dark)">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+  <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+  <meta property="og:site_name" content="MacClean">
+  <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script>
+    (function () {
+      var d = document.documentElement, l = null;
+      d.className += ' js';
+      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+      d.lang = l === 'zh' ? 'zh-CN' : 'en';
+      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+    })();
+  </script>
+  <!-- /@head -->
+</head>
+<body data-page="order">
+  <!-- @nav -->
+  <a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+  <div class="announce" id="announce" hidden></div>
+  <header class="nav" id="nav">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="MacClean">
+        <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+        <span>MacClean</span>
+      </a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+        <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+        <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+        <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+      </ul>
+      <div class="nav-end">
+        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+        </button>
+        <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-magnetic data-i18n="nav.cta">免费下载</a>
+        <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+          <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- /@nav -->
+
+  <main id="main">
+    <section class="page-hero">
+      <div class="aurora" aria-hidden="true"><i></i><b style="background:radial-gradient(ellipse at 50% 120%, transparent 0%, var(--bg) 70%),linear-gradient(to bottom, transparent 60%, var(--bg) 100%)"></b></div>
+      <div class="wrap">
+        <h1 data-i18n="order.h1">查询订单</h1>
+        <p data-i18n="order.sub">输入订单号和下单时填写的邮箱，查看付款状态和许可证。</p>
+      </div>
+    </section>
+
+    <section class="section tight" style="padding-top:0">
+      <div class="wrap">
+        <div id="loading" class="panel" hidden style="text-align:center"><p class="muted" data-i18n="common.loading">加载中…</p></div>
+
+        <form class="panel" id="lookup" novalidate style="max-width:620px;margin:0 auto">
+          <h2 data-i18n="order.lookupH">找到你的订单</h2>
+          <p data-i18n="order.lookupP">订单号以 MC 开头，显示在下单后的付款页面上。</p>
+          <div class="field">
+            <label for="no" data-i18n="order.noLabel">订单号</label>
+            <input class="input" id="no" name="no" required autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="MC20261001-7K3Q">
+          </div>
+          <div class="field">
+            <label for="lemail" data-i18n="buy.email">邮箱</label>
+            <input class="input" id="lemail" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com">
+          </div>
+          <div id="lookup-msg"></div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit" id="lookup-btn"><span data-i18n="order.lookupBtn">查询</span></button>
+            <span class="hint" style="margin:0"><span data-i18n="order.lost">找不到订单号？</span> <a class="link" href="mailto:support@thulem.com" data-contact-email data-i18n="order.mailUs">给我们写信</a></span>
+          </div>
+        </form>
+
+        <div class="panel" id="saved" hidden style="max-width:620px;margin:24px auto 0">
+          <h2 data-i18n="buy.yours">你的订单</h2>
+          <p data-i18n="buy.yoursP">在这台设备上创建过的订单，点开查看付款状态和许可证。</p>
+          <div class="my-orders"></div>
+        </div>
+
+        <div id="order-box" tabindex="-1" hidden></div>
+        <p class="hint" id="back" hidden style="margin-top:20px;text-align:center"><a class="link" href="/order.html" data-i18n="order.another">查询其他订单</a></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- @footer -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+        </div>
+        <div>
+          <h4 data-i18n="foot.product">产品</h4>
+          <ul>
+            <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+            <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+            <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+            <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.help">帮助</h4>
+          <ul>
+            <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+            <li><a href="mailto:support@thulem.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="foot.legal">条款</h4>
+          <ul>
+            <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+            <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 MacClean</span>
+        <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+      </div>
+    </div>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- /@footer -->
+  <script type="module" src="/assets/js/order.js"></script>
+</body>
+</html>

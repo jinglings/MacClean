@@ -7,7 +7,7 @@
 	     2. 把 appcast.xml 部署到 SUFeedURL 指向的地址（用 bin/generate_appcast 生成）。
 	     公钥仍为占位值时，应用内更新功能会自动停用。 -->
 	<key>SUFeedURL</key>
-	<string>https://macclean.app/appcast.xml</string>
+	<string>https://thulem.com/appcast.xml</string>
 	<key>SUPublicEDKey</key>
 	<string>REPLACE_WITH_SPARKLE_PUBLIC_ED_KEY</string>
 	<key>SUEnableAutomaticChecks</key>
