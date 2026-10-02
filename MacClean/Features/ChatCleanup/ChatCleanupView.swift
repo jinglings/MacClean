@@ -11,6 +11,7 @@ import SwiftUI
 struct ChatCleanupView: View {
     @ObservedObject private var viewModel: ChatCleanupViewModel
 
+    @State private var inspectedGroupID: String?
     @State private var showConfirm = false
     @State private var showCompletion = false
     @State private var showHistory = false
@@ -20,8 +21,9 @@ struct ChatCleanupView: View {
         self.init(viewModel: .shared)
     }
 
-    init(viewModel: ChatCleanupViewModel) {
+    init(viewModel: ChatCleanupViewModel, inspectedGroupID: String? = nil) {
         _viewModel = ObservedObject(wrappedValue: viewModel)
+        _inspectedGroupID = State(initialValue: inspectedGroupID)
     }
 
     var body: some View {
@@ -209,11 +211,31 @@ struct ChatCleanupView: View {
             .foregroundColor(AppTheme.textPrimary)
             .padding(.top, 4)
             .id(Self.groupsAnchor)
-        LazyVStack(spacing: 10) {
-            ForEach(account.groups) { group in
-                ChatGroupCard(viewModel: viewModel, account: account, group: group)
+        HStack(alignment: .top, spacing: 0) {
+            LazyVStack(spacing: 0) {
+                ForEach(account.groups) { group in
+                    ChatGroupCard(
+                        viewModel: viewModel, account: account, group: group,
+                        isInspected: inspectedGroupID == group.id,
+                        onInspect: { inspectedGroupID = group.id }
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity)
+
+            if let group = account.groups.first(where: { $0.id == inspectedGroupID }) {
+                ChatGroupInspector(
+                    title: viewModel.label(for: group, in: account), group: group,
+                    onClose: { inspectedGroupID = nil }
+                )
+                .frame(width: 208)
+                .padding(.leading, 16)
+                .padding(.vertical, 12)
+                .overlay(alignment: .leading) { AppTheme.divider.frame(width: 1) }
             }
         }
+        .onChange(of: account.id) { _, _ in inspectedGroupID = nil }
+        .onChange(of: viewModel.app) { _, _ in inspectedGroupID = nil }
     }
 
     static let groupsAnchor = "chat-groups"

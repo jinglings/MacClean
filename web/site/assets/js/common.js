@@ -1,6 +1,6 @@
 // Shared behavior for every page: nav, language, config, screenshots, motion helpers.
-import { initI18n, getLang, setLang, onLangChange, t } from './i18n.js?v=1.4';
-import { api } from './api.js?v=1.4';
+import { initI18n, getLang, setLang, onLangChange, t } from './i18n.js?v=20261002.1';
+import { api } from './api.js?v=20261002.1';
 
 export const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 export const darkScheme = matchMedia('(prefers-color-scheme: dark)');
@@ -94,7 +94,8 @@ export const SHOT_EXT = '.webp';
 
 export function shotURL(tab, { scheme, lang = getLang(), small = false } = {}) {
   scheme ??= darkScheme.matches ? 'dark' : 'light';
-  return `${SHOT_DIR}${scheme}-${lang}-${tab}${small ? '-900' : ''}${SHOT_EXT}`;
+  const nativeTabs = ['chat_cleanup', 'disk_analysis', 'developer_tools', 'cache_cleanup', 'app_uninstaller', 'similar_photos_tab', 'smart_care'];
+  return `${SHOT_DIR}${nativeTabs.includes(tab) ? 'native/' : ''}${scheme}-${lang}-${tab}${small ? '-900' : ''}${SHOT_EXT}`;
 }
 
 export function updateShot(img) {
@@ -226,7 +227,6 @@ async function applySiteConfig() {
 export function boot() {
   initI18n();
   initNav();
-  initMagnetic();
   initReveal();
   updateShots();
   darkScheme.addEventListener('change', () => updateShots());

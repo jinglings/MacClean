@@ -1,5 +1,5 @@
 // Thin JSON client for the MacClean server (see web/SPEC.md).
-import { t } from './i18n.js?v=1.4';
+import { t } from './i18n.js?v=20261002.1';
 
 export class ApiError extends Error {
   constructor(kind, status = 0, message = '', data = null) {

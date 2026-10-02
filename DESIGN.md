@@ -1,53 +1,50 @@
 # Design
 
-视觉主题：**「原生通透」(Native Clarity)** —— 跟随系统浅色/深色自动切换；侧栏 macOS 毛玻璃，内容区柔和渐变底；薄荷绿→青色品牌渐变；每个功能一枚彩色渐变图标块。2026-10 取代「石墨 + 薄荷」纯深色主题。
+视觉主题：**原生工具（Native Utility）**。2026-10 按用户确认的蓝色版设计稿统一应用：白色工作区、浅蓝灰侧栏、系统蓝交互、少量彩色功能符号。支持系统浅色和深色，不使用背景光晕、渐变按钮或彩色图标底块。
 
-所有 token 在 `MacClean/Core/Theme/ThemeConstants.swift`。颜色一律用 `Color(light:dark:)` 动态色，**禁止直接写 `Color.white.opacity(...)`**——用 `AppTheme.ink(x)`（深色下为白、浅色下为黑）。
+所有 token 在 `MacClean/Core/Theme/ThemeConstants.swift`。用 `Color(light:dark:)` 或 `AppTheme.ink(x)` 适配外观，不硬编码浅色页面专用的白色透明层。
 
 ## Color
 
 | Token | 浅色 / 深色 | 用途 |
 |---|---|---|
-| primaryGradient | #F7F8FA→#EEF1F4 / #1A1D23→#111317 | 内容区底（`AppBackdrop` 叠加右上角极淡品牌光晕） |
-| sidebar | 毛玻璃 `.sidebar` + 55% 着色 | 侧栏 |
-| surface / surfaceHover | 白 82%/100% / 白 5.5%/8.5% | 卡片 |
-| surfaceBorder | 黑 7% / 白 9% | 卡片描边 |
-| textPrimary / Secondary / Muted | #161A21, 68%, 50% / #F2F4F7, 72%, 50% | 文本 |
-| accent | #0EA372 / #3DDC97 | 实色强调：选中、进度、数字高亮 |
-| brandGradient | #10B981 → #0891B2 | 主按钮、Logo、勾选框、角标 |
-| warning / danger | #D48A0C / #F0B654 ，#E04E3B / #F07A68 | 语义 |
-| 功能图标渐变 | `AppTab.tileGradient` | 侧栏、页头、引导页的图标块 |
+| primaryGradient（兼容名称） | #FFFFFF / #1E1E20，两个端点相同 | 纯色工作区 |
+| sidebar | 浅蓝灰 #EAF0F7 着色 + 系统 sidebar 材质 | 导航背景 |
+| accent | #007AFF / #0A84FF | 选中、勾选、进度、主按钮 |
+| accentSoft | 系统蓝低透明度 | 内容行选中态 |
+| surface / surfaceHover | 白色 / 淡蓝灰；深色下低透明白 | 分组、悬停 |
+| surfaceBorder / divider | 中性细线 | 区域边界、行分隔 |
+| mint / teal / sky / amber / violet | 动态绿、青、蓝、橙、紫 | 小型功能符号与分类，不能替代统一的交互蓝色 |
+| warning / danger | 动态橙 / 红 | 警告与危险操作 |
 
 ## Typography
 
-SF Pro。页标题 22 bold（左侧配 40pt 功能图标块）/ 引导标题 22 bold / 区块 15–17 semibold / 正文 13–13.5 / 标注 11–12。数字 `.rounded` + monospacedDigit。
+SF Pro / 系统中文字体。页标题 19 semibold，引导标题 20 semibold，区块 15–17，正文 13，辅助 11–12。容量数字使用 monospacedDigit，不使用巨型数字英雄区。
 
 ## Layout
 
-- 侧栏 236pt：Logo + 分组导航（概览 / 清理 / 管理）+ 解锁按钮 + 磁盘环形卡片。
-- 内容区 padding 32；卡片圆角 14（continuous），控件 9，主按钮大号 11。
-- 未扫描页面：统一 `ScanIntroView` 英雄卡（大图标块 + 特性网格 + 主按钮 + 只读安全提示）；上方已有配置卡时用 `compact: true`。页头的「开始扫描」在未扫描时隐藏，避免重复按钮。
+- 侧栏 216pt，28pt 导航行。选中项系统蓝底白字；普通项彩色线性符号与深色文字。
+- 侧栏底部显示磁盘名称、细用量条和可用/总容量，不使用圆环卡片。
+- 页头带底部分隔线，内容水平间距 24pt。
+- 分组圆角 8pt、按钮 6pt。分组使用细描边，不加浮起阴影。
+- 文件与会话使用连续列表，避免一行一个大卡片。聊天会话信息按钮打开详情栏；详情浏览独立于删除勾选。
+- 扫描前显示简洁符号、说明、功能要点和一个扫描按钮，取消光晕与多层英雄卡。
 
 ## Components
 
-- `NeonButtonStyle`：品牌渐变 + 白字 + 顶部高光 + 同色柔和投影；hover 提亮、按下 0.98 缩放。
-- `NeonOutlineButtonStyle`：surface 填充 + 描边 + 轻投影。
-- `GradientIconTile`：圆角方块渐变图标（侧栏 24 / 页头 40 / 结果卡 40–42 / 英雄 84）。
-- `themeCard()`：surface + 描边 + 阴影（浅色 7% / 深色 28%）。
-- 勾选框：未选为 surface + 描边，选中为品牌渐变 + 白色对勾。
+保留旧类型名以兼容现有页面，其视觉已经更新：
 
-## Motion
+- `NeonButtonStyle`：实色系统蓝（危险操作保留语义色），30/36pt 高，无光晕。
+- `NeonOutlineButtonStyle`：中性填充、细描边，30/32pt 级别尺寸。
+- `GradientIconTile`：彩色 SF Symbol，无底块、无阴影；旧 gradient 参数仅保留接口兼容。
+- `themeCard()`：8pt 分组边框，无投影。
+- `PageHeader`：小型功能符号、紧凑标题和操作按钮。
+- `ScanIntroView`：简洁扫描说明，不做营销式卡片墙。
 
-150–250ms easeOut；hover 微提亮/上浮 1pt；完成态 spring(0.4, 0.8) 一次性弹入。不做常驻循环动画、粒子、星空。注意：离屏截图不渲染 `.blur`，光晕一律用 RadialGradient。
+## Motion & Safety
 
-## Naming(菜单/功能命名,刻意避开 CleanMyMac 词表)
+短时 hover/状态过渡，不做常驻动画。保留确认、风险提示、运行中保护、权限提示、清理记录与撤销。普通文件移入废纸篓；不把 Docker prune 或删除本地快照描述成可撤销。
 
-| Tab | 中文 | English |
-|---|---|---|
-| smart_care | 一键体检 | Checkup |
-| disk_analysis | 存储地图 | Storage Map |
-| cache_cleanup | 释放空间 | Reclaim |
-| developer_tools | 开发缓存 | Dev Caches |
-| app_uninstaller | 应用管家 | App Manager |
+## Naming
 
-内部分组:系统缓存 / 二进制冗余 / Xcode 构建产物。
+保留现有功能名：一键体检、存储地图、释放空间、聊天清理、开发缓存、应用管家等。视觉重构不改扫描与清理规则。

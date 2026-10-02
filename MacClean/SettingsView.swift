@@ -121,6 +121,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
 struct GeneralSettingsView: View {
     @AppStorage("showInMenuBar") private var showInMenuBar = true
+    @AppStorage(SensorSettingsKey.showTemperatureInMenuBar) private var showsTemperatureInMenuBar = false
     @AppStorage(AppAppearance.storageKey) private var appearance = AppAppearance.system.rawValue
     @ObservedObject private var updater = AppUpdater.shared
 
@@ -150,6 +151,11 @@ struct GeneralSettingsView: View {
                     Text("在菜单栏显示")
                     Text("快速查看磁盘、内存与网络状态")
                 }
+                Toggle(isOn: $showsTemperatureInMenuBar) {
+                    Text("在菜单栏图标旁显示 CPU 温度")
+                    Text("每分钟读取一次传感器，只读")
+                }
+                .disabled(!showInMenuBar)
             }
 
             Section("外观与语言") {

@@ -117,28 +117,8 @@ extension EnvironmentValues {
 /// 柔和渐变底 + 右上角极淡的品牌色光晕，让内容区有空气感
 struct AppBackdrop: View {
     var body: some View {
-        ZStack {
-            AppTheme.primaryGradient
-            GeometryReader { proxy in
-                let w = proxy.size.width
-                ZStack {
-                    RadialGradient(
-                        colors: [AppTheme.accent.opacity(0.13), AppTheme.accent.opacity(0)],
-                        center: UnitPoint(x: 0.92, y: -0.05),
-                        startRadius: 0,
-                        endRadius: w * 0.55
-                    )
-                    RadialGradient(
-                        colors: [AppTheme.sky.opacity(0.08), AppTheme.sky.opacity(0)],
-                        center: UnitPoint(x: 0.05, y: 1.05),
-                        startRadius: 0,
-                        endRadius: w * 0.5
-                    )
-                }
-            }
-            .allowsHitTesting(false)
-        }
-        .ignoresSafeArea()
+        AppTheme.primaryGradient
+            .ignoresSafeArea()
     }
 }
 
@@ -165,12 +145,11 @@ struct PageHeader<Trailing: View>: View {
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
             if let tab {
-                GradientIconTile(systemName: tab.filledIcon, gradient: tab.tileGradient, size: 40, glyphRatio: 0.46, shadowColor: tab.tileShadow)
-                    .shadow(color: tab.tileShadow.opacity(0.25), radius: 8, y: 4)
+                GradientIconTile(systemName: tab.filledIcon, gradient: tab.tileGradient, size: 26, glyphRatio: 0.62, shadowColor: tab.tileShadow)
             }
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(size: 19, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary)
                 if let subtitle {
                     Text(subtitle)
@@ -184,7 +163,9 @@ struct PageHeader<Trailing: View>: View {
             trailing
         }
         .padding(.horizontal, CosmicSizes.pagePadding)
-        .padding(.top, 30)
+        .padding(.top, 22)
+        .padding(.bottom, 16)
+        .overlay(alignment: .bottom) { AppTheme.divider.frame(height: 1) }
     }
 }
 

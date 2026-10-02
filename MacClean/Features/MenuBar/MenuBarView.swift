@@ -9,7 +9,7 @@
 import SwiftUI
 
 enum MenuBarPanel: Equatable {
-    case disk, memory, network, devices
+    case disk, memory, network, devices, thermal
 }
 
 struct MenuBarView: View {
@@ -25,6 +25,10 @@ struct MenuBarView: View {
     @State private var indexResults: [FileSearchResult]?
     @State private var indexTotal = 0
     @FocusState private var isSearchFocused: Bool
+
+    init(initialPanel: MenuBarPanel? = nil) {
+        _panel = State(initialValue: initialPanel)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -47,6 +51,7 @@ struct MenuBarView: View {
                 case .memory: MemoryReleasePanel(onBack: back)
                 case .network: NetworkPanel(onBack: back)
                 case .devices: DevicesPanel(onBack: back)
+                case .thermal: ThermalPanel(onBack: back)
                 }
                 }
             }
@@ -278,17 +283,31 @@ struct MenuBarView: View {
 
     private var cpuCard: some View {
         let thermal = monitor.thermal
+        let sensors = monitor.sensors
+        var lines = [StatusLine(text: String(localized: "负载 \(monitor.cpuLoad.map { "\($0)%" } ?? "—")"), color: AppTheme.textSecondary)]
+        if let cpuMax = sensors?.cpuMax {
+            lines.append(StatusLine(text: String(localized: "温度 \(SensorFormat.celsius(cpuMax))"), color: TemperatureLevel.of(cpuMax).color))
+        }
+        if let sensors, sensors.hasFans {
+            let idle = sensors.fans.allSatisfy(\.isIdle)
+            lines.append(StatusLine(
+                text: idle ? String(localized: "风扇 静止") : String(localized: "风扇 \(SensorFormat.rpm(sensors.fanRPM ?? 0))"),
+                color: AppTheme.textMuted
+            ))
+        }
+        if sensors?.cpuMax == nil {
+            lines.append(StatusLine(text: String(localized: "温度状态由系统热管理报告"), color: AppTheme.textMuted))
+        }
         return StatusCard(
             icon: "cpu",
             title: "CPU",
             trailing: thermal.title,
-            trailingColor: thermal == .nominal ? AppTheme.accent : (thermal == .fair ? AppTheme.warning : AppTheme.danger),
-            lines: [
-                StatusLine(text: String(localized: "负载 \(monitor.cpuLoad.map { "\($0)%" } ?? "—")"), color: AppTheme.textSecondary),
-                StatusLine(text: String(localized: "温度状态由系统热管理报告"), color: AppTheme.textMuted),
-            ],
+            trailingColor: thermal.color,
+            lines: lines,
             meter: monitor.cpuLoad.map { Double($0) / 100 },
-            meterColor: (monitor.cpuLoad ?? 0) >= 90 ? AppTheme.warning : AppTheme.accent
+            meterColor: (monitor.cpuLoad ?? 0) >= 90 ? AppTheme.warning : AppTheme.accent,
+            actionTitle: String(localized: "详情"),
+            action: { show(.thermal) }
         )
     }
 

@@ -43,7 +43,7 @@ struct MacCleanApp: App {
                 .environmentObject(appState)
                 .modifier(AppShellActions())
         } label: {
-            Label("MacClean", systemImage: "gauge.with.dots.needle.33percent")
+            MenuBarStatusLabel()
         }
         .menuBarExtraStyle(.window)
 

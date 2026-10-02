@@ -23,7 +23,7 @@ struct CoolSidebarView: View {
 
             brandHeader
                 .padding(.horizontal, 18)
-                .padding(.bottom, 16)
+                .padding(.bottom, 10)
 
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 2) {
@@ -90,24 +90,12 @@ struct CoolSidebarView: View {
         [
             (String(localized: "概览"), [.smartCare, .diskAnalysis]),
             (String(localized: "清理"), [.cacheCleanup, .chatCleanup, .largeOldFiles, .similarPhotos, .developerTools, .privacy]),
-            (String(localized: "优化"), [.security, .loginItems, .maintenance]),
-            (String(localized: "管理"), [.appStorage, .appUninstaller, .fileSearch, .recovery])
+            (String(localized: "管理"), [.appUninstaller, .appStorage, .loginItems, .maintenance, .security, .fileSearch, .recovery])
         ]
     }
 
     private var brandHeader: some View {
         HStack(spacing: 10) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(AppTheme.brandGradient)
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(LinearGradient(colors: [Color.white.opacity(0.16), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
-                Image(systemName: "sparkles")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-            .frame(width: 32, height: 32)
-            .shadow(color: Color(hex: 0x12A99A).opacity(0.35), radius: 6, y: 3)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text("MacClean")
@@ -132,7 +120,6 @@ struct CoolSidebarView: View {
                         .padding(.horizontal, 9)
                         .frame(height: 22)
                         .background(Capsule().fill(AppTheme.brandGradient))
-                        .shadow(color: Color(hex: 0x12A99A).opacity(0.3), radius: 4, y: 2)
                 }
                 .buttonStyle(.plain)
                 .help("解锁完整版")
@@ -202,42 +189,37 @@ struct CoolSidebarView: View {
     }
 
     private var diskCard: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .stroke(AppTheme.ink(0.10), lineWidth: 5)
-                Circle()
-                    .trim(from: 0, to: CGFloat(Double(diskPercent) / 100.0))
-                    .stroke(
-                        diskPercent >= 90 ? AnyShapeStyle(AppTheme.danger) : AnyShapeStyle(AngularGradient(colors: [Color(hex: 0x15B985), Color(hex: 0x0E9BB5), Color(hex: 0x15B985)], center: .center)),
-                        style: StrokeStyle(lineWidth: 5, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                Text("\(diskPercent)%")
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundColor(AppTheme.textPrimary)
-            }
-            .frame(width: 44, height: 44)
-
-            VStack(alignment: .leading, spacing: 3) {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider()
+                .padding(.bottom, 4)
+            HStack(spacing: 7) {
+                Image(systemName: "internaldrive")
+                    .foregroundStyle(AppTheme.slate)
                 Text(appState.diskInfo?.volumeName ?? "Macintosh HD")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(AppTheme.textPrimary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(AppTheme.textPrimary)
                     .lineLimit(1)
-                Text(diskFreeText)
-                    .font(.system(size: 11.5, weight: .medium))
-                    .foregroundColor(diskPercent >= 90 ? AppTheme.danger : AppTheme.accent)
-                    .lineLimit(1)
-                Text(diskUsageText)
-                    .font(.system(size: 10.5))
-                    .foregroundColor(AppTheme.textMuted)
-                    .lineLimit(1)
+                Spacer(minLength: 0)
             }
-            Spacer(minLength: 0)
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(AppTheme.ink(0.10))
+                    Capsule().fill(diskPercent >= 90 ? AppTheme.danger : AppTheme.accent)
+                        .frame(width: geometry.size.width * CGFloat(min(100, max(0, diskPercent))) / 100)
+                }
+            }
+            .frame(height: 5)
+            HStack(spacing: 4) {
+                Text(diskFreeText)
+                Spacer(minLength: 0)
+                Text(diskUsageText)
+            }
+            .font(.system(size: 10.5))
+            .foregroundStyle(AppTheme.textSecondary)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
         }
-        .padding(12)
-        .themeCard()
+        .padding(.horizontal, 6)
     }
 
     private var diskFreeText: String {
@@ -270,28 +252,30 @@ private struct SidebarNavRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 10) {
-                GradientIconTile(systemName: tab.filledIcon, gradient: tab.tileGradient, size: 21, cornerRatio: 0.27, glyphRatio: 0.5, shadowColor: tab.tileShadow)
-                    .saturation(isSelected || isHovered ? 1 : 0.85)
+                Image(systemName: tab.icon)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(isSelected ? AppTheme.onAccent : tab.tileShadow)
+                    .frame(width: 22, height: 22)
+                    .accessibilityHidden(true)
 
                 Text(title)
                     .font(.system(size: 13, weight: isSelected ? .semibold : .medium))
-                    .foregroundColor(isSelected ? AppTheme.textPrimary : AppTheme.textSecondary)
+                    .foregroundColor(isSelected ? AppTheme.onAccent : AppTheme.textPrimary)
                     .lineLimit(1)
 
                 Spacer()
             }
             .padding(.horizontal, 7)
-            .frame(height: 29)
+            .frame(height: 28)
             .background(
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .fill(isSelected ? AppTheme.surfaceHover : (isHovered ? AppTheme.ink(0.05) : Color.clear))
+                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .fill(isSelected ? AppTheme.accent : (isHovered ? AppTheme.ink(0.05) : Color.clear))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .strokeBorder(isSelected ? AppTheme.surfaceBorder : Color.clear, lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 6, style: .continuous)
+                            .strokeBorder(Color.clear, lineWidth: 1)
                     )
-                    .shadow(color: isSelected ? AppTheme.cardShadow : .clear, radius: 4, y: 2)
             )
-            .contentShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .buttonStyle(.plain)
         .onHover { isHovered = $0 }

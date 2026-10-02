@@ -1688,3 +1688,8 @@
 "清空暂存篮" = "Empty Basket";
 "移出暂存篮" = "Remove from Basket";
 "隐藏与可清除空间" = "Hidden & Purgeable Space";
+
+/* Chat inspector */
+"显示详情" = "Show Details";
+"关闭详情" = "Close Details";
+"删除后，聊天中的原图可能无法打开。" = "After deletion, original images in chats may no longer open.";

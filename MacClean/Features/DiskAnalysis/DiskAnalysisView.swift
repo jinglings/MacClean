@@ -154,9 +154,12 @@ final class SpaceLensViewModel: ObservableObject {
         !currentPath.isEmpty
     }
 
+    /// 焦点项：列表行，或树状图里嵌套一层的格子。
     var focusedItem: SpaceLensItem? {
         guard let focusedID else { return nil }
-        return currentChildren.first { $0.id == focusedID }
+        let children = currentChildren
+        return children.first { $0.id == focusedID }
+            ?? children.lazy.flatMap(\.children).first { $0.id == focusedID }
     }
 
     /// 地图外的占用：已用空间里没被扫描树覆盖的部分（快照、权限外目录、系统卷等）。
@@ -228,6 +231,12 @@ final class SpaceLensViewModel: ObservableObject {
     
     func enter(_ item: SpaceLensItem) {
         guard item.isDirectory, item.isReadable, !item.isVirtual else { return }
+        // 树状图可直接双击嵌套一层的文件夹：先补上它的父文件夹
+        let children = currentChildren
+        if !children.contains(where: { $0.id == item.id }),
+           let parent = children.first(where: { $0.children.contains { $0.id == item.id } }) {
+            currentPath.append(parent.id)
+        }
         currentPath.append(item.id)
         selectedIDs = []
         focusedID = nil
@@ -744,6 +753,7 @@ private struct SpaceLensPathTicker: View {
 private struct SpaceLensResultsView: View {
     @ObservedObject var viewModel: SpaceLensViewModel
     @FocusState private var keyboardFocused: Bool
+    @AppStorage(FolderMapStyle.storageKey) private var mapStyle: FolderMapStyle = .bubbles
     
     var body: some View {
         VStack(spacing: 0) {
@@ -765,17 +775,23 @@ private struct SpaceLensResultsView: View {
                 directoryList
                     .frame(width: 400)
 
-                SpaceLensBubbleMap(
-                    items: Array(viewModel.currentChildren.prefix(10)),
-                    totalSize: max(viewModel.currentItem?.size ?? 1, 1),
-                    selectedIDs: viewModel.selectedIDs,
-                    basket: viewModel.basket,
-                    selectAction: viewModel.toggleSelection,
-                    enterAction: viewModel.enter,
-                    basketAction: viewModel.addToBasket,
-                    removeFromBasket: viewModel.removeFromBasket,
-                    quickLookAction: viewModel.quickLook
-                )
+                switch mapStyle {
+                case .bubbles:
+                    SpaceLensBubbleMap(
+                        items: Array(viewModel.currentChildren.prefix(10)),
+                        totalSize: max(viewModel.currentItem?.size ?? 1, 1),
+                        selectedIDs: viewModel.selectedIDs,
+                        basket: viewModel.basket,
+                        selectAction: viewModel.toggleSelection,
+                        enterAction: viewModel.enter,
+                        basketAction: viewModel.addToBasket,
+                        removeFromBasket: viewModel.removeFromBasket,
+                        quickLookAction: viewModel.quickLook
+                    )
+                case .treemap:
+                    StorageTreemapView(viewModel: viewModel)
+                        .padding(.bottom, 16)
+                }
             }
             .padding(.horizontal, CosmicSizes.pagePadding)
             .padding(.top, 20)
@@ -896,6 +912,8 @@ private struct SpaceLensResultsView: View {
                     .fill(AppTheme.ink(0.05))
                     .overlay(RoundedRectangle(cornerRadius: CosmicSizes.controlRadius).stroke(AppTheme.surfaceBorder, lineWidth: 1))
             )
+
+            FolderMapStylePicker(style: $mapStyle)
         }
         .padding(.horizontal, CosmicSizes.pagePadding)
     }

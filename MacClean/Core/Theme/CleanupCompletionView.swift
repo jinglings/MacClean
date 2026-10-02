@@ -31,21 +31,10 @@ struct CleanupCompletionView: View {
             VStack(spacing: 0) {
                 Spacer()
 
-                ZStack {
-                    Circle()
-                        .fill(AppTheme.accentSoft)
-                        .frame(width: 136, height: 136)
-                    Circle()
-                        .fill(AppTheme.accentSoft)
-                        .frame(width: 108, height: 108)
-                    Circle()
-                        .fill(AppTheme.brandGradient)
-                        .frame(width: 80, height: 80)
-                        .shadow(color: Color(hex: 0x12A99A).opacity(0.4), radius: 16, y: 8)
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.white)
-                }
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 56, weight: .regular))
+                    .foregroundStyle(AppTheme.mint)
+                    .frame(width: 80, height: 80)
                 .scaleEffect(showCheckmark ? 1 : 0.6)
                 .opacity(showCheckmark ? 1 : 0)
 
@@ -154,26 +143,17 @@ struct NeonButtonStyle: ButtonStyle {
         @State private var isHovered = false
 
         var body: some View {
-            let radius: CGFloat = isLarge ? 11 : CosmicSizes.controlRadius
+            let radius = CosmicSizes.controlRadius
             configuration.label
-                .font(.system(size: isLarge ? 15 : 13, weight: .semibold))
+                .font(.system(size: isLarge ? 14 : 13, weight: .semibold))
                 .foregroundColor(AppTheme.onAccent)
-                .padding(.horizontal, isLarge ? 30 : 18)
-                .frame(height: isLarge ? 44 : 32)
+                .padding(.horizontal, isLarge ? 22 : 14)
+                .frame(height: isLarge ? 36 : 30)
                 .background(
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
                         .fill(gradient)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: radius, style: .continuous)
-                                .fill(LinearGradient(colors: [Color.white.opacity(0.12), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: radius, style: .continuous)
-                                .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5)
-                        )
                         .brightness(configuration.isPressed ? -0.06 : (isHovered ? 0.04 : 0))
                 )
-                .shadow(color: Color(hex: 0x12A99A).opacity(isEnabled ? (isLarge ? 0.35 : 0.22) : 0), radius: isLarge ? 12 : 6, y: isLarge ? 6 : 3)
                 .scaleEffect(configuration.isPressed ? 0.98 : 1)
                 .opacity(isEnabled ? 1 : 0.45)
                 .onHover { isHovered = $0 }
@@ -210,7 +190,6 @@ struct NeonOutlineButtonStyle: ButtonStyle {
                             RoundedRectangle(cornerRadius: CosmicSizes.controlRadius, style: .continuous)
                                 .strokeBorder(AppTheme.surfaceBorder, lineWidth: 1)
                         )
-                        .shadow(color: AppTheme.cardShadow.opacity(0.6), radius: 2, y: 1)
                 )
                 .opacity(isEnabled ? 1 : 0.5)
                 .onHover { isHovered = $0 }

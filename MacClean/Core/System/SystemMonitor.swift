@@ -19,9 +19,10 @@ struct SystemSnapshot: Sendable {
     let network: NetworkInfo
     let volumes: [ExternalVolume]
     let registryBatteries: [String: Int]
+    var sensors: ThermalSample? = nil
 
-    nonisolated static func capture() -> SystemSnapshot {
-        SystemSnapshot(
+    nonisolated static func capture(sensors reader: SensorReader? = nil, allSensors: Bool = false) -> SystemSnapshot {
+        var snapshot = SystemSnapshot(
             date: Date(),
             disk: SystemStats.disk(),
             memory: SystemStats.memory(),
@@ -33,7 +34,15 @@ struct SystemSnapshot: Sendable {
             volumes: SystemStats.externalVolumes(),
             registryBatteries: BluetoothBatteryReader.registryBatteries()
         )
+        snapshot.sensors = reader?.sample(includeAll: allSensors)
+        return snapshot
     }
+}
+
+/// 设置页与菜单栏图标共用的键。
+nonisolated enum SensorSettingsKey {
+    static let showTemperatureInMenuBar = "showCPUTemperatureInMenuBar"
+    static let overheatLastAlertAt = "overheatLastAlertAt"
 }
 
 @MainActor
@@ -52,7 +61,22 @@ final class SystemMonitor: ObservableObject {
     @Published private(set) var volumes: [ExternalVolume] = []
     @Published private(set) var bluetoothDevices: [BluetoothDeviceInfo] = []
     @Published private(set) var health = HealthAssessment(level: .good, issues: [])
+    /// 温度与风扇；nil 表示还没采样过。
+    @Published private(set) var sensors: ThermalSample?
+    @Published private(set) var thermalHistory = ThermalHistory()
+    /// 「全部传感器」展开时为 true：采样时连「其他」类传感器一起读（每个约 1 ms）。
+    var wantsAllSensors = false
     let modelName = SystemStats.modelName()
+
+    private let sensorReader = SensorReader()
+    /// 菜单栏图标显示温度时的慢速采样（60 秒一次），面板打开时由 2 秒采样接管。
+    private var backgroundThermalTimer: Timer?
+    private var isSamplingSensors = false
+    private var overheatState = OverheatAlertState()
+    #if DEBUG
+    /// 截图用：把 Wi-Fi 名称、蓝牙设备名、外接卷名换成中性示例文字。
+    var redactsPersonalInfo = false
+    #endif
 
     private var timer: Timer?
     private var activeViewers = 0
@@ -63,7 +87,13 @@ final class SystemMonitor: ObservableObject {
     private var profilerFetchedAt: Date?
     private var isFetchingProfiler = false
 
-    private init() {}
+    private init() {
+        overheatState.lastAlertAt = UserDefaults.standard.object(forKey: SensorSettingsKey.overheatLastAlertAt) as? Date
+        updateBackgroundThermal()
+        NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: .main) { _ in
+            Task { @MainActor in SystemMonitor.shared.updateBackgroundThermal() }
+        }
+    }
 
     func start() {
         activeViewers += 1
@@ -87,14 +117,17 @@ final class SystemMonitor: ObservableObject {
     func refresh() {
         guard !isSampling else { return }
         isSampling = true
+        let reader = sensorReader
+        let allSensors = wantsAllSensors
         Task.detached(priority: .utility) { [weak self] in
-            let snapshot = SystemSnapshot.capture()
+            let snapshot = SystemSnapshot.capture(sensors: reader, allSensors: allSensors)
             await self?.apply(snapshot)
         }
     }
 
     private func apply(_ snapshot: SystemSnapshot) {
         isSampling = false
+        if let sample = snapshot.sensors { applySensors(sample) }
         disk = snapshot.disk
         memory = snapshot.memory
         thermal = snapshot.thermal
@@ -114,7 +147,75 @@ final class SystemMonitor: ObservableObject {
         previous = snapshot
 
         health = HealthAssessment.evaluate(disk: disk, memory: memory, battery: battery, thermal: thermal)
+        #if DEBUG
+        if redactsPersonalInfo { redactPersonalInfo() }
+        #endif
     }
+
+    // MARK: 温度与风扇
+
+    /// 菜单栏图标旁显示温度时，面板关闭期间也每 60 秒采一次（只读温度，不碰其他指标）。
+    func updateBackgroundThermal() {
+        let enabled = UserDefaults.standard.bool(forKey: SensorSettingsKey.showTemperatureInMenuBar)
+        guard enabled != (backgroundThermalTimer != nil) else { return }
+        if enabled {
+            sampleSensorsInBackground()
+            let timer = Timer(timeInterval: 60, repeats: true) { _ in
+                Task { @MainActor in SystemMonitor.shared.sampleSensorsInBackground() }
+            }
+            timer.tolerance = 10
+            RunLoop.main.add(timer, forMode: .common)
+            backgroundThermalTimer = timer
+        } else {
+            backgroundThermalTimer?.invalidate()
+            backgroundThermalTimer = nil
+        }
+    }
+
+    private func sampleSensorsInBackground() {
+        // 面板打开时 2 秒采样已经在读
+        guard timer == nil, !isSamplingSensors else { return }
+        isSamplingSensors = true
+        let reader = sensorReader
+        Task.detached(priority: .utility) { [weak self] in
+            let sample = reader.sample(includeAll: false)
+            await self?.finishBackgroundSample(sample)
+        }
+    }
+
+    private func finishBackgroundSample(_ sample: ThermalSample) {
+        isSamplingSensors = false
+        applySensors(sample)
+    }
+
+    private func applySensors(_ sample: ThermalSample) {
+        sensors = sample
+        if !sample.isUnavailable {
+            thermalHistory.append(ThermalPoint(date: sample.date, cpuMax: sample.cpuMax, fanRPM: sample.fanRPM))
+        }
+        let result = OverheatAlertPolicy.evaluate(cpuMax: sample.cpuMax, now: sample.date, state: overheatState)
+        overheatState = result.state
+        guard result.notify else { return }
+        UserDefaults.standard.set(sample.date, forKey: SensorSettingsKey.overheatLastAlertAt)
+        let temperature = SensorFormat.celsius(sample.cpuMax)
+        Task {
+            let top = await Task.detached(priority: .utility) { OverheatAlertPolicy.topProcessName() }.value
+            await DiskAlertScheduler.shared.postOverheatAlert(temperature: temperature, topProcess: top)
+        }
+    }
+
+    #if DEBUG
+    private func redactPersonalInfo() {
+        if network.ssid != nil { network = NetworkInfo(kind: network.kind, ssid: "Home Wi-Fi") }
+        let samples = ["AirPods Pro", "Magic Keyboard", "Magic Mouse"]
+        bluetoothDevices = bluetoothDevices.enumerated().map { index, device in
+            BluetoothDeviceInfo(address: device.address, name: samples[index % samples.count], kind: device.kind, battery: device.battery)
+        }
+        volumes = volumes.enumerated().map { index, volume in
+            ExternalVolume(url: volume.url, name: index == 0 ? "Backup" : "Backup \(index + 1)", total: volume.total, available: volume.available)
+        }
+    }
+    #endif
 
     // MARK: 蓝牙
 

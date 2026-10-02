@@ -463,6 +463,14 @@ struct ChatMediaTests {
                     .frame(width: 944, height: 900)
                 try await Self.snapshot(view, size: CGSize(width: 944, height: 900), appearance: appearance,
                                         to: outDir.appendingPathComponent("\(mode)-chat_cleanup-results-\(name).png"))
+                if name == "wechat" {
+                    let detail = ChatCleanupView(viewModel: vm, inspectedGroupID: account.groups[0].id)
+                        .environment(\.currentAppTab, .chatCleanup)
+                        .background(AppBackdrop())
+                        .frame(width: 944, height: 900)
+                    try await Self.snapshot(detail, size: CGSize(width: 944, height: 900), appearance: appearance,
+                                            to: outDir.appendingPathComponent("\(mode)-chat-inspector.png"))
+                }
             }
         }
     }

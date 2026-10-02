@@ -2,7 +2,7 @@
 //  ThemeConstants.swift
 //  MacClean
 //
-//  「石墨 + 薄荷」设计系统：中性深色工作台 + 单一薄荷绿强调色。
+//  原生工具设计系统：中性工作台、系统蓝交互与彩色功能符号。
 //  旧代码中的 CosmicTheme / MacCleanTheme 引用统一映射到本主题。
 //
 
@@ -15,11 +15,11 @@ typealias CosmicTheme = AppTheme
 struct AppTheme {
     // MARK: - 背景层（浅色 / 深色自动跟随系统）
 
-    /// 全局页面背景：柔和的纵向渐变
+    /// 全局纯色工作区；保留渐变类型兼容已有调用。
     static let primaryGradient = LinearGradient(
         colors: [
-            Color(light: 0xF7F8FA, dark: 0x1A1D23),
-            Color(light: 0xEEF1F4, dark: 0x111317)
+            Color(light: 0xFFFFFF, dark: 0x1E1E20),
+            Color(light: 0xFFFFFF, dark: 0x1E1E20)
         ],
         startPoint: .top,
         endPoint: .bottom
@@ -28,48 +28,48 @@ struct AppTheme {
     /// 侧栏毛玻璃之上的轻微着色（毛玻璃不可用时也作为底色）
     static let sidebarGradient = LinearGradient(
         colors: [
-            Color(light: 0xF0F2F5, dark: 0x1E2128, lightAlpha: 0.55, darkAlpha: 0.55),
-            Color(light: 0xE9ECF0, dark: 0x17191E, lightAlpha: 0.55, darkAlpha: 0.55)
+            Color(light: 0xEAF0F7, dark: 0x1E2128, lightAlpha: 0.55, darkAlpha: 0.55),
+            Color(light: 0xEAF0F7, dark: 0x17191E, lightAlpha: 0.55, darkAlpha: 0.55)
         ],
         startPoint: .top,
         endPoint: .bottom
     )
 
-    static let sidebarColor = Color(light: 0xF0F2F5, dark: 0x1C1F25)
+    static let sidebarColor = Color(light: 0xEAF0F7, dark: 0x1C1F25)
 
     // MARK: - 品牌色
 
     /// 实色强调：图标、选中、进度
-    static let accent = Color(light: 0x0EA372, dark: 0x3DDC97)
+    static let accent = Color(light: 0x007AFF, dark: 0x0A84FF)
     /// 第二品牌色（渐变终点）
-    static let accentAlt = Color(light: 0x0B93B0, dark: 0x34C6D8)
+    static let accentAlt = Color(light: 0x008C9E, dark: 0x40C8E0)
     /// 品牌渐变填充上的文字
     static let onAccent = Color.white
     static let accentColor = accent
     static let accentGlow = accent.opacity(0.35)
 
-    /// 品牌渐变：主按钮、Logo、英雄图标
+    /// 实色系统蓝填充；保留旧接口。
     static let brandGradient = LinearGradient(
-        colors: [Color(hex: 0x10B981), Color(hex: 0x0891B2)],
+        colors: [accent, accent],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
 
     /// 选中态 / 柔和强调底
-    static let accentSoft = Color(light: 0x0EA372, dark: 0x3DDC97, lightAlpha: 0.11, darkAlpha: 0.14)
+    static let accentSoft = Color(light: 0x007AFF, dark: 0x0A84FF, lightAlpha: 0.11, darkAlpha: 0.14)
 
     // MARK: - 语义色
 
-    static let warning = Color(light: 0xD48A0C, dark: 0xF0B654)
-    static let danger = Color(light: 0xE04E3B, dark: 0xF07A68)
+    static let warning = Color(light: 0xC77800, dark: 0xFFB340)
+    static let danger = Color(light: 0xD9342B, dark: 0xFF6961)
 
     // MARK: - 分类色
 
-    static let mint = accent
-    static let sky = Color(light: 0x2F80ED, dark: 0x62A8E8)
+    static let mint = Color(light: 0x248A3D, dark: 0x30D158)
+    static let sky = Color(light: 0x007AFF, dark: 0x64B5FF)
     static let amber = warning
     static let coral = danger
-    static let violet = Color(light: 0x7B61FF, dark: 0x9D8CFF)
+    static let violet = Color(light: 0x8950D5, dark: 0xBF9AFF)
     static let slate = Color(light: 0x6B7385, dark: 0x8B93A7)
     static let pink = Color(light: 0xE0457B, dark: 0xF27BA5)
     static let teal = accentAlt
@@ -119,8 +119,8 @@ struct AppTheme {
         Color(light: 0x0B1220, dark: 0xFFFFFF, lightAlpha: min(1, opacity * 0.85), darkAlpha: opacity)
     }
 
-    static let surface = Color(light: 0xFFFFFF, dark: 0xFFFFFF, lightAlpha: 0.82, darkAlpha: 0.055)
-    static let surfaceHover = Color(light: 0xFFFFFF, dark: 0xFFFFFF, lightAlpha: 1, darkAlpha: 0.085)
+    static let surface = Color(light: 0xFFFFFF, dark: 0xFFFFFF, lightAlpha: 1, darkAlpha: 0.035)
+    static let surfaceHover = Color(light: 0xF2F6FC, dark: 0xFFFFFF, lightAlpha: 1, darkAlpha: 0.07)
     static let surfaceBorder = Color(light: 0x0B1220, dark: 0xFFFFFF, lightAlpha: 0.07, darkAlpha: 0.09)
     static let divider = ink(0.07)
 
@@ -134,13 +134,13 @@ struct AppTheme {
         endPoint: .bottom
     )
 
-    static let cardShadow = Color(light: 0x1B2433, dark: 0x000000, lightAlpha: 0.07, darkAlpha: 0.28)
+    static let cardShadow = Color(light: 0x1B2433, dark: 0x000000, lightAlpha: 0.04, darkAlpha: 0.16)
 
     // MARK: - 文本
 
     static let textPrimary = Color(light: 0x161A21, dark: 0xF2F4F7)
     static let textSecondary = Color(light: 0x161A21, dark: 0xFFFFFF, lightAlpha: 0.68, darkAlpha: 0.72)
-    static let textMuted = Color(light: 0x161A21, dark: 0xFFFFFF, lightAlpha: 0.50, darkAlpha: 0.50)
+    static let textMuted = Color(light: 0x161A21, dark: 0xFFFFFF, lightAlpha: 0.60, darkAlpha: 0.60)
     static let textGlow = accent
 
     static let starColors: [Color] = [textMuted, slate, sky]
@@ -199,13 +199,13 @@ extension Color {
 
 struct CosmicSizes {
     static let orbSize: CGFloat = 200
-    static let cardRadius: CGFloat = 14
-    static let controlRadius: CGFloat = 9
-    static let buttonRadius: CGFloat = 9
+    static let cardRadius: CGFloat = 8
+    static let controlRadius: CGFloat = 6
+    static let buttonRadius: CGFloat = 6
     static let iconSize: CGFloat = 20
-    static let sidebarWidth: CGFloat = 236
-    static let cardPadding: CGFloat = 20
-    static let pagePadding: CGFloat = 32
+    static let sidebarWidth: CGFloat = 216
+    static let cardPadding: CGFloat = 16
+    static let pagePadding: CGFloat = 24
 }
 
 struct CosmicAnimations {
@@ -233,7 +233,7 @@ struct ThemeCard: ViewModifier {
                             .strokeBorder(AppTheme.surfaceBorder, lineWidth: 1)
                     )
             )
-            .shadow(color: AppTheme.cardShadow, radius: 14, y: 6)
+
     }
 }
 
@@ -263,7 +263,7 @@ struct VisualEffectBackground: NSViewRepresentable {
     }
 }
 
-// MARK: - 渐变图标块（功能图标 / 英雄图标）
+// MARK: - 彩色功能符号（保留旧类型名兼容调用）
 
 struct GradientIconTile: View {
     let systemName: String
@@ -271,23 +271,14 @@ struct GradientIconTile: View {
     var size: CGFloat = 28
     var cornerRatio: CGFloat = 0.28
     var glyphRatio: CGFloat = 0.5
-    var shadowColor: Color = Color(hex: 0x12A99A)
+    var shadowColor: Color = AppTheme.accent
 
     var body: some View {
-        RoundedRectangle(cornerRadius: size * cornerRatio, style: .continuous)
-            .fill(gradient)
-            .overlay(
-                RoundedRectangle(cornerRadius: size * cornerRatio, style: .continuous)
-                    .fill(LinearGradient(colors: [Color.white.opacity(0.16), Color.white.opacity(0)], startPoint: .top, endPoint: .center))
-            )
-            .overlay(
-                Image(systemName: systemName)
-                    .font(.system(size: size * glyphRatio, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .shadow(color: .black.opacity(0.12), radius: 1, y: 1)
-            )
+        Image(systemName: systemName)
+            .font(.system(size: size * max(glyphRatio, 0.62), weight: .regular))
+            .foregroundStyle(shadowColor)
             .frame(width: size, height: size)
-            .shadow(color: shadowColor.opacity(size > 40 ? 0.35 : 0.18), radius: size > 40 ? 18 : 3, y: size > 40 ? 10 : 1)
+            .accessibilityHidden(true)
     }
 }
 
@@ -337,17 +328,13 @@ extension AppTab {
 
     var tileShadow: Color {
         switch self {
-        case .smartCare, .cacheCleanup: return Color(hex: 0x14A980)
-        case .diskAnalysis, .fileSearch, .appUninstaller: return Color(hex: 0x2F6FE0)
-        case .largeOldFiles: return Color(hex: 0xE4801C)
-        case .similarPhotos: return Color(hex: 0xD9457A)
-        case .appStorage: return Color(hex: 0x6247E8)
-        case .developerTools, .maintenance: return Color(hex: 0x4E5767)
-        case .privacy: return Color(hex: 0x1E8FB8)
-        case .recovery: return Color(hex: 0x0F8F9E)
-        case .loginItems: return Color(hex: 0xE5533D)
-        case .security: return Color(hex: 0x3B50E0)
-        case .chatCleanup: return Color(hex: 0x1AAD3B)
+        case .smartCare, .privacy, .recovery: return AppTheme.teal
+        case .cacheCleanup, .diskAnalysis, .fileSearch, .appUninstaller: return AppTheme.sky
+        case .largeOldFiles, .loginItems: return AppTheme.amber
+        case .similarPhotos, .appStorage: return AppTheme.violet
+        case .developerTools, .maintenance: return AppTheme.slate
+        case .security: return Color(light: 0x5856D6, dark: 0xA29BFE)
+        case .chatCleanup: return AppTheme.mint
         }
     }
 
@@ -356,7 +343,7 @@ extension AppTab {
         switch self {
         case .smartCare: return "checkmark.seal.fill"
         case .diskAnalysis: return "chart.pie.fill"
-        case .cacheCleanup: return "sparkles"
+        case .cacheCleanup: return "trash"
         case .chatCleanup: return "bubble.left.and.bubble.right.fill"
         case .largeOldFiles: return "doc.fill"
         case .similarPhotos: return "doc.on.doc.fill"

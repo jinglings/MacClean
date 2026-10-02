@@ -60,14 +60,15 @@ struct ChatAppSwitcher: View {
                             Text(formatSize(size))
                                 .font(.system(size: 11, design: .rounded))
                                 .monospacedDigit()
-                                .foregroundColor(isOn ? AppTheme.onAccent.opacity(0.8) : AppTheme.textMuted)
+                                .foregroundColor(isOn ? AppTheme.textSecondary : AppTheme.textMuted)
                         }
                     }
-                    .foregroundColor(isOn ? AppTheme.onAccent : AppTheme.textSecondary)
+                    .foregroundColor(isOn ? AppTheme.textPrimary : AppTheme.textSecondary)
                     .padding(.horizontal, 12)
                     .frame(height: 32)
                     .background(
-                        Capsule().fill(isOn ? AnyShapeStyle(AppTab.chatCleanup.tileGradient) : AnyShapeStyle(AppTheme.ink(0.06)))
+                        RoundedRectangle(cornerRadius: 6).fill(isOn ? AppTheme.surface : AppTheme.ink(0.04))
+                            .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(AppTheme.surfaceBorder, lineWidth: 1))
                     )
                 }
                 .buttonStyle(.plain)
@@ -392,6 +393,8 @@ struct ChatGroupCard: View {
     @ObservedObject var viewModel: ChatCleanupViewModel
     let account: ChatAccount
     let group: ChatGroup
+    var isInspected = false
+    var onInspect: (() -> Void)? = nil
 
     @State private var isHovered = false
     @State private var isRenaming = false
@@ -414,7 +417,7 @@ struct ChatGroupCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            if !group.thumbnails.isEmpty {
+            if onInspect == nil && !group.thumbnails.isEmpty {
                 ChatThumbnailStrip(paths: group.thumbnails)
                     .padding(.leading, 16 + 17 + 12 + 36 + 12)
                     .padding(.trailing, 16)
@@ -430,7 +433,8 @@ struct ChatGroupCard: View {
                 .padding(.vertical, 4)
             }
         }
-        .themeCard(isHovered: isHovered)
+        .background(isInspected ? AppTheme.accentSoft : (isHovered ? AppTheme.surfaceHover : AppTheme.surface))
+        .overlay(alignment: .bottom) { AppTheme.divider.frame(height: 1) }
         .onHover { isHovered = $0 }
     }
 
@@ -441,12 +445,12 @@ struct ChatGroupCard: View {
             }
 
             GradientIconTile(
-                systemName: icon,
+                systemName: group.conversationHash != nil ? "folder.fill" : icon,
                 gradient: group.conversationHash != nil ? AppTab.chatCleanup.tileGradient : AppTheme.tileGradient(AppTheme.slate, AppTheme.slate.opacity(0.75)),
-                size: 36,
+                size: 24,
                 cornerRatio: 0.27,
                 glyphRatio: 0.44,
-                shadowColor: AppTab.chatCleanup.tileShadow
+                shadowColor: AppTheme.sky
             )
 
             VStack(alignment: .leading, spacing: 3) {
@@ -492,6 +496,16 @@ struct ChatGroupCard: View {
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundColor(AppTheme.textPrimary)
+
+            if let onInspect {
+                Button(action: onInspect) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 14))
+                        .foregroundStyle(isInspected ? AppTheme.accent : AppTheme.textSecondary)
+                }
+                .buttonStyle(.plain)
+                .help(String(localized: "显示详情"))
+            }
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 11, weight: .semibold))
@@ -679,6 +693,7 @@ struct ChatThumbnailStrip: View {
 
 private struct ChatThumbnail: View {
     let path: String
+    var side: CGFloat = 46
     @State private var image: NSImage?
     @State private var failed = false
 
@@ -701,7 +716,7 @@ private struct ChatThumbnail: View {
                     .foregroundColor(AppTheme.textMuted)
             }
         }
-        .frame(width: 46, height: 46)
+        .frame(width: side, height: side)
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).strokeBorder(AppTheme.ink(0.08), lineWidth: 1))
         .task(id: path) {
@@ -822,5 +837,72 @@ struct ChatEmptyState: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 60)
         .themeCard()
+    }
+}
+
+
+// MARK: - 会话详情（仅展示本地预览，不改变清理选择）
+
+struct ChatGroupInspector: View {
+    let title: String
+    let group: ChatGroup
+    let onClose: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top) {
+                Text(title)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(AppTheme.textPrimary)
+                    .textSelection(.enabled)
+                Spacer(minLength: 4)
+                Button(action: onClose) { Image(systemName: "xmark") }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(AppTheme.textSecondary)
+                    .help(String(localized: "关闭详情"))
+            }
+            if !group.thumbnails.isEmpty {
+                LazyVGrid(columns: [GridItem(.fixed(88)), GridItem(.fixed(88))], spacing: 6) {
+                    ForEach(Array(group.thumbnails.prefix(4)), id: \.self) { path in
+                        ChatThumbnail(path: path, side: 88)
+                    }
+                }
+            }
+            Text(formatSize(group.size))
+                .font(.system(size: 16, weight: .medium))
+                .monospacedDigit()
+                .foregroundStyle(AppTheme.textPrimary)
+            Divider()
+            ForEach(group.types) { type in
+                HStack {
+                    Label(type.title, systemImage: type.icon)
+                        .foregroundStyle(type.tint)
+                    Spacer(minLength: 4)
+                    Text(formatSize(group.size(of: type)))
+                        .monospacedDigit()
+                        .foregroundStyle(AppTheme.textSecondary)
+                }
+                .font(.system(size: 11.5))
+            }
+            if let path = group.thumbnails.first {
+                Divider()
+                Text((path as NSString).deletingLastPathComponent)
+                    .font(.system(size: 11))
+                    .foregroundStyle(AppTheme.textSecondary)
+                    .lineLimit(3)
+                    .truncationMode(.middle)
+                    .textSelection(.enabled)
+                Button("在 Finder 中显示") {
+                    NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: path)])
+                }
+                .buttonStyle(NeonOutlineButtonStyle())
+            }
+            Divider()
+            Text("删除后，聊天中的原图可能无法打开。")
+                .font(.system(size: 11.5))
+                .foregroundStyle(AppTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.trailing, 8)
     }
 }

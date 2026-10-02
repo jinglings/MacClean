@@ -48,32 +48,15 @@ struct ScanIntroView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            ZStack {
-                Circle()
-                    .fill(RadialGradient(colors: [tint.opacity(0.28), tint.opacity(0)], center: .center, startRadius: 20, endRadius: 100))
-                    .frame(width: 200, height: 200)
-                Circle()
-                    .strokeBorder(tint.opacity(0.14), lineWidth: 1)
-                    .frame(width: 132, height: 132)
-                Circle()
-                    .strokeBorder(tint.opacity(0.08), lineWidth: 1)
-                    .frame(width: 176, height: 176)
-                GradientIconTile(
-                    systemName: tab?.filledIcon ?? icon,
-                    gradient: tab?.tileGradient ?? AppTheme.brandGradient,
-                    size: compact ? 64 : 84,
-                    cornerRatio: 0.26,
-                    glyphRatio: 0.44,
-                    shadowColor: tint
-                )
-            }
-            .frame(height: compact ? 120 : 176)
-            .clipped()
-            .padding(.bottom, compact ? 12 : 20)
+            Image(systemName: tab?.icon ?? icon)
+                .font(.system(size: compact ? 36 : 44, weight: .light))
+                .foregroundStyle(tint)
+                .frame(height: compact ? 56 : 72)
+                .padding(.bottom, 16)
 
             VStack(spacing: 8) {
                 Text(title)
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary)
                 Text(message)
                     .font(.system(size: 13.5))
@@ -101,14 +84,7 @@ struct ScanIntroView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
                         .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(AppTheme.ink(0.035))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .strokeBorder(AppTheme.ink(0.06), lineWidth: 1)
-                                )
-                        )
+
                     }
                 }
                 .frame(maxWidth: 560)
@@ -139,12 +115,8 @@ struct ScanIntroView: View {
         }
         .padding(.horizontal, 32)
         .padding(.vertical, compact ? 24 : 40)
-        .frame(maxWidth: .infinity, minHeight: compact ? 0 : 520)
-        .background(
-            RoundedRectangle(cornerRadius: CosmicSizes.cardRadius, style: .continuous)
-                .fill(LinearGradient(colors: [tint.opacity(0.09), tint.opacity(0)], startPoint: .top, endPoint: .center))
-        )
-        .themeCard()
+        .frame(maxWidth: .infinity, minHeight: compact ? 0 : 400)
+
     }
 }
 

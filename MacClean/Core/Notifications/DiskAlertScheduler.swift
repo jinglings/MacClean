@@ -281,14 +281,29 @@ final class DiskAlertScheduler: NSObject, ObservableObject, UNUserNotificationCe
         }
     }
 
+    /// 温度持续偏高（判断在 OverheatAlertPolicy）。点按通知打开活动监视器。
+    @discardableResult
+    func postOverheatAlert(temperature: String, topProcess: String?) async -> Bool {
+        let body = topProcess.map {
+            String(localized: "CPU 温度已连续 2 分钟高于 95°C（当前 \(temperature)）。占用 CPU 最多的是「\($0)」，可在活动监视器中查看并退出不需要的程序。")
+        } ?? String(localized: "CPU 温度已连续 2 分钟高于 95°C（当前 \(temperature)）。可在活动监视器中查看占用 CPU 较多的程序并退出不需要的。")
+        return await post(id: "overheat", title: String(localized: "Mac 温度偏高"), body: body, actionRaw: Self.activityMonitorAction)
+    }
+
+    nonisolated private static let activityMonitorAction = "activityMonitor"
+
     private func post(id: String, title: String, body: String, action: AppTab) async -> Bool {
+        await post(id: id, title: title, body: body, actionRaw: action.rawValue)
+    }
+
+    private func post(id: String, title: String, body: String, actionRaw: String) async -> Bool {
         await refreshAuthorizationStatus()
         guard authorizationStatus == .authorized || authorizationStatus == .provisional else { return false }
         let content = UNMutableNotificationContent()
         content.title = title
         content.body = body
         content.sound = .default
-        content.userInfo = [Self.actionKey: action.rawValue]
+        content.userInfo = [Self.actionKey: actionRaw]
         do {
             try await center.add(UNNotificationRequest(identifier: id, content: content, trigger: nil))
             return true
@@ -313,6 +328,12 @@ final class DiskAlertScheduler: NSObject, ObservableObject, UNUserNotificationCe
     ) async {
         let raw = response.notification.request.content.userInfo[Self.actionKey] as? String
         await MainActor.run {
+            if raw == Self.activityMonitorAction {
+                if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: "com.apple.ActivityMonitor") {
+                    NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
+                }
+                return
+            }
             guard let raw, let tab = AppTab(rawValue: raw) else {
                 AppState.shared.openMainWindow()
                 return

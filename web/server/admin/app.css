@@ -1,8 +1,8 @@
 :root {
-  --mint: #10B981;
-  --teal: #0891B2;
-  --grad: linear-gradient(135deg, #10B981 0%, #0891B2 100%);
-  --bg: #F3F6F7;
+  --mint: #0071E3;
+  --teal: #0071E3;
+  --grad: #0071E3;
+  --bg: #F5F5F7;
   --surface: #FFFFFF;
   --surface-2: #F7F9FA;
   --surface-3: #EEF2F4;
@@ -11,8 +11,8 @@
   --text: #0E1A1F;
   --text-2: #3A4A52;
   --muted: #6B7C84;
-  --accent: #0E9F77;
-  --accent-soft: rgba(16, 185, 129, 0.12);
+  --accent: #0068D1;
+  --accent-soft: rgba(0, 113, 227, 0.10);
   --teal-soft: rgba(8, 145, 178, 0.12);
   --danger: #DC3B42;
   --danger-soft: rgba(220, 59, 66, 0.1);
@@ -23,16 +23,16 @@
   --shadow-sm: 0 1px 2px rgba(15, 30, 36, 0.06);
   --shadow: 0 1px 2px rgba(15, 30, 36, 0.05), 0 4px 16px rgba(15, 30, 36, 0.06);
   --shadow-lg: 0 12px 48px rgba(15, 30, 36, 0.18);
-  --radius: 14px;
-  --radius-sm: 9px;
+  --radius: 8px;
+  --radius-sm: 6px;
   --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --bg: #0A1013;
-  --surface: #111A1E;
+  --bg: #161617;
+  --surface: #1D1D1F;
   --surface-2: #152126;
   --surface-3: #1B292F;
   --border: #213037;
@@ -40,8 +40,8 @@
   --text: #E5EEF0;
   --text-2: #BFCDD2;
   --muted: #84979F;
-  --accent: #2DD4A0;
-  --accent-soft: rgba(45, 212, 160, 0.13);
+  --accent: #64B5FF;
+  --accent-soft: rgba(10, 132, 255, 0.15);
   --teal-soft: rgba(34, 180, 214, 0.14);
   --danger: #F2666C;
   --danger-soft: rgba(242, 102, 108, 0.13);
@@ -381,3 +381,16 @@ table.table { width: 100%; border-collapse: separate; border-spacing: 0; }
   .grid-2, .grid-3, .grid-4, .qr-grid { grid-template-columns: 1fr; }
   .search .input { width: 100%; }
 }
+
+/* Native Utility: quiet surfaces, blue actions and compact controls. */
+.sidebar { background: var(--surface-2); }
+.brand-mark, .card, .btn.primary, .kpi.hot { box-shadow: none; }
+.brand-mark { border-radius: 7px; }
+.nav-item { border-radius: 6px; }
+.nav-item.active { background: #0071E3; color: #fff; }
+.btn, .btn.lg, .input, .select, .textarea, .tabs, .tab { border-radius: 6px; }
+.kpi.hot { background: var(--surface); color: var(--text); border-color: var(--border); border-top: 2px solid var(--accent); }
+.kpi.hot .kpi-label, .kpi.hot .kpi-foot { color: var(--muted); }
+.kpi.hot .kpi-icon { background: var(--accent-soft); color: var(--accent); }
+.kpi.clickable:hover { transform: none; }
+.page-title { font-size: 22px; font-weight: 600; }
