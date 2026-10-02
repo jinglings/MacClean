@@ -362,7 +362,12 @@ struct SmartCareView: View {
         case .junk:
             SmartCareDetailListView(title: String(localized: "清理"), items: $viewModel.junkItems)
         case .duplicates:
-            SmartCareDetailListView(title: String(localized: "重复文件"), items: $viewModel.duplicateItems)
+            SmartCareDetailListView(title: String(localized: "重复文件"), items: $viewModel.duplicateItems, onViewAll: {
+                // 体检只扫文稿/桌面/下载里 1 MB 以上的文件；完整扫描在「重复与相似」页面
+                activeSheet = nil
+                PageModelStore.shared.duplicates.mode = .exact
+                AppState.shared.currentTab = .similarPhotos
+            })
         case .largeFiles:
             SmartCareDetailListView(title: String(localized: "大文件"), items: $viewModel.largeFileItems, showRevealInFinder: true, footnote: String(localized: "大文件仅供盘点，默认不选中，请确认后再清理"))
         case .brokenLoginItems:
@@ -453,6 +458,7 @@ struct SmartCareDetailListView: View {
     @Binding var items: [CleanableItem]
     var showRevealInFinder: Bool = false
     var footnote: String? = nil
+    var onViewAll: (() -> Void)? = nil
 
     @Environment(\.dismiss) private var dismiss
 
@@ -463,6 +469,10 @@ struct SmartCareDetailListView: View {
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(AppTheme.textPrimary)
                 Spacer()
+                if let onViewAll {
+                    Button("查看全部", action: onViewAll)
+                        .buttonStyle(NeonOutlineButtonStyle())
+                }
                 Button("全选") { setAll(true) }
                     .buttonStyle(NeonOutlineButtonStyle())
                 Button("取消全选") { setAll(false) }

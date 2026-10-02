@@ -401,6 +401,7 @@ h1, h2, h3 { text-wrap: balance; }
 .g-privacy { --g: linear-gradient(135deg, #4FC3D9, #1E8FB8); }
 .g-login { --g: linear-gradient(135deg, #FF8A5B, #E5533D); }
 .g-maint { --g: linear-gradient(135deg, #9AA5B8, #5F6B80); }
+.g-security { --g: linear-gradient(135deg, #6E8BFF, #3B50E0); }
 .g-recover { --g: linear-gradient(135deg, #34D3B4, #0F8F9E); }
 .g-appmgr { --g: linear-gradient(135deg, #3FB4F0, #5C6CF2); }
 .g-menubar { --g: linear-gradient(135deg, #10B981, #0891B2); }

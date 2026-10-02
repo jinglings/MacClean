@@ -22,6 +22,7 @@ final class PageModelStore {
     lazy var devCaches = CleanGroupsViewModel(descriptors: CleanGroupDescriptor.devGroups)
     lazy var largeOldFiles = LargeOldFilesViewModel()
     lazy var similarPhotos = SimilarPhotosViewModel()
+    lazy var duplicates = DuplicatesViewModel()
     lazy var appStorage = AppStorageViewModel()
     lazy var fileSearch = FileSearchViewModel()
     lazy var spaceLens = SpaceLensViewModel()

@@ -185,6 +185,17 @@
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="cache_cleanup" src="/assets/img/screens/light-zh-cache_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
+            <li class="sc-step g-photos" data-tab="duplicates">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dup"/></svg></span>
+              <h3 data-i18n="f.dup">重复与相似</h3>
+              <p data-i18n="sc.dup.p">两种模式：「完全相同的文件」找出任意类型、内容逐字节相同的副本；「相似照片」找出连拍和轻微改动的照片。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.dup.b1">默认扫描整个主目录，可按最小大小和文件类型筛选</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.dup.b2">每组自动保留一份（文稿 > 桌面 > 下载，不带「副本」「(1)」的名字，最早的那份），可以改选</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.dup.b3">整组永远不能全删；删掉的副本进废纸篓，可以撤销</span></li>
+              </ul>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="duplicates" src="/assets/img/screens/light-zh-duplicates.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
             <li class="sc-step g-recover" data-tab="file_recovery">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span>
               <h3 data-i18n="f.recover">找回文件</h3>
@@ -207,6 +218,18 @@
                 <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.privacy.b3">浏览器运行时自动锁定，避免损坏数据库</span></li>
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="privacy_cleanup" src="/assets/img/screens/light-zh-privacy_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-security" data-tab="security_center">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#security"/></svg></span>
+              <h3 data-i18n="f.security">安全中心</h3>
+              <p data-i18n="sc.security.p">看看 macOS 自带的防护是否开着、哪些应用拿到了敏感权限、有没有来路不明的后台程序。它不是杀毒软件。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.security.b1">检查 FileVault、防火墙、SIP、Gatekeeper、XProtect 数据是否最新、自动安全更新、锁屏、远程登录与屏幕共享</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.security.b2">列出拥有摄像头、麦克风、屏幕录制、辅助功能、完全磁盘访问等权限的应用，标出未签名的应用和已卸载应用留下的授权</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.security.b3">签名有问题或位置异常的后台程序、被吊销的证书、描述文件、权限过宽的浏览器扩展，按「值得留意」「提示」标注原因</span></li>
+              </ul>
+              <p class="sc-note" data-i18n="sc.security.note">只读取，不修改。每一项都说明为什么重要，并带你打开对应的系统设置；撤销权限在系统设置里完成，由你决定。</p>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="security_center" src="/assets/img/screens/light-zh-security_center.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
             <li class="sc-step g-login" data-tab="login_items">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span>
@@ -241,16 +264,6 @@
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="app_uninstaller" src="/assets/img/screens/light-zh-app_uninstaller.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
-            <li class="sc-step g-search" data-tab="file_search">
-              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg></span>
-              <h3 data-i18n="f.search">文件搜索</h3>
-              <p data-i18n="sc.search.p">Spotlight 加上 MacClean 自己的索引，Spotlight 漏掉的文件也能找到。</p>
-              <ul>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.search.b1">按名称、大小、修改时间筛选</span></li>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.search.b2">在菜单栏面板里也能直接搜索</span></li>
-              </ul>
-              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="file_search" src="/assets/img/screens/light-zh-file_search.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
-            </li>
           </ol>
           <div class="sc-stage" aria-hidden="true">
             <div class="window-wrap" id="sc-wrap">
@@ -268,24 +281,25 @@
     <section class="section tight" id="all-features" style="padding-top:0">
       <div class="wrap">
         <div class="sec-head">
-          <h2 data-i18n="bento.h2">十三个工具，各管一件事。</h2>
+          <h2 data-i18n="bento.h2">十四个工具，各管一件事。</h2>
           <p data-i18n="bento.p">再加一个随时待命的菜单栏面板。</p>
         </div>
         <div class="bento">
           <article class="cell wide g-checkup"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#checkup"/></svg></span><h3 data-i18n="f.checkup">一键体检</h3><p data-i18n="b.checkup">冗余、重复、大文件和失效启动项，一次扫描全部看到。</p><div class="meta"><span class="tag" data-i18n="b.checkup.t1">冗余文件</span><span class="tag" data-i18n="b.checkup.t2">重复文件</span><span class="tag" data-i18n="b.checkup.t3">大文件</span><span class="tag" data-i18n="b.checkup.t4">失效启动项</span></div></article>
           <article class="cell g-storage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#storage"/></svg></span><h3 data-i18n="f.storage">存储地图</h3><p data-i18n="b.storage">整块磁盘的可视化地图，逐层下钻。</p></article>
           <article class="cell g-reclaim"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#reclaim"/></svg></span><h3 data-i18n="f.reclaim">释放空间</h3><p data-i18n="b.reclaim">缓存、旧日志、安装包、邮件附件、设备备份。</p></article>
-          <article class="cell g-large"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#large"/></svg></span><h3 data-i18n="f.large">大型与陈旧文件</h3><p data-i18n="b.large">按大小和上次打开时间，找出很久没碰过的大文件。</p></article>
-          <article class="cell g-photos"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#photos"/></svg></span><h3 data-i18n="f.photos">相似照片</h3><p data-i18n="b.photos">连拍、重复导出、轻微裁剪或压缩的副本，保留最好的一张。</p></article>
+          <article class="cell wide g-photos"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dup"/></svg></span><h3 data-i18n="f.dup">重复与相似</h3><p data-i18n="b.dup">「完全相同的文件」找出任意类型、内容逐字节相同的副本；「相似照片」找出连拍、重复导出和轻微裁剪的照片。每组始终保留一份。</p><div class="meta"><span class="tag" data-i18n="b.dup.t1">完全相同的文件</span><span class="tag" data-i18n="b.dup.t2">相似照片</span><span class="tag" data-i18n="b.dup.t3">每组保留一份</span><span class="tag" data-i18n="b.dup.t4">可撤销</span></div></article>
           <article class="cell wide g-dev"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dev"/></svg></span><h3 data-i18n="f.dev">开发缓存</h3><p data-i18n="b.dev">Xcode DerivedData 与模拟器、npm / pip / Gradle / Cargo 缓存，以及闲置项目里的 node_modules。</p><div class="meta"><span class="tag">DerivedData</span><span class="tag">Simulators</span><span class="tag">node_modules</span><span class="tag">Gradle</span><span class="tag">Cargo</span></div></article>
+          <article class="cell g-large"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#large"/></svg></span><h3 data-i18n="f.large">大型与陈旧文件</h3><p data-i18n="b.large">按大小和上次打开时间，找出很久没碰过的大文件。</p></article>
           <article class="cell g-privacy"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#privacy"/></svg></span><h3 data-i18n="f.privacy">隐私清理</h3><p data-i18n="b.privacy">五款浏览器的历史、Cookie 与会话。书签和密码不碰。</p></article>
           <article class="cell g-login"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span><h3 data-i18n="f.login">启动项</h3><p data-i18n="b.login">登录项、启动代理、守护进程，以及失效残留。</p></article>
           <article class="cell g-maint"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#maint"/></svg></span><h3 data-i18n="f.maint">系统维护</h3><p data-i18n="b.maint">刷新 DNS、重建索引、删除本地快照、重启程序坞。</p></article>
+          <article class="cell wide g-security"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#security"/></svg></span><h3 data-i18n="f.security">安全中心</h3><p data-i18n="b.security">检查 macOS 自带防护是否开着、哪些应用拿到了敏感权限、有没有签名有问题的后台程序。只读，不是杀毒软件。</p><div class="meta"><span class="tag" data-i18n="b.security.t1">系统防护体检</span><span class="tag" data-i18n="b.security.t2">应用权限</span><span class="tag" data-i18n="b.security.t3">值得留意</span></div></article>
           <article class="cell g-appstorage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appstorage"/></svg></span><h3 data-i18n="f.appstorage">应用占用</h3><p data-i18n="b.appstorage">每个应用的真实大小，包括微信、QQ 聊天数据和 Docker 磁盘。</p></article>
-          <article class="cell wide g-recover"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span><h3 data-i18n="f.recover">找回文件</h3><p data-i18n="b.recover">从本地快照和时间机器备份里找回误删的文件，包括已经清空废纸篓的。</p><div class="meta"><span class="tag" data-i18n="b.recover.t1">本地快照</span><span class="tag" data-i18n="b.recover.t2">时间机器</span><span class="tag" data-i18n="b.recover.t3">只读挂载</span><span class="tag" data-i18n="b.recover.t4">从不覆盖</span></div></article>
           <article class="cell g-appmgr"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appmgr"/></svg></span><h3 data-i18n="f.appmgr">应用管家</h3><p data-i18n="b.appmgr">彻底卸载、检查更新、清理孤立残留。</p></article>
+          <article class="cell wide g-recover"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span><h3 data-i18n="f.recover">找回文件</h3><p data-i18n="b.recover">从本地快照和时间机器备份里找回误删的文件，包括已经清空废纸篓的。</p><div class="meta"><span class="tag" data-i18n="b.recover.t1">本地快照</span><span class="tag" data-i18n="b.recover.t2">时间机器</span><span class="tag" data-i18n="b.recover.t3">只读挂载</span><span class="tag" data-i18n="b.recover.t4">从不覆盖</span></div></article>
           <article class="cell g-search"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg></span><h3 data-i18n="f.search">文件搜索</h3><p data-i18n="b.search">Spotlight 加上自建索引。</p></article>
-          <article class="cell full g-menubar"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg></span><h3 data-i18n="f.menubar">菜单栏面板</h3><p data-i18n="b.menubar">磁盘、内存、电池健康度、CPU、网络测速与蓝牙设备电量，点一下菜单栏就能看到。</p><div class="meta"><span class="tag" data-i18n="mb.disk">磁盘</span><span class="tag" data-i18n="mb.mem">内存</span><span class="tag" data-i18n="mb.battery">电池</span><span class="tag">CPU</span><span class="tag" data-i18n="mb.net">网络测速</span><span class="tag" data-i18n="mb.bt">蓝牙电量</span></div></article>
+          <article class="cell g-menubar"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menubar"/></svg></span><h3 data-i18n="f.menubar">菜单栏面板</h3><p data-i18n="b.menubar">磁盘、内存、电池健康度、CPU、网络测速与蓝牙设备电量，点一下菜单栏就能看到。</p><div class="meta"><span class="tag" data-i18n="mb.disk">磁盘</span><span class="tag" data-i18n="mb.mem">内存</span><span class="tag" data-i18n="mb.battery">电池</span><span class="tag">CPU</span><span class="tag" data-i18n="mb.net">网络测速</span><span class="tag" data-i18n="mb.bt">蓝牙电量</span></div></article>
         </div>
       </div>
     </section>
@@ -444,6 +458,7 @@
               <tr><th scope="row" data-i18n="cmp.r6">一次购买，长期使用</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r6c">多为订阅制</td></tr>
               <tr><th scope="row" data-i18n="cmp.r7">无需注册账户</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r7c">常要求登录</td></tr>
               <tr><th scope="row" data-i18n="cmp.r8">误删后从快照或时间机器找回</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r8c">很少提供</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r9">重复文件每组强制保留一份</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r9c">视产品而定</td></tr>
             </tbody>
           </table>
         </div>
@@ -474,6 +489,8 @@
           <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。清空之后，还可以用「找回文件」从本地快照或时间机器备份中尝试找回。</p></div></details>
           <details><summary data-i18n="faq.q11">清空了废纸篓，还能找回文件吗？</summary><div class="ans"><p data-i18n="faq.a11">有机会，但不能保证。MacClean 1.1 的「找回文件」可以从 APFS 本地快照和时间机器备份里把文件复制回来：开启时间机器时（或系统更新后），macOS 会保留最近约 24 小时的本地快照。如果文件删除时既不在快照里、也没有备份，就无法找回，MacClean 也不会假装能做到。这时可以看看 iCloud 云盘或「照片」里的「最近删除」。</p></div></details>
           <details><summary data-i18n="faq.q12">怎样提高误删后找回的机会？</summary><div class="ans"><p data-i18n="faq.a12">打开时间机器：它会定期备份，也会让 macOS 保留本地快照。发现误删后尽快找回，本地快照通常只保留约 24 小时。找回之前尽量不要往磁盘写入大量数据（比如下载大文件、安装应用），以免 macOS 为腾出空间提前清理快照。</p></div></details>
+          <details><summary data-i18n="faq.q13">安全中心能查杀病毒吗？</summary><div class="ans"><p data-i18n="faq.a13">不能，MacClean 不是杀毒软件。macOS 自带 XProtect 等防护，会在后台检查已知的恶意软件。安全中心做的是检查这些自带防护是否开着、XProtect 的数据是否最新，并列出权限和签名上值得留意的地方，由你决定怎么处理。它只读取，不修改任何设置。</p></div></details>
+          <details><summary data-i18n="faq.q14">重复文件会不会删错？</summary><div class="ans"><p data-i18n="faq.a14">「完全相同的文件」只把内容逐字节相同的文件归为一组，每组都会自动保留一份，整组永远不能全删；你也可以改选保留哪一份。删掉的副本会移到废纸篓，在「清理记录」里一键恢复。</p></div></details>
           <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
           <details><summary data-i18n="faq.q5">可以退款吗？</summary><div class="ans"><p data-i18n="faq.a5">可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。</p></div></details>
           <details><summary data-i18n="faq.q6">一个许可证能用在几台 Mac 上？</summary><div class="ans"><p data-i18n="faq.a6">终身版可以激活 2 台 Mac，家庭版可以激活 5 台。换电脑时，在旧 Mac 的设置里点「在此 Mac 上停用」，名额就腾出来了。</p></div></details>
@@ -521,7 +538,7 @@
           <ul>
             <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
             <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
-            <li><a href="mailto:support@thulem.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+            <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
           </ul>
         </div>
         <div>

@@ -21,6 +21,7 @@ struct MacCleanApp: App {
                 .frame(minWidth: 800, minHeight: 600)
                 .modifier(AppShellActions())
         }
+        .defaultSize(width: 1180, height: 820)
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentMinSize)
         .commands {

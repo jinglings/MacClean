@@ -22,7 +22,7 @@
 "disk_analysis" = "存储地图";
 "cache_cleanup" = "释放空间";
 "large_old_files" = "大型与陈旧文件";
-"similar_photos_tab" = "相似照片";
+"similar_photos_tab" = "重复与相似";
 "app_storage" = "应用占用";
 "file_search" = "文件搜索";
 "developer_tools" = "开发缓存";
@@ -148,3 +148,4 @@
 "space_lens" = "存储地图项目";
 "trash" = "废纸篓";
 "file_recovery" = "找回文件";
+"security_center" = "安全中心";

@@ -37,11 +37,11 @@ const config = () => ({
   payment: process.env.MOCK_QR === 'none'
     ? { wechatQr: null, alipayQr: null, instructions: '' }
     : { wechatQr: '/files/qr-wechat.svg?v=1727770000', alipayQr: null, instructions: '请使用扫码付款，金额与订单一致。' },
-  contactEmail: 'hello@thulem.com',
+  contactEmail: 'wjw599330@gmail.com',
   announcement: process.env.MOCK_ANNOUNCE || null,
   latestRelease: process.env.MOCK_RELEASE === 'none' ? null : {
-    version: '1.1', build: '20', minOS: '14.0', size: 14_623_418,
-    notes: '## 新增：找回文件\n- 从 APFS 本地快照和时间机器备份中找回误删的文件\n- 按文件夹查看最近删掉的文件，或按文件名搜索（支持 * 通配符）\n- 在 MacClean 中清空废纸篓前，会先列出将被永久删除的文件\n\n修复了若干问题。',
+    version: '1.2', build: '30', minOS: '14.0', size: 14_623_418,
+    notes: '## 新增：安全中心\n- 检查 macOS 自带防护是否开启：FileVault、防火墙、SIP、Gatekeeper、XProtect 数据是否最新等\n- 查看哪些应用拿到了摄像头、麦克风、屏幕录制等权限\n- 标出签名有问题或来路不明的后台程序（只读，不改动）\n\n## 重复与相似\n- 新增「完全相同的文件」：任意类型，内容逐字节相同；每组始终保留一份\n- 「相似照片」保持不变',
     publishedAt: '2026-09-28T08:00:00Z', downloadUrl: '/download/latest',
   },
 });
@@ -155,11 +155,11 @@ createServer(async (req, res) => {
   }
   if (path === '/download/latest') {
     if (process.env.MOCK_RELEASE === 'none') return send(res, 404, { error: 'no release' });
-    res.writeHead(302, { Location: '/files/releases/MacClean-1.1.dmg' });
+    res.writeHead(302, { Location: '/files/releases/MacClean-1.2.dmg' });
     return res.end();
   }
-  if (path === '/files/releases/MacClean-1.1.dmg') {
-    res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="MacClean-1.1.dmg"' });
+  if (path === '/files/releases/MacClean-1.2.dmg') {
+    res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="MacClean-1.2.dmg"' });
     return res.end('fake dmg for local testing\n');
   }
   if (path === '/files/qr-wechat.svg') {

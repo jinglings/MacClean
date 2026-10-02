@@ -2,8 +2,8 @@
 //  SimilarPhotosView.swift
 //  MacClean
 //
-//  相似照片：按画面相似度分组，默认一张都不勾选；「智能选择」为每组保留推荐的一张、勾选其余。
-//  整组全部勾选时会显式警告。删除走废纸篓，可撤销。
+//  「重复与相似」页面入口 + 相似照片模式：按画面相似度分组，默认一张都不勾选；
+//  「智能选择」为每组保留推荐的一张、勾选其余。整组全部勾选时会显式警告。删除走废纸篓，可撤销。
 //
 
 import SwiftUI
@@ -185,18 +185,20 @@ final class SimilarPhotosViewModel: ObservableObject {
     }
 }
 
-// MARK: - 页面
+// MARK: - 页面（重复与相似）
 
+/// 侧栏「重复与相似」的页面入口（沿用 SimilarPhotosView 这个名字，ContentView 按 AppTab.similarPhotos 挂载）。
+/// 顶部分段切换两个模式：完全相同的文件（DuplicatesViewModel）与相似照片（SimilarPhotosViewModel）；
+/// 两个 ViewModel 都常驻在 PageModelStore，切换模式或侧栏都不丢结果。
 struct SimilarPhotosView: View {
-    @ObservedObject private var viewModel = PageModelStore.shared.similarPhotos
+    @ObservedObject private var duplicates = PageModelStore.shared.duplicates
+    @ObservedObject private var photos = PageModelStore.shared.similarPhotos
 
-    @State private var showConfirm = false
-    @State private var showCompletion = false
     @State private var showHistory = false
 
     var body: some View {
         VStack(spacing: 0) {
-            PageHeader(title: String(localized: "相似照片"), subtitle: String(localized: "找出连拍、重复导出与轻微裁剪/压缩过的照片，每组只留最好的一张")) {
+            PageHeader(title: String(localized: "重复与相似"), subtitle: String(localized: "找出内容完全相同的文件和画面相似的照片，每组只留一份")) {
                 HStack(spacing: 8) {
                     Button {
                         showHistory = true
@@ -209,25 +211,106 @@ struct SimilarPhotosView: View {
                     }
                     .buttonStyle(NeonOutlineButtonStyle())
 
-                    if viewModel.isScanning {
-                        Button("停止") { viewModel.cancelScan() }
-                            .buttonStyle(NeonOutlineButtonStyle())
-                    } else if viewModel.hasScanned {
-                        Button {
-                            viewModel.scan()
-                        } label: {
-                            HStack(spacing: 6) {
-                                Image(systemName: viewModel.hasScanned ? "arrow.clockwise" : "magnifyingglass")
-                                    .font(.system(size: 12, weight: .medium))
-                                viewModel.hasScanned ? Text("重新扫描") : Text("开始扫描")
-                            }
-                        }
-                        .buttonStyle(NeonButtonStyle())
-                        .disabled(viewModel.folders.isEmpty || viewModel.isCleaning)
+                    switch duplicates.mode {
+                    case .exact: ExactDuplicatesScanControls(viewModel: duplicates)
+                    case .similar: SimilarPhotosScanControls(viewModel: photos)
                     }
                 }
             }
 
+            HStack {
+                ModeSwitch(selection: $duplicates.mode)
+                Spacer()
+            }
+            .padding(.horizontal, CosmicSizes.pagePadding)
+            .padding(.top, 18)
+
+            switch duplicates.mode {
+            case .exact: ExactDuplicatesPane(viewModel: duplicates)
+            case .similar: SimilarPhotosPane(viewModel: photos)
+            }
+        }
+        .sheet(isPresented: $showHistory) {
+            CleanupHistoryView(onRestored: {
+                if duplicates.hasScanned { duplicates.scan() }
+                if photos.hasScanned { photos.scan() }
+            })
+            .frame(width: 640, height: 520)
+        }
+    }
+}
+
+// MARK: - 模式切换
+
+private struct ModeSwitch: View {
+    @Binding var selection: DuplicatesMode
+
+    var body: some View {
+        HStack(spacing: 2) {
+            ForEach(DuplicatesMode.allCases) { mode in
+                let isOn = mode == selection
+                Button {
+                    withAnimation(.easeOut(duration: 0.15)) { selection = mode }
+                } label: {
+                    Text(mode.title)
+                        .font(.system(size: 12.5, weight: isOn ? .semibold : .medium))
+                        .foregroundColor(isOn ? AppTheme.textPrimary : AppTheme.textSecondary)
+                        .padding(.horizontal, 16)
+                        .frame(height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                .fill(isOn ? AppTheme.surfaceHover : Color.clear)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                        .strokeBorder(isOn ? AppTheme.ink(0.10) : Color.clear, lineWidth: 1)
+                                )
+                                .shadow(color: .black.opacity(isOn ? 0.10 : 0), radius: 2, y: 1)
+                        )
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(3)
+        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(AppTheme.ink(0.06)))
+    }
+}
+
+// MARK: - 相似照片：页头按钮
+
+struct SimilarPhotosScanControls: View {
+    @ObservedObject var viewModel: SimilarPhotosViewModel
+
+    var body: some View {
+        if viewModel.isScanning {
+            Button("停止") { viewModel.cancelScan() }
+                .buttonStyle(NeonOutlineButtonStyle())
+        } else if viewModel.hasScanned {
+            Button {
+                viewModel.scan()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: viewModel.hasScanned ? "arrow.clockwise" : "magnifyingglass")
+                        .font(.system(size: 12, weight: .medium))
+                    viewModel.hasScanned ? Text("重新扫描") : Text("开始扫描")
+                }
+            }
+            .buttonStyle(NeonButtonStyle())
+            .disabled(viewModel.folders.isEmpty || viewModel.isCleaning)
+        }
+    }
+}
+
+// MARK: - 相似照片：内容
+
+struct SimilarPhotosPane: View {
+    @ObservedObject var viewModel: SimilarPhotosViewModel
+
+    @State private var showConfirm = false
+    @State private var showCompletion = false
+
+    var body: some View {
+        VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     scopeCard
@@ -291,10 +374,6 @@ struct SimilarPhotosView: View {
                 },
                 onDismiss: { showCompletion = false }
             )
-        }
-        .sheet(isPresented: $showHistory) {
-            CleanupHistoryView(onRestored: { if viewModel.hasScanned { viewModel.scan() } })
-                .frame(width: 640, height: 520)
         }
     }
 

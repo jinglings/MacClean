@@ -13,7 +13,7 @@ export const DEFAULT_CONFIG = {
     { id: 'family', name: '家庭版', nameEn: 'Family', price: 168, currency: 'CNY', devices: 5, features: [], highlight: false },
   ],
   payment: { wechatQr: null, alipayQr: null, instructions: '' },
-  contactEmail: 'support@thulem.com',
+  contactEmail: 'wjw599330@gmail.com',
   announcement: null,
   latestRelease: null,
 };

@@ -48,6 +48,9 @@ struct ContentView: View {
                 case .privacy:
                     PrivacyCleanupView()
 
+                case .security:
+                    SecurityCenterView()
+
                 case .loginItems:
                     LoginItemsView()
 

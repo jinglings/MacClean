@@ -324,6 +324,7 @@ extension AppTab {
         case .fileSearch: pair = (0x5AB8F5, 0x2F86D8)
         case .developerTools: pair = (0x7C8799, 0x4E5767)
         case .privacy: pair = (0x4FC3D9, 0x1E8FB8)
+        case .security: pair = (0x6E8BFF, 0x3B50E0)
         case .loginItems: pair = (0xFF8A5B, 0xE5533D)
         case .maintenance: pair = (0x9AA5B8, 0x5F6B80)
         case .recovery: pair = (0x34D3B4, 0x0F8F9E)
@@ -343,6 +344,7 @@ extension AppTab {
         case .privacy: return Color(hex: 0x1E8FB8)
         case .recovery: return Color(hex: 0x0F8F9E)
         case .loginItems: return Color(hex: 0xE5533D)
+        case .security: return Color(hex: 0x3B50E0)
         }
     }
 
@@ -353,12 +355,13 @@ extension AppTab {
         case .diskAnalysis: return "chart.pie.fill"
         case .cacheCleanup: return "sparkles"
         case .largeOldFiles: return "doc.fill"
-        case .similarPhotos: return "photo.on.rectangle.angled"
+        case .similarPhotos: return "doc.on.doc.fill"
         case .appStorage: return "shippingbox.fill"
         case .fileSearch: return "magnifyingglass"
         case .developerTools: return "hammer.fill"
         case .privacy: return "hand.raised.fill"
         case .loginItems: return "power"
+        case .security: return "lock.shield.fill"
         case .maintenance: return "wrench.and.screwdriver.fill"
         case .recovery: return "clock.arrow.circlepath"
         case .appUninstaller: return "square.grid.2x2.fill"
