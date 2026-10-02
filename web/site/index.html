@@ -135,7 +135,7 @@
         <div>
           <div class="sec-head">
             <h2 data-i18n="ring.h2">每一 GB 去了哪里，一目了然。</h2>
-            <p data-i18n="ring.p">存储地图把整块磁盘画成一张可以逐层深入的地图：照片图库、聊天记录、Xcode 缓存、被遗忘的下载……先看清楚，再决定删什么。</p>
+            <p data-i18n="ring.p">存储地图把整块磁盘画成一张可以逐层深入的地图：照片图库、聊天记录、Xcode 缓存、被遗忘的下载……它还能把 macOS 的「系统数据」逐项拆开。先看清楚，再决定删什么。</p>
           </div>
           <ul class="legend" id="ring-legend"></ul>
           <p class="ring-note" data-i18n="ring.note">示例数据，取自一台开发者的 Mac。</p>
@@ -163,16 +163,17 @@
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="smart_care" src="/assets/img/screens/light-zh-smart_care.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
-            <li class="sc-step g-storage" data-tab="disk_analysis">
+            <li class="sc-step g-storage" data-tab="system_data">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#storage"/></svg></span>
               <h3 data-i18n="f.storage">存储地图</h3>
-              <p data-i18n="sc.storage.p">扫描整块磁盘，按大小逐层浏览，找到真正占用空间的文件夹。</p>
+              <p data-i18n="sc.storage.p">扫描整块磁盘，按大小逐层浏览，找到真正占用空间的文件夹。新的「系统数据」模式把 macOS 里那一大块「系统数据」逐项拆开讲清楚。</p>
               <ul>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b1">包含隐藏文件与系统目录</span></li>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b2">逐层下钻，支持多选</span></li>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b3">删除先移入废纸篓，随时恢复</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b1">文件夹地图：包含隐藏文件与系统目录，逐层下钻，删除先进废纸篓</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b2">系统数据：本地快照、Spotlight 索引、iOS 备份、Xcode、Docker、本地 AI 模型、日志等十几项，各自的大小和用途</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.storage.b3">每项标注正常、偏大或异常及判断标准，并给出安全的下一步，比如「Spotlight 索引异常 → 系统维护里重建索引」</span></li>
               </ul>
-              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="disk_analysis" src="/assets/img/screens/light-zh-disk_analysis.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+              <p class="sc-note" data-i18n="sc.storage.note">只读，不会自己删除任何东西。需要管理员权限才能测量的部分会如实标注，不做估算。</p>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="system_data" src="/assets/img/screens/light-zh-system_data.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
             <li class="sc-step g-reclaim" data-tab="cache_cleanup">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#reclaim"/></svg></span>
@@ -184,6 +185,18 @@
                 <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.reclaim.b3">受保护路径自动跳过</span></li>
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="cache_cleanup" src="/assets/img/screens/light-zh-cache_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
+            </li>
+            <li class="sc-step g-chat" data-tab="chat_cleanup">
+              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#chat"/></svg></span>
+              <h3 data-i18n="f.chat">聊天清理</h3>
+              <p data-i18n="sc.chat.p">很多人的微信占用了几十甚至上百 GB，而微信自带的「清理缓存」往往腾不出多少真实空间。聊天清理按会话、日期和类型清理微信、QQ 和企业微信里的图片、视频、文件、语音和缓存。</p>
+              <ul>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.chat.b1">快速选择：一年前的视频、半年前的图片、全部缓存与缩略图、超过 100 MB 的文件</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.chat.b2">聊天文字记录永远不碰；不解密、不读取聊天数据库和消息内容，所以不显示会话名称，你可以给会话起个本地备注</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.chat.b3">只预选可以重新生成的缓存和缩略图，收到的文件从不预选；清理前需先退出聊天应用，所有文件进废纸篓，可以撤销</span></li>
+              </ul>
+              <p class="sc-note" data-i18n="sc.chat.note">微信的图片按会话分组；微信 4.x 的视频和收到的文件只按月份存放，所以按月份和类型清理。QQ 和企业微信按月份分组。清理掉的内容在聊天应用里会显示为「已过期」或「已清理」。</p>
+              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="chat_cleanup" src="/assets/img/screens/light-zh-chat_cleanup.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
             <li class="sc-step g-photos" data-tab="duplicates">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dup"/></svg></span>
@@ -231,17 +244,6 @@
               <p class="sc-note" data-i18n="sc.security.note">只读取，不修改。每一项都说明为什么重要，并带你打开对应的系统设置；撤销权限在系统设置里完成，由你决定。</p>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="security_center" src="/assets/img/screens/light-zh-security_center.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
-            <li class="sc-step g-login" data-tab="login_items">
-              <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span>
-              <h3 data-i18n="f.login">启动项</h3>
-              <p data-i18n="sc.login.p">找出登录时自动打开的应用、后台常驻的启动代理与守护进程。</p>
-              <ul>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.login.b1">标出卸载后残留的失效项</span></li>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.login.b2">检查只读取配置，不改动任何启动项</span></li>
-                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.login.b3">关掉之后，随时可以重新开启</span></li>
-              </ul>
-              <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="login_items" src="/assets/img/screens/light-zh-login_items.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
-            </li>
             <li class="sc-step g-maint" data-tab="maintenance">
               <span class="tile"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#maint"/></svg></span>
               <h3 data-i18n="f.maint">系统维护</h3>
@@ -250,6 +252,7 @@
                 <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b1">刷新 DNS、重建 Spotlight 索引与「打开方式」数据库</span></li>
                 <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b2">删除 Time Machine 本地快照，重启程序坞与访达</span></li>
                 <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b3">每条命令都写明用途和代价，再由你运行</span></li>
+                <li><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="sc.maint.b4">搭配「启动项」：找出登录时自动打开的应用和卸载后残留的失效项</span></li>
               </ul>
               <div class="sc-inline"><div class="window-wrap"><div class="window"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><img data-shot="maintenance" src="/assets/img/screens/light-zh-maintenance.webp" loading="lazy" decoding="async" width="1600" height="1030" alt=""></div></div></div>
             </li>
@@ -281,21 +284,22 @@
     <section class="section tight" id="all-features" style="padding-top:0">
       <div class="wrap">
         <div class="sec-head">
-          <h2 data-i18n="bento.h2">十四个工具，各管一件事。</h2>
+          <h2 data-i18n="bento.h2">十五个工具，各管一件事。</h2>
           <p data-i18n="bento.p">再加一个随时待命的菜单栏面板。</p>
         </div>
         <div class="bento">
           <article class="cell wide g-checkup"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#checkup"/></svg></span><h3 data-i18n="f.checkup">一键体检</h3><p data-i18n="b.checkup">冗余、重复、大文件和失效启动项，一次扫描全部看到。</p><div class="meta"><span class="tag" data-i18n="b.checkup.t1">冗余文件</span><span class="tag" data-i18n="b.checkup.t2">重复文件</span><span class="tag" data-i18n="b.checkup.t3">大文件</span><span class="tag" data-i18n="b.checkup.t4">失效启动项</span></div></article>
-          <article class="cell g-storage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#storage"/></svg></span><h3 data-i18n="f.storage">存储地图</h3><p data-i18n="b.storage">整块磁盘的可视化地图，逐层下钻。</p></article>
+          <article class="cell wide g-storage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#storage"/></svg></span><h3 data-i18n="f.storage">存储地图</h3><p data-i18n="b.storage">整块磁盘的可视化地图，逐层下钻。「系统数据」模式逐项解释 macOS 系统数据里装了什么、大小是否正常、下一步该怎么做。</p><div class="meta"><span class="tag" data-i18n="b.storage.t1">文件夹地图</span><span class="tag" data-i18n="b.storage.t2">系统数据</span><span class="tag" data-i18n="b.storage.t3">只读</span></div></article>
           <article class="cell g-reclaim"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#reclaim"/></svg></span><h3 data-i18n="f.reclaim">释放空间</h3><p data-i18n="b.reclaim">缓存、旧日志、安装包、邮件附件、设备备份。</p></article>
+          <article class="cell wide g-chat"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#chat"/></svg></span><h3 data-i18n="f.chat">聊天清理</h3><p data-i18n="b.chat">按会话、日期和类型清理微信、QQ 和企业微信的图片、视频、文件与缓存。聊天文字记录不碰，也不读取消息内容。</p><div class="meta"><span class="tag" data-i18n="b.chat.t1">微信</span><span class="tag">QQ</span><span class="tag" data-i18n="b.chat.t2">企业微信</span><span class="tag" data-i18n="b.chat.t3">不读消息内容</span></div></article>
+          <article class="cell g-large"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#large"/></svg></span><h3 data-i18n="f.large">大型与陈旧文件</h3><p data-i18n="b.large">按大小和上次打开时间，找出很久没碰过的大文件。</p></article>
           <article class="cell wide g-photos"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dup"/></svg></span><h3 data-i18n="f.dup">重复与相似</h3><p data-i18n="b.dup">「完全相同的文件」找出任意类型、内容逐字节相同的副本；「相似照片」找出连拍、重复导出和轻微裁剪的照片。每组始终保留一份。</p><div class="meta"><span class="tag" data-i18n="b.dup.t1">完全相同的文件</span><span class="tag" data-i18n="b.dup.t2">相似照片</span><span class="tag" data-i18n="b.dup.t3">每组保留一份</span><span class="tag" data-i18n="b.dup.t4">可撤销</span></div></article>
           <article class="cell wide g-dev"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#dev"/></svg></span><h3 data-i18n="f.dev">开发缓存</h3><p data-i18n="b.dev">Xcode DerivedData 与模拟器、npm / pip / Gradle / Cargo 缓存，以及闲置项目里的 node_modules。</p><div class="meta"><span class="tag">DerivedData</span><span class="tag">Simulators</span><span class="tag">node_modules</span><span class="tag">Gradle</span><span class="tag">Cargo</span></div></article>
-          <article class="cell g-large"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#large"/></svg></span><h3 data-i18n="f.large">大型与陈旧文件</h3><p data-i18n="b.large">按大小和上次打开时间，找出很久没碰过的大文件。</p></article>
           <article class="cell g-privacy"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#privacy"/></svg></span><h3 data-i18n="f.privacy">隐私清理</h3><p data-i18n="b.privacy">五款浏览器的历史、Cookie 与会话。书签和密码不碰。</p></article>
+          <article class="cell wide g-security"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#security"/></svg></span><h3 data-i18n="f.security">安全中心</h3><p data-i18n="b.security">检查 macOS 自带防护是否开着、哪些应用拿到了敏感权限、有没有签名有问题的后台程序。只读，不是杀毒软件。</p><div class="meta"><span class="tag" data-i18n="b.security.t1">系统防护体检</span><span class="tag" data-i18n="b.security.t2">应用权限</span><span class="tag" data-i18n="b.security.t3">值得留意</span></div></article>
           <article class="cell g-login"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#login"/></svg></span><h3 data-i18n="f.login">启动项</h3><p data-i18n="b.login">登录项、启动代理、守护进程，以及失效残留。</p></article>
           <article class="cell g-maint"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#maint"/></svg></span><h3 data-i18n="f.maint">系统维护</h3><p data-i18n="b.maint">刷新 DNS、重建索引、删除本地快照、重启程序坞。</p></article>
-          <article class="cell wide g-security"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#security"/></svg></span><h3 data-i18n="f.security">安全中心</h3><p data-i18n="b.security">检查 macOS 自带防护是否开着、哪些应用拿到了敏感权限、有没有签名有问题的后台程序。只读，不是杀毒软件。</p><div class="meta"><span class="tag" data-i18n="b.security.t1">系统防护体检</span><span class="tag" data-i18n="b.security.t2">应用权限</span><span class="tag" data-i18n="b.security.t3">值得留意</span></div></article>
-          <article class="cell g-appstorage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appstorage"/></svg></span><h3 data-i18n="f.appstorage">应用占用</h3><p data-i18n="b.appstorage">每个应用的真实大小，包括微信、QQ 聊天数据和 Docker 磁盘。</p></article>
+          <article class="cell wide g-appstorage"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appstorage"/></svg></span><h3 data-i18n="f.appstorage">应用占用</h3><p data-i18n="b.appstorage">每个应用的真实大小，包括微信、QQ 聊天数据和 Docker 磁盘。</p></article>
           <article class="cell g-appmgr"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#appmgr"/></svg></span><h3 data-i18n="f.appmgr">应用管家</h3><p data-i18n="b.appmgr">彻底卸载、检查更新、清理孤立残留。</p></article>
           <article class="cell wide g-recover"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#recover"/></svg></span><h3 data-i18n="f.recover">找回文件</h3><p data-i18n="b.recover">从本地快照和时间机器备份里找回误删的文件，包括已经清空废纸篓的。</p><div class="meta"><span class="tag" data-i18n="b.recover.t1">本地快照</span><span class="tag" data-i18n="b.recover.t2">时间机器</span><span class="tag" data-i18n="b.recover.t3">只读挂载</span><span class="tag" data-i18n="b.recover.t4">从不覆盖</span></div></article>
           <article class="cell g-search"><span class="tile sm"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#search"/></svg></span><h3 data-i18n="f.search">文件搜索</h3><p data-i18n="b.search">Spotlight 加上自建索引。</p></article>
@@ -453,7 +457,7 @@
               <tr><th scope="row" data-i18n="cmp.r1">100% 本地运行，不上传文件信息</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r1c">不一定，部分需要联网扫描</td></tr>
               <tr><th scope="row" data-i18n="cmp.r2">先进废纸篓，可一键撤销</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r2c">多数直接删除</td></tr>
               <tr><th scope="row" data-i18n="cmp.r3">识别开发缓存</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r3c">很少覆盖</td></tr>
-              <tr><th scope="row" data-i18n="cmp.r4">显示微信、QQ 聊天数据占用</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r4c">很少覆盖</td></tr>
+              <tr><th scope="row" data-i18n="cmp.r4">按会话、日期和类型清理微信/QQ 聊天媒体</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r4c">很少覆盖</td></tr>
               <tr><th scope="row" data-i18n="cmp.r5">中文与英文界面</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r5c">视产品而定</td></tr>
               <tr><th scope="row" data-i18n="cmp.r6">一次购买，长期使用</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r6c">多为订阅制</td></tr>
               <tr><th scope="row" data-i18n="cmp.r7">无需注册账户</th><td class="us"><span class="yes"><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#check"/></svg><span data-i18n="cmp.yes">是</span></span></td><td data-i18n="cmp.r7c">常要求登录</td></tr>
@@ -491,6 +495,8 @@
           <details><summary data-i18n="faq.q12">怎样提高误删后找回的机会？</summary><div class="ans"><p data-i18n="faq.a12">打开时间机器：它会定期备份，也会让 macOS 保留本地快照。发现误删后尽快找回，本地快照通常只保留约 24 小时。找回之前尽量不要往磁盘写入大量数据（比如下载大文件、安装应用），以免 macOS 为腾出空间提前清理快照。</p></div></details>
           <details><summary data-i18n="faq.q13">安全中心能查杀病毒吗？</summary><div class="ans"><p data-i18n="faq.a13">不能，MacClean 不是杀毒软件。macOS 自带 XProtect 等防护，会在后台检查已知的恶意软件。安全中心做的是检查这些自带防护是否开着、XProtect 的数据是否最新，并列出权限和签名上值得留意的地方，由你决定怎么处理。它只读取，不修改任何设置。</p></div></details>
           <details><summary data-i18n="faq.q14">重复文件会不会删错？</summary><div class="ans"><p data-i18n="faq.a14">「完全相同的文件」只把内容逐字节相同的文件归为一组，每组都会自动保留一份，整组永远不能全删；你也可以改选保留哪一份。删掉的副本会移到废纸篓，在「清理记录」里一键恢复。</p></div></details>
+          <details><summary data-i18n="faq.q15">微信占了几十 GB，能安全清理吗？</summary><div class="ans"><p data-i18n="faq.a15">可以，用「聊天清理」。它按会话、日期和类型清理微信、QQ 和企业微信里的图片、视频、文件和缓存，从不碰聊天文字记录，也不解密或读取聊天数据库。默认只勾选可以重新生成的缓存和缩略图，收到的文件需要你自己勾选；清理前要先退出聊天应用，文件会移到废纸篓，可以撤销。清理掉的图片和视频在聊天里会显示为「已过期」或「已清理」。</p></div></details>
+          <details><summary data-i18n="faq.q16">「系统数据」为什么这么大？MacClean 能帮我做什么？</summary><div class="ans"><p data-i18n="faq.a16">「系统数据」是 macOS 把很多东西归在一起的结果：本地快照和可清除空间、Spotlight 索引、照片分析缓存、iOS 备份、Xcode 和模拟器、Docker 与虚拟机、本地 AI 模型、应用缓存、日志、虚拟内存等。存储地图的「系统数据」模式会逐项列出它们在你这台 Mac 上的大小，标注正常、偏大或异常及判断标准，并给出安全的下一步，比如 Spotlight 索引异常时去「系统维护」重建。它只读，不会自己删除任何东西；需要管理员权限才能测量的部分会如实标注。</p></div></details>
           <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
           <details><summary data-i18n="faq.q5">可以退款吗？</summary><div class="ans"><p data-i18n="faq.a5">可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。</p></div></details>
           <details><summary data-i18n="faq.q6">一个许可证能用在几台 Mac 上？</summary><div class="ans"><p data-i18n="faq.a6">终身版可以激活 2 台 Mac，家庭版可以激活 5 台。换电脑时，在旧 Mac 的设置里点「在此 Mac 上停用」，名额就腾出来了。</p></div></details>

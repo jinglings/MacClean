@@ -30,6 +30,9 @@ struct ContentView: View {
                 case .cacheCleanup:
                     CosmicCacheView()
 
+                case .chatCleanup:
+                    ChatCleanupView()
+
                 case .largeOldFiles:
                     LargeOldFilesView()
 

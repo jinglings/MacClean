@@ -318,6 +318,7 @@ extension AppTab {
         case .smartCare: pair = (0x1CC88A, 0x0E9BB5)
         case .diskAnalysis: pair = (0x4C8DF6, 0x2A5FE0)
         case .cacheCleanup: pair = (0x33C7A0, 0x14A06F)
+        case .chatCleanup: pair = (0x4CD964, 0x1AAD3B)
         case .largeOldFiles: pair = (0xF5B342, 0xE4801C)
         case .similarPhotos: pair = (0xF2709C, 0xD9457A)
         case .appStorage: pair = (0x8E7CFF, 0x6247E8)
@@ -345,6 +346,7 @@ extension AppTab {
         case .recovery: return Color(hex: 0x0F8F9E)
         case .loginItems: return Color(hex: 0xE5533D)
         case .security: return Color(hex: 0x3B50E0)
+        case .chatCleanup: return Color(hex: 0x1AAD3B)
         }
     }
 
@@ -354,6 +356,7 @@ extension AppTab {
         case .smartCare: return "checkmark.seal.fill"
         case .diskAnalysis: return "chart.pie.fill"
         case .cacheCleanup: return "sparkles"
+        case .chatCleanup: return "bubble.left.and.bubble.right.fill"
         case .largeOldFiles: return "doc.fill"
         case .similarPhotos: return "doc.on.doc.fill"
         case .appStorage: return "shippingbox.fill"

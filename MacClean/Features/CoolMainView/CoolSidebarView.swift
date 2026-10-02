@@ -89,7 +89,7 @@ struct CoolSidebarView: View {
     private var sections: [(title: String, tabs: [AppTab])] {
         [
             (String(localized: "概览"), [.smartCare, .diskAnalysis]),
-            (String(localized: "清理"), [.cacheCleanup, .largeOldFiles, .similarPhotos, .developerTools, .privacy]),
+            (String(localized: "清理"), [.cacheCleanup, .chatCleanup, .largeOldFiles, .similarPhotos, .developerTools, .privacy]),
             (String(localized: "优化"), [.security, .loginItems, .maintenance]),
             (String(localized: "管理"), [.appStorage, .appUninstaller, .fileSearch, .recovery])
         ]

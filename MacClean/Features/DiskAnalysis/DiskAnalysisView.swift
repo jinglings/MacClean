@@ -10,6 +10,20 @@ import Combine
 import SwiftUI
 
 struct DiskAnalysisView: View {
+    @AppStorage(StorageMapMode.storageKey) private var mode: StorageMapMode = .folderMap
+
+    var body: some View {
+        switch mode {
+        case .folderMap:
+            FolderMapView()
+        case .systemData:
+            SystemDataView(viewModel: SystemDataViewModel.shared)
+        }
+    }
+}
+
+/// 存储地图 →「目录地图」：整盘目录占用的气泡图与逐层钻取。
+private struct FolderMapView: View {
     @ObservedObject private var viewModel = PageModelStore.shared.spaceLens
     
     var body: some View {
@@ -375,8 +389,11 @@ private struct SpaceLensTopBar: View {
 
     var body: some View {
         PageHeader(title: String(localized: "存储地图"), subtitle: String(localized: "可视化整盘占用，找到吃掉空间的目录")) {
-            if let leading {
-                leading
+            HStack(spacing: 12) {
+                if let leading {
+                    leading
+                }
+                StorageMapModePicker()
             }
         }
     }
