@@ -110,7 +110,7 @@ actor CleanupManager {
 
         case .largeFiles, .oldFiles, .duplicates, .brokenLoginItems,
              .installers, .iosBackups, .iosUpdates, .projectArtifacts, .similarPhotos,
-             .applications, .appLeftovers, .privacyData, .spaceLens:
+             .applications, .appLeftovers, .privacyData, .spaceLens, .aiModels:
             // 整个文件/目录移入废纸篓
             return (try trashItem(atPath: path), [])
         }

@@ -66,7 +66,7 @@ thulem.com {
 		}
 
 		@assets path /assets/*
-		header @assets Cache-Control "public, max-age=604800"
+		header @assets Cache-Control "public, max-age=3600"
 		@html path / *.html
 		header @html Cache-Control "public, max-age=0, must-revalidate"
 

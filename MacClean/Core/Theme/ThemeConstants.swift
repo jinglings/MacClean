@@ -166,6 +166,7 @@ struct AppTheme {
         case .appLeftovers: return amber
         case .privacyData: return teal
         case .spaceLens: return sky
+        case .aiModels: return violet
         }
     }
 }

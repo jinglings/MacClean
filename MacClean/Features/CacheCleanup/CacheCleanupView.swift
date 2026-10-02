@@ -20,6 +20,26 @@ struct CleanGroupDescriptor: Identifiable, Sendable {
     let riskNote: String?
     /// 后台线程执行的同步扫描函数（必须只调用 nonisolated 代码）。
     let scan: @Sendable (URL) -> [CleanableItem]
+    /// 展开分组后列表顶部的提示。
+    var hint: String? = nil
+    /// 条目行显示上次修改时间。
+    var showsLastModified = false
+    /// 某个应用运行时锁定本组的部分条目，需先退出。
+    var runningApp: RunningAppGuard? = nil
+    /// 清理前在后台把选中条目展开为真正要移走的路径（如 Ollama 模型 → 清单 + 不再被引用的数据块）。
+    var prepareForCleaning: (@Sendable ([CleanableItem]) -> [CleanableItem])? = nil
+}
+
+/// 应用运行时不能安全删除它正在使用的文件：锁定 lockedPaths 下的条目，并提供「退出」按钮。
+struct RunningAppGuard: Sendable {
+    let appName: String
+    let lockedPaths: [String]
+    let isRunning: @Sendable () -> Bool
+    let quit: @Sendable () -> Void
+
+    func locks(_ path: String) -> Bool {
+        lockedPaths.contains { path == $0 || path.hasPrefix($0 + "/") }
+    }
 }
 
 struct CleanGroupState: Identifiable {
@@ -27,8 +47,13 @@ struct CleanGroupState: Identifiable {
     var items: [CleanableItem] = []
     var isScanning = false
     var hasScanned = false
+    /// descriptor.runningApp 对应的应用正在运行
+    var isAppRunning = false
 
     var id: String { descriptor.id }
+    func isLocked(_ item: CleanableItem) -> Bool {
+        isAppRunning && descriptor.runningApp?.locks(item.path) == true
+    }
     var totalSize: Int64 { items.reduce(0) { $0 + $1.size } }
     var selectedSize: Int64 { items.filter(\.isSelected).reduce(0) { $0 + $1.size } }
     var selectedCount: Int { items.filter(\.isSelected).count }
@@ -69,7 +94,25 @@ extension CleanGroupDescriptor {
             riskNote: nil,
             scan: { home in ProjectArtifactFinder.find(home: home) }
         )
-        return [projects] + caches
+        let locations = AIModelLocations.resolve(home: FileManager.default.homeDirectoryForCurrentUser, environment: AIModelLocations.currentEnvironment)
+        let aiModels = CleanGroupDescriptor(
+            id: "aiModels",
+            title: String(localized: "本地 AI 模型"),
+            subtitle: String(localized: "Ollama、Hugging Face、LM Studio 等下载到本机的模型"),
+            icon: "brain",
+            riskNote: String(localized: "删除后需要重新下载"),
+            scan: { home in AIModelCatalog.scan(home: home) },
+            hint: String(localized: "长期没用的大模型最值得清理；删除后用到时会自动重新下载"),
+            showsLastModified: true,
+            runningApp: RunningAppGuard(
+                appName: "Ollama",
+                lockedPaths: locations.ollamaModels,
+                isRunning: { OllamaProcess.isRunning() },
+                quit: { OllamaProcess.quit() }
+            ),
+            prepareForCleaning: { AIModelCatalog.prepareForCleaning($0) }
+        )
+        return [projects, aiModels] + caches
     }
 }
 
@@ -90,16 +133,29 @@ final class CleanGroupsViewModel: ObservableObject {
     @Published var cleanProgress: Double = 0
     @Published var lastCleanResult: CleanResult?
     @Published var lastRestoreResult: RestoreResult?
+    /// 展开的分组；放在 ViewModel 里，切换侧栏后回来仍保持展开状态
+    @Published var expandedGroupIDs: Set<String> = []
     /// 最近一次全部分组扫描完成的时间
     @Published private(set) var lastScannedAt: Date?
 
     private let home: URL
+    private var cancellables: Set<AnyCancellable> = []
     /// 每次触发扫描递增，旧扫描的回调据此丢弃，避免重新扫描时新旧结果互相覆盖。
     private var scanGeneration: [String: Int] = [:]
 
     init(descriptors: [CleanGroupDescriptor], home: URL = FileManager.default.homeDirectoryForCurrentUser) {
         self.groups = descriptors.map { CleanGroupState(descriptor: $0) }
         self.home = home
+        if descriptors.contains(where: { $0.runningApp != nil }) {
+            let center = NSWorkspace.shared.notificationCenter
+            Publishers.Merge(
+                center.publisher(for: NSWorkspace.didLaunchApplicationNotification),
+                center.publisher(for: NSWorkspace.didTerminateApplicationNotification)
+            )
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.refreshRunningApps() }
+            .store(in: &cancellables)
+        }
     }
 
     var isScanning: Bool { groups.contains(where: \.isScanning) }
@@ -117,6 +173,7 @@ final class CleanGroupsViewModel: ObservableObject {
     // MARK: - 扫描
 
     func scanAll() {
+        refreshRunningApps()
         for group in groups { scan(groupID: group.id) }
     }
 
@@ -141,14 +198,42 @@ final class CleanGroupsViewModel: ObservableObject {
         groups[index].isScanning = false
         groups[index].hasScanned = true
         if !isScanning { lastScannedAt = Date() }
+        refreshRunningApps()
+    }
+
+    // MARK: - 运行中的应用
+
+    /// 刷新各分组关联应用的运行状态；运行中时取消勾选被锁定的条目。
+    func refreshRunningApps() {
+        for index in groups.indices {
+            guard let runningApp = groups[index].descriptor.runningApp else { continue }
+            let running = runningApp.isRunning()
+            if groups[index].isAppRunning != running { groups[index].isAppRunning = running }
+            guard running else { continue }
+            for itemIndex in groups[index].items.indices where groups[index].items[itemIndex].isSelected
+                && runningApp.locks(groups[index].items[itemIndex].path) {
+                groups[index].items[itemIndex].isSelected = false
+            }
+        }
+    }
+
+    func quitRunningApp(groupID: String) {
+        guard let runningApp = groups.first(where: { $0.id == groupID })?.descriptor.runningApp else { return }
+        runningApp.quit()
+        // 后台服务进程不发应用退出通知；应用弹出确认框时也能在稍后补刷一次
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            refreshRunningApps()
+        }
     }
 
     // MARK: - 选择
 
     func setSelection(groupID: String, selected: Bool) {
         guard let index = groups.firstIndex(where: { $0.id == groupID }) else { return }
-        for itemIndex in groups[index].items.indices {
-            groups[index].items[itemIndex].isSelected = selected
+        let group = groups[index]
+        for itemIndex in group.items.indices {
+            groups[index].items[itemIndex].isSelected = selected && !group.isLocked(group.items[itemIndex])
         }
     }
 
@@ -164,13 +249,24 @@ final class CleanGroupsViewModel: ObservableObject {
 
     func cleanSelected() async {
         guard !isCleaning else { return }
-        let affectedGroups = groups.filter { $0.selectedCount > 0 }.map(\.id)
-        let selected = selectedItems
-        guard !selected.isEmpty else { return }
+        // 清理前再确认一次运行状态，刚打开的应用不能删它正在用的文件
+        refreshRunningApps()
+        let affectedGroups = groups.filter { $0.selectedCount > 0 }
+        guard !affectedGroups.isEmpty else { return }
 
         isCleaning = true
         cleanProgress = 0
         lastRestoreResult = nil
+
+        var selected: [CleanableItem] = []
+        for group in affectedGroups {
+            let items = group.items.filter(\.isSelected)
+            if let prepare = group.descriptor.prepareForCleaning {
+                selected += await Task.detached(priority: .userInitiated) { prepare(items) }.value
+            } else {
+                selected += items
+            }
+        }
 
         do {
             // CleanupManager 内部会先做 PathGuard 校验，再按分类策略处理并写入清理记录。
@@ -186,7 +282,7 @@ final class CleanGroupsViewModel: ObservableObject {
 
         isCleaning = false
         // 缓存类只清空内容、目录还在，需要重新扫描拿到准确的剩余大小。
-        for groupID in affectedGroups { scan(groupID: groupID) }
+        for group in affectedGroups { scan(groupID: group.id) }
     }
 
     /// 撤销最近一次清理：把仍在废纸篓里的项目放回原处。

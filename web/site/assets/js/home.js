@@ -1,5 +1,5 @@
-import { boot, reducedMotion, getConfig, planName, planFeatures, money, escapeHTML, updateShot } from './common.js';
-import { t, getLang, onLangChange } from './i18n.js';
+import { boot, reducedMotion, getConfig, planName, planFeatures, money, escapeHTML, updateShot } from './common.js?v=1.4';
+import { t, getLang, onLangChange } from './i18n.js?v=1.4';
 
 boot();
 
@@ -235,9 +235,9 @@ if (!motionOK() || !('IntersectionObserver' in window)) {
   const steps = [...document.querySelectorAll('#sc-steps > .sc-step')];
   const stack = document.getElementById('sc-stack');
   const wrap = document.getElementById('sc-wrap');
-  const imgs = steps.map(step => {
+  const picture = tab => {
     const img = document.createElement('img');
-    img.dataset.shot = step.dataset.tab;
+    img.dataset.shot = tab;
     img.dataset.sizes = '(max-width: 900px) 0px, 60vw';
     img.loading = 'lazy';
     img.decoding = 'async';
@@ -248,13 +248,21 @@ if (!motionOK() || !('IntersectionObserver' in window)) {
     pic.append(img);
     stack.append(pic);
     return pic;
-  });
-  let active = -1;
+  };
+  // A step may name a second screenshot (data-alt); the stage alternates between the two.
+  const pics = steps.map(step => [step.dataset.tab, step.dataset.alt].filter(Boolean).map(picture));
+  let active = -1, shown = 0, timer = 0;
+  const show = (i, k) => {
+    shown = k;
+    pics.forEach((list, j) => list.forEach((p, n) => p.classList.toggle('active', j === i && n === k)));
+  };
   const activate = i => {
     if (i === active) return;
     active = i;
     steps.forEach((s, j) => s.classList.toggle('active', j === i));
-    imgs.forEach((p, j) => p.classList.toggle('active', j === i));
+    show(i, 0);
+    clearInterval(timer);
+    if (pics[i].length > 1 && motionOK()) timer = setInterval(() => show(i, (shown + 1) % pics[i].length), 4500);
     wrap.style.setProperty('--g', getComputedStyle(steps[i]).getPropertyValue('--g'));
   };
   activate(0);
@@ -276,12 +284,19 @@ if (!motionOK() || !('IntersectionObserver' in window)) {
     ['~/Library/Caches/Homebrew', '2.1 GB'],
     ['~/.cargo/registry', '1.9 GB'],
     ['~/Projects/demo-app/node_modules', '1.2 GB', 'dev.idle210'],
-    ['~/Projects/old-site/node_modules', '0.9 GB', 'dev.idle94'],
+  ];
+  // Local AI models are never preselected.
+  const models = [
+    ['Ollama · llama3.1:8b', '4.9 GB'],
+    ['Hugging Face · whisper-large-v3', '3.1 GB'],
   ];
   const lines = () => [
     [['c', t('dev.l0')]],
     [],
     ...rows.map(([p, s, note]) => [['p', '✓ '], ['', p.padEnd(44)], ['s', s.padStart(8)], ...(note ? [['c', '  ' + t(note)]] : [])]),
+    [],
+    [['c', t('dev.aiHead')]],
+    ...models.map(([p, s]) => [['c', '○ '], ['', p.padEnd(44)], ['s', s.padStart(8)], ['c', '  ' + t('dev.aiNote')]]),
     [],
     [['t', t('dev.total')]],
     [['ok', t('dev.done')]],

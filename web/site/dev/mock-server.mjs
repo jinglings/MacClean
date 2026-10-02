@@ -40,8 +40,8 @@ const config = () => ({
   contactEmail: 'wjw599330@gmail.com',
   announcement: process.env.MOCK_ANNOUNCE || null,
   latestRelease: process.env.MOCK_RELEASE === 'none' ? null : {
-    version: '1.3', build: '40', minOS: '14.0', size: 14_623_418,
-    notes: '## 新增：聊天清理\n- 按会话、日期和类型清理微信、QQ 和企业微信的图片、视频、文件与缓存\n- 不读取聊天数据库和消息内容；所有清理先进废纸篓\n\n## 存储地图：系统数据\n- 逐项解释「系统数据」里有什么、是否正常、下一步怎么做',
+    version: '1.4', build: '50', minOS: '14.0', size: 14_623_418,
+    notes: '## 开发缓存：本地 AI 模型\n- 找出 Ollama、Hugging Face、LM Studio 等下载的模型，逐个显示可释放和需重新下载的大小\n\n## 存储地图：暂存篮\n- 浏览时把要删的东西放进暂存篮，最后一次性移到废纸篓',
     publishedAt: '2026-09-28T08:00:00Z', downloadUrl: '/download/latest',
   },
 });
@@ -155,11 +155,11 @@ createServer(async (req, res) => {
   }
   if (path === '/download/latest') {
     if (process.env.MOCK_RELEASE === 'none') return send(res, 404, { error: 'no release' });
-    res.writeHead(302, { Location: '/files/releases/MacClean-1.3.dmg' });
+    res.writeHead(302, { Location: '/files/releases/MacClean-1.4.dmg' });
     return res.end();
   }
-  if (path === '/files/releases/MacClean-1.3.dmg') {
-    res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="MacClean-1.3.dmg"' });
+  if (path === '/files/releases/MacClean-1.4.dmg') {
+    res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="MacClean-1.4.dmg"' });
     return res.end('fake dmg for local testing\n');
   }
   if (path === '/files/qr-wechat.svg') {

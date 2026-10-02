@@ -519,6 +519,26 @@ actor DiskAnalyzer {
         )
     }
 
+    // MARK: - 可清除空间（存储地图摘要用）
+
+    /// 可清除空间 = 「重要用途可用」−「真正空闲」，与系统数据页同一口径。
+    nonisolated static func purgeableBytes(available: Int64, availableForImportantUsage: Int64) -> Int64 {
+        SystemDataRules.purgeable(available: available, availableForImportantUsage: availableForImportantUsage)
+    }
+
+    /// 读取卷的可清除空间；读不到返回 nil。会访问文件系统，别在主线程调用。
+    nonisolated static func purgeableSpace(
+        onVolumeOf url: URL = FileManager.default.homeDirectoryForCurrentUser
+    ) -> Int64? {
+        guard let values = try? url.resourceValues(forKeys: [
+            .volumeAvailableCapacityKey,
+            .volumeAvailableCapacityForImportantUsageKey
+        ]),
+              let available = values.volumeAvailableCapacity,
+              let important = values.volumeAvailableCapacityForImportantUsage else { return nil }
+        return purgeableBytes(available: Int64(available), availableForImportantUsage: important)
+    }
+
     // MARK: - 只计大小的遍历（系统数据用）
     //
     // 用 getattrlistbulk 批量读取目录条目（比空间透镜的 readdir + lstat 快），不建树：只返回总占用和直属子项占用。

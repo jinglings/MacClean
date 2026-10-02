@@ -41,3 +41,10 @@ xcrun stapler staple build/MacClean.dmg
 - 界面截图走查：`TEST_RUNNER_MACCLEAN_SNAPSHOT_DIR=<目录> xcodebuild … test -only-testing:MacCleanTests/UISnapshotTests`（可加 `TEST_RUNNER_MACCLEAN_SNAPSHOT_SCAN=1` 看真实扫描结果）。
 - 在一台没装过 MacClean 的 Mac（最低 macOS 14）上走一遍：首次引导 → 完全磁盘访问授权 → 一键体检 → 清理 → 撤销 → 试用到期后的购买页 → 激活 → 停用。
 - 文案：不写“让 Mac 更快”之类无法证实的承诺，所有数字必须是真实扫描结果（参考 MacKeeper 集体诉讼）。
+
+## 6. 发布官网改动
+
+1. `node web/site/dev/bump-asset-version.mjs <版本号>`：给所有 JS/CSS 引用加上 `?v=<版本号>`。thulem.com 在 Cloudflare 后面，静态资源会被边缘缓存；不改 URL 的话，访客可能拿到新 HTML 配旧 JS（比如英文版文案缺失）。
+2. 同步 `web/site/`（排除 `dev/`）到服务器 `/var/www/thulem.com/`，并 `chown -R caddy:caddy`。
+3. 抽查：`curl -sS https://thulem.com/ | grep -o 'home.js?v=[0-9.]*'` 应为新版本号。
+

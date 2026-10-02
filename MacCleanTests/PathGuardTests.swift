@@ -256,4 +256,63 @@ struct PathGuardTests {
         home.makeFile("workspace/big.log")
         try PathGuard.validateForSpaceLens(path: home.path("workspace/big.log"), homeDirectory: home.url)
     }
+
+    // MARK: - 本地 AI 模型
+
+    static let aiModelRoots = [
+        ".ollama/models", ".cache/huggingface", ".cache/lm-studio", ".lmstudio/models", "jan",
+        "Library/Application Support/Jan", "Library/Application Support/nomic.ai/GPT4All", ".diffusionbee",
+        "ComfyUI/models", ".cache/whisper", ".cache/torch", ".cache/llama.cpp", ".cache/mlx",
+    ]
+
+    @Test(arguments: aiModelRoots)
+    func aiModelsAllowsPathsInsideEachRoot(root: String) throws {
+        let home = TestHome()
+        home.makeFile(root + "/some-model/weights.bin")
+        try PathGuard.validate(path: home.path(root + "/some-model"), category: .aiModels, removesContainer: true, homeDirectory: home.url)
+        try PathGuard.validate(path: home.path(root + "/some-model/weights.bin"), category: .aiModels, removesContainer: true, homeDirectory: home.url)
+    }
+
+    @Test(arguments: aiModelRoots)
+    func aiModelsRejectsEachRootItself(root: String) {
+        let home = TestHome()
+        home.makeDirectory(root)
+        #expect(throws: PathGuardError.self) {
+            try PathGuard.validate(path: home.path(root), category: .aiModels, removesContainer: true, homeDirectory: home.url)
+        }
+        #expect(throws: PathGuardError.self) {
+            try PathGuard.validate(path: home.path(root), category: .aiModels, removesContainer: false, homeDirectory: home.url)
+        }
+    }
+
+    @Test(arguments: [
+        ".ollama/config.json", ".ollama/id_ed25519", ".cache/other/file", ".cache", "Documents/model.gguf",
+        "ComfyUI/output/image.png", "Library/Application Support/Other/model.bin", ".lmstudio/settings.json",
+        ".cache/not-mlx/file", "Library/Caches/model",
+    ])
+    func aiModelsRejectsOutsideRoots(relative: String) {
+        let home = TestHome()
+        home.makeFile(relative)
+        #expect(throws: PathGuardError.self) {
+            try PathGuard.validate(path: home.path(relative), category: .aiModels, removesContainer: true, homeDirectory: home.url)
+        }
+    }
+
+    @Test func aiModelsRejectsSymlinkEscape() {
+        let home = TestHome()
+        home.makeFile("Documents/thesis.pdf")
+        home.makeSymlink(".ollama/models/blobs/sha256-evil", pointingTo: home.path("Documents/thesis.pdf"))
+        #expect(throws: PathGuardError.self) {
+            try PathGuard.validate(path: home.path(".ollama/models/blobs/sha256-evil"), category: .aiModels, removesContainer: true, homeDirectory: home.url)
+        }
+    }
+
+    @Test func aiModelsRejectsHomeAndSystemPaths() {
+        let home = TestHome()
+        for path in [home.url.path, "/System/Library", "/Users", home.path("Library")] {
+            #expect(throws: (any Error).self) {
+                try PathGuard.validate(path: path, category: .aiModels, removesContainer: true, homeDirectory: home.url)
+            }
+        }
+    }
 }

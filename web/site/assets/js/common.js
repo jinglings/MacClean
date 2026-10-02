@@ -1,6 +1,6 @@
 // Shared behavior for every page: nav, language, config, screenshots, motion helpers.
-import { initI18n, getLang, setLang, onLangChange, t } from './i18n.js';
-import { api } from './api.js';
+import { initI18n, getLang, setLang, onLangChange, t } from './i18n.js?v=1.4';
+import { api } from './api.js?v=1.4';
 
 export const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 export const darkScheme = matchMedia('(prefers-color-scheme: dark)');

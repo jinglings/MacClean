@@ -19,7 +19,6 @@ struct CleanGroupsPage: View {
     var introMessage = ""
     var introPoints: [String] = []
 
-    @State private var expandedGroups: Set<String> = []
     @State private var showConfirm = false
     @State private var showCompletion = false
     @State private var showHistory = false
@@ -64,10 +63,11 @@ struct CleanGroupsPage: View {
                     ForEach($viewModel.groups) { $group in
                         CleanGroupCard(
                             group: $group,
-                            isExpanded: expandedGroups.contains(group.id),
+                            isExpanded: viewModel.expandedGroupIDs.contains(group.id),
                             onToggleExpanded: { toggle(group.id) },
                             onSelectAll: { viewModel.setSelection(groupID: group.id, selected: $0) },
-                            onIgnore: { viewModel.ignore($0) }
+                            onIgnore: { viewModel.ignore($0) },
+                            onQuitApp: { viewModel.quitRunningApp(groupID: group.id) }
                         )
                     }
                     }
@@ -123,10 +123,10 @@ struct CleanGroupsPage: View {
 
     private func toggle(_ id: String) {
         withAnimation(CosmicAnimations.smooth) {
-            if expandedGroups.contains(id) {
-                expandedGroups.remove(id)
+            if viewModel.expandedGroupIDs.contains(id) {
+                viewModel.expandedGroupIDs.remove(id)
             } else {
-                expandedGroups.insert(id)
+                viewModel.expandedGroupIDs.insert(id)
             }
         }
     }
@@ -275,6 +275,7 @@ struct CleanGroupCard: View {
     let onToggleExpanded: () -> Void
     let onSelectAll: (Bool) -> Void
     let onIgnore: (CleanableItem) -> Void
+    var onQuitApp: () -> Void = {}
 
     @State private var isHovered = false
 
@@ -367,8 +368,37 @@ struct CleanGroupCard: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 14)
 
+            if group.isAppRunning, let runningApp = group.descriptor.runningApp {
+                Divider().overlay(AppTheme.divider)
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(AppTheme.warning)
+                    Text("\(runningApp.appName) 正在运行，退出后才能删除它的文件")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.textSecondary)
+                    Spacer()
+                    Button(String(localized: "退出 \(runningApp.appName)"), action: onQuitApp)
+                        .buttonStyle(NeonOutlineButtonStyle())
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+            }
+
             if isExpanded {
                 Divider().overlay(AppTheme.divider)
+                if let hint = group.descriptor.hint, !group.items.isEmpty {
+                    HStack(spacing: 8) {
+                        Image(systemName: "lightbulb")
+                            .foregroundColor(AppTheme.accent)
+                        Text(hint)
+                            .font(.system(size: 12))
+                            .foregroundColor(AppTheme.textSecondary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    Divider().overlay(AppTheme.divider)
+                }
                 if group.items.isEmpty {
                     HStack(spacing: 8) {
                         Image(systemName: group.isScanning ? "hourglass" : "checkmark.circle")
@@ -382,7 +412,12 @@ struct CleanGroupCard: View {
                 } else {
                     LazyVStack(spacing: 0) {
                         ForEach($group.items) { $item in
-                            CleanItemRow(item: $item, onIgnore: { onIgnore(item) })
+                            CleanItemRow(
+                                item: $item,
+                                onIgnore: { onIgnore(item) },
+                                isLocked: group.isLocked(item),
+                                showsLastModified: group.descriptor.showsLastModified
+                            )
                             if item.id != group.items.last?.id {
                                 Divider().overlay(AppTheme.divider).padding(.leading, 84)
                             }
@@ -401,6 +436,9 @@ struct CleanGroupCard: View {
 struct CleanItemRow: View {
     @Binding var item: CleanableItem
     let onIgnore: () -> Void
+    /// 关联应用运行中，暂不可勾选
+    var isLocked = false
+    var showsLastModified = false
 
     @State private var isHovered = false
 
@@ -410,6 +448,8 @@ struct CleanItemRow: View {
                 .toggleStyle(CosmicCheckboxStyle(accentColor: AppTheme.accent))
                 .labelsHidden()
                 .padding(.leading, 26)
+                .disabled(isLocked)
+                .opacity(isLocked ? 0.4 : 1)
 
             Image(nsImage: AppLookup.icon(for: item))
                 .resizable()
@@ -440,6 +480,14 @@ struct CleanItemRow: View {
                 }
                 .buttonStyle(.plain)
                 .help("在访达中显示")
+            }
+
+            if showsLastModified, let date = item.lastModified {
+                Text(date, format: .relative(presentation: .named))
+                    .font(.system(size: 11))
+                    .foregroundColor(AppTheme.textMuted)
+                    .lineLimit(1)
+                    .help(date.formatted(date: .long, time: .shortened))
             }
 
             Text(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file))

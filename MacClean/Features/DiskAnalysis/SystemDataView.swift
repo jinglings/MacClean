@@ -912,7 +912,7 @@ private struct SystemDataCategoryRow: View {
                     }
 
                     HStack(spacing: 8) {
-                        ForEach(category.actions, id: \.self) { action in
+                        ForEach((category.id == .aiModels ? [.openTab(.devCaches)] : []) + category.actions, id: \.self) { action in
                             actionView(action)
                         }
                         Spacer(minLength: 0)

@@ -230,6 +230,8 @@ enum PathGuard {
                 home + "/Library/Application Support/Firefox/Profiles",
                 home + "/Library/Application Support/com.apple.sharedfilelist",
             ]
+        case .aiModels:
+            return AIModelCatalog.allowedRoots(home: home)
         case .applications, .spaceLens:
             return []
         case .installers:

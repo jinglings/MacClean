@@ -146,6 +146,7 @@
 "project_artifacts" = "Project Build Artifacts";
 "similar_photos" = "Similar Photos";
 "space_lens" = "Storage Map Items";
+"ai_models" = "AI Models";
 "trash" = "Trash";
 
 /* ===== 界面文字（以中文原文为键）===== */
@@ -1634,3 +1635,56 @@
 "已停止" = "Stopped";
 "等上面几项测完后计算" = "Calculated once the items above finish";
 "正在测量…" = "Measuring…";
+
+/* AI 模型 */
+"；其中 %@ 与其他模型共用，一起删除时才会释放" = "; %@ shared with other models";
+"删除后再次使用需要重新下载，约 %@" = "Re-download to use again (about %@)";
+"%@ · 模型数据" = "%@ · Model Data";
+"Hugging Face 数据集" = "Hugging Face Dataset";
+"Hugging Face 缓存 · %@" = "Hugging Face Cache · %@";
+"下载与加载时的缓存，删除后按需重建" = "Download and loading cache, rebuilt when needed";
+"Ollama、Hugging Face、LM Studio 等下载到本机的模型" = "Models downloaded by Ollama, Hugging Face, LM Studio and more";
+"删除后需要重新下载" = "Re-download needed";
+"长期没用的大模型最值得清理；删除后用到时会自动重新下载" = "Large models you haven't used in a while are the best candidates; they re-download automatically when needed";
+"%@ 正在运行，退出后才能删除它的文件" = "%@ is running. Quit it before removing its files";
+
+/* 暂存篮 */
+" · 地图外占用 %@" = " · %@ outside the map";
+"%lld 个子项在暂存篮中" = "Basket items inside: %lld";
+"%lld 项 · 可释放 %@" = "%lld items · can free %@";
+"%lld 项未能清理" = "%lld failed";
+"%lld 项未能清理，已留在暂存篮" = "%lld items couldn't be cleaned and stay in the Basket";
+"+%@" = "+%@";
+"「%@」已包含 %lld 个子项" = "“%@” now includes %lld items already in the Basket";
+"「%@」已在暂存篮中" = "“%@” is already in the Basket";
+"「其他」是零散文件的汇总，请进入文件夹后逐项加入" = "“Other” groups loose files. Open the folder and add items one by one";
+"加入暂存篮" = "Add to Basket";
+"加入暂存篮（B）" = "Add to Basket (B)";
+"受保护：%@" = "Protected: %@";
+"受保护：iCloud 云盘" = "Protected: iCloud Drive";
+"受保护：不在可清理范围内" = "Protected: outside the cleanable area";
+"受保护：主目录与资源库" = "Protected: home folder or Library";
+"受保护：主目录顶层文件夹" = "Protected: top-level home folder";
+"受保护：磁盘顶层目录" = "Protected: top-level disk folder";
+"受保护：系统文件夹" = "Protected: system folder";
+"受保护：链接指向受保护的位置" = "Protected: link points to a protected location";
+"可清除 %@，系统需要时自动释放" = "%@ purgeable, freed automatically when macOS needs it";
+"将 %lld 个项目（共 %@）移入废纸篓，可在「清理记录」中恢复。" = "%lld items (%@) will be moved to the Trash. You can restore them from Cleanup History.";
+"已加入 %lld 项，%lld 项未加入" = "Added %lld items, %lld not added";
+"已包含 %lld 个子项" = "Includes %lld items added earlier";
+"已在暂存篮中，点按移出" = "In the Basket. Click to remove";
+"已在暂存篮的「%@」中" = "Already in the Basket as part of “%@”";
+"快速查看（空格）" = "Quick Look (Space)";
+"悬停后按 B 加入暂存篮，空格快速查看" = "Hover + B: add to Basket · Space: Quick Look";
+"拖入文件夹、按 B 或点行尾的加入按钮，最后统一清理" = "Drag folders here, press B, or click the add button on a row, then clean up all at once";
+"暂存篮" = "Basket";
+"暂存篮 · %lld 项" = "Basket · %lld items";
+"未能移到废纸篓" = "Couldn't move to the Trash";
+"松手加入暂存篮" = "Drop to add to Basket";
+"查看系统数据" = "View System Data";
+"注意：%@ 位于文稿、桌面、图片、影片或音乐文件夹，可能是个人资料。" = "Note: %@ is in Documents, Desktop, Pictures, Movies, or Music and may be personal data.";
+"注意：%@ 超过 10 GB，请确认不再需要。" = "Note: %@ is larger than 10 GB. Make sure you no longer need it.";
+"清理暂存篮？" = "Clean Up the Basket?";
+"清空暂存篮" = "Empty Basket";
+"移出暂存篮" = "Remove from Basket";
+"隐藏与可清除空间" = "Hidden & Purgeable Space";

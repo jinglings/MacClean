@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
   <meta property="og:site_name" content="MacClean">
   <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
-  <link rel="stylesheet" href="/assets/css/site.css">
+  <link rel="stylesheet" href="/assets/css/site.css?v=1.4">
   <script>
     (function () {
       var d = document.documentElement, l = null;
@@ -98,6 +98,8 @@
           <details><summary data-i18n="faq.q14">重复文件会不会删错？</summary><div class="ans"><p data-i18n="faq.a14">「完全相同的文件」只把内容逐字节相同的文件归为一组，每组都会自动保留一份，整组永远不能全删；你也可以改选保留哪一份。删掉的副本会移到废纸篓，在「清理记录」里一键恢复。</p></div></details>
           <details><summary data-i18n="faq.q15">微信占了几十 GB，能安全清理吗？</summary><div class="ans"><p data-i18n="faq.a15">可以，用「聊天清理」。它按会话、日期和类型清理微信、QQ 和企业微信里的图片、视频、文件和缓存，从不碰聊天文字记录，也不解密或读取聊天数据库。默认只勾选可以重新生成的缓存和缩略图，收到的文件需要你自己勾选；清理前要先退出聊天应用，文件会移到废纸篓，可以撤销。清理掉的图片和视频在聊天里会显示为「已过期」或「已清理」。</p></div></details>
           <details><summary data-i18n="faq.q16">「系统数据」为什么这么大？MacClean 能帮我做什么？</summary><div class="ans"><p data-i18n="faq.a16">「系统数据」是 macOS 把很多东西归在一起的结果：本地快照和可清除空间、Spotlight 索引、照片分析缓存、iOS 备份、Xcode 和模拟器、Docker 与虚拟机、本地 AI 模型、应用缓存、日志、虚拟内存等。存储地图的「系统数据」模式会逐项列出它们在你这台 Mac 上的大小，标注正常、偏大或异常及判断标准，并给出安全的下一步，比如 Spotlight 索引异常时去「系统维护」重建。它只读，不会自己删除任何东西；需要管理员权限才能测量的部分会如实标注。</p></div></details>
+          <details><summary data-i18n="faq.q17">本地 AI 模型占了很多空间，删了会怎样？</summary><div class="ans"><p data-i18n="faq.a17">删掉的模型下次用到时需要重新下载，MacClean 会在每一行写明要重新下载多少，并且默认一个都不勾选。Ollama 的多个模型会共用数据文件，可释放空间只计算没有其他模型在用的部分。文件会移到废纸篓，可以撤销；MacClean 不会执行 ollama rm，清理前需要先退出 Ollama。Hugging Face 令牌和你生成的图片不会被碰。</p></div></details>
+          <details><summary data-i18n="faq.q18">存储地图的暂存篮怎么用？</summary><div class="ans"><p data-i18n="faq.a18">在文件夹地图里浏览时，把想删的文件或文件夹拖进暂存篮，或者用悬停按钮、右键菜单、按 B 键加入，顶部会实时显示一共能释放多少空间。加入一个文件夹时，里面已经加入的项目会自动合并，不会重复计算；系统目录、主目录下的顶层文件夹和 iCloud 云盘不能加入，会说明原因。确认清单、去掉不想删的之后，一次性移到废纸篓，可以撤销。文稿、桌面、图片里的项目和超过 10 GB 的项目会额外提醒。按空格键可以像访达一样快速查看。</p></div></details>
           <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
           <details><summary data-i18n="sp.q.after">付款后多久能拿到许可证？</summary><div class="ans"><p data-i18n="sp.a.after">我们人工核对收款，通常在 24 小时内发放。付款时请务必在备注里填写付款码，这样我们才能对上你的订单。核对完成后，订单页面会直接显示许可证，打开订单链接或用订单号和邮箱<a href="/order.html">查询</a>即可。</p></div></details>
           <details><summary data-i18n="sp.q.nocode">付款时忘了填写备注怎么办？</summary><div class="ans"><p data-i18n="sp.a.nocode">没关系。把订单号、付款时间和金额发邮件给我们，我们会手动核对。</p></div></details>
@@ -155,6 +157,6 @@
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- /@footer -->
-  <script type="module" src="/assets/js/page.js"></script>
+  <script type="module" src="/assets/js/page.js?v=1.4"></script>
 </body>
 </html>

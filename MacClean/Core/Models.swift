@@ -71,6 +71,8 @@ enum CleanableCategory: String, CaseIterable {
     case privacyData = "privacy_data"
     /// 「存储地图」中用户手动选择删除的任意文件/文件夹。
     case spaceLens = "space_lens"
+    /// Ollama、Hugging Face 等下载到本机的 AI 模型（整项移入废纸篓）。
+    case aiModels = "ai_models"
 
     var localizedName: String {
         NSLocalizedString(rawValue, comment: "")
@@ -98,6 +100,7 @@ enum CleanableCategory: String, CaseIterable {
         case .appLeftovers: return "folder.fill.badge.minus"
         case .privacyData: return "hand.raised.fill"
         case .spaceLens: return "chart.pie.fill"
+        case .aiModels: return "brain"
         }
     }
 
@@ -123,6 +126,7 @@ enum CleanableCategory: String, CaseIterable {
         case .appLeftovers: return .orange
         case .privacyData: return .teal
         case .spaceLens: return .blue
+        case .aiModels: return .indigo
         }
     }
 
