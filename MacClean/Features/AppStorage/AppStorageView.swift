@@ -75,6 +75,7 @@ final class AppStorageViewModel: ObservableObject {
         isScanning = false
         hasScanned = true
         lastScannedAt = Date()
+        UsageAnalytics.shared.recordScanCompleted()
     }
 
     /// 清理后只重新统计这一个应用。

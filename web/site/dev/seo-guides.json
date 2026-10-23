@@ -1,0 +1,554 @@
+[
+  {
+    "slug": "mac-system-data-cleanup",
+    "sourceFiles": [
+      "MacClean/Core/FileManager/SystemDataAnalyzer.swift",
+      "MacClean/Features/DiskAnalysis/SystemDataView.swift",
+      "MacClean/Core/FileManager/CleanupManager.swift",
+      "MacClean/Core/FileManager/CleanupHistory.swift",
+      "MacClean/Resources/zh-Hans.lproj/Localizable.strings",
+      "MacClean/Resources/en.lproj/Localizable.strings"
+    ],
+    "zh": {
+      "title": "Mac 系统数据太大？先查占用，再清理 | MacClean",
+      "description": "Mac 系统数据为什么很大、哪些文件能清理？用 MacClean 只读分析缓存、Xcode、备份和应用数据，区分系统管理项，清理前确认恢复边界。",
+      "h1": "Mac 系统数据太大，应该从哪里清理？",
+      "intro": "先找出具体的占用来源，再决定处理哪一项。系统设置里的「系统数据」是一个汇总分类，不能把整块空间都当成垃圾。MacClean 的系统数据分析先测量、解释和提供下一步入口，扫描本身不会删除文件。",
+      "sections": [
+        {
+          "id": "check-storage",
+          "title": "先看 macOS 的存储情况",
+          "paragraphs": [
+            "在 macOS Ventura 13 或更高版本，打开苹果菜单 → 系统设置 → 通用 → 储存空间。先记下可用空间，再查看文稿、应用程序等可管理的类别。Apple 说明「系统数据」包含未归入其他类别的日志、缓存和支持数据等；这个分类的大小会随 Mac 的使用状态变化。",
+            "判断是否需要清理时，把安装更新、复制文件等任务所需的空间放在前面。仅凭系统数据的颜色块很大，无法判断其中哪些文件可以删除。"
+          ],
+          "steps": [
+            "记录当前可用空间和你需要腾出的空间。",
+            "查看可管理类别中的大文件，先识别明确不用的下载、安装包或个人文件。",
+            "对仍无法解释的占用，再进入 MacClean 的「存储地图」→「系统数据」。"
+          ]
+        },
+        {
+          "id": "read-report",
+          "title": "用只读报告定位具体类别",
+          "paragraphs": [
+            "开始扫描后，MacClean 先显示系统数据类别，再继续测量应用程序、个人文件和其他用户等对照项。等待后续测量结束后，再看「其他未分类」。如果提前停止，对照项可能仍未完成。",
+            "展开较大的类别，查看占用、说明和具体路径。例如「Xcode 与模拟器」「应用缓存」「iPhone / iPad 备份」需要不同的处理方式。「应用容器与支持数据」会聚合应用支持目录、容器和组容器，并列出占用最多的应用。",
+            "如果报告提示某个路径需要完整磁盘访问权限或管理员权限，表示那部分没有完整测量，不能当成零占用。按提示补齐访问权限后重新扫描，或先处理已经可以确认的部分。",
+            "报告中的「本地快照与可清除空间」以系统报告的两种可用空间数值之差估算可清除空间，并显示找到的快照名称。这个数字不是把每个快照文件相加得到的精确容量。"
+          ]
+        },
+        {
+          "id": "choose-action",
+          "title": "按类别选择处理入口",
+          "paragraphs": [
+            "应用缓存、日志和废纸篓：从报告进入「释放空间」，查看具体项目和勾选范围。缓存与日志用途不同，仍应先退出相关应用、确认选中的内容。",
+            "Xcode 与模拟器：进入「开发缓存」，按项目查看 DerivedData、设备符号和其他缓存。Archives 含发布归档，不应按普通缓存一并删除。",
+            "应用容器与支持数据：进入「应用占用」查看归属。这些目录可能包含数据库、离线资料或账户数据；目录很大并不说明里面全是缓存。",
+            "macOS 系统本身、系统资源和虚拟内存等系统管理项：遵循报告的说明。Time Machine 快照由系统按需要回收；Apple 也说明快照空间可计入可用空间。MacClean 的分析页不会把这些类别自动删除。",
+            "个人文件或其他未分类占用：切换「目录地图」，继续定位到认识的文件和目录。不要因为父目录很大就直接删掉整个资源库。"
+          ]
+        },
+        {
+          "id": "verify-space",
+          "title": "清理后核对可用空间与恢复条件",
+          "paragraphs": [
+            "MacClean 的常规文件清理会把选中项目移入废纸篓，并在有记录时支持从「清理记录」恢复。文件必须仍在废纸篓里，恢复才能进行；原位置已有同名文件或权限不足时，恢复可能失败。",
+            "移入废纸篓保留了撤销机会，也会继续占用磁盘。确认应用和资料都正常、需要的文件已另行保存后，再决定是否清空废纸篓。清空是永久删除，MacClean 的清理记录无法恢复已被清空的文件。",
+            "最后回到系统设置核对可用空间，必要时重新扫描。优先看实际可用空间与目标任务能否完成，不要求两个工具的分类数字完全一致。扫描范围、权限、APFS 共享数据和系统分类都会影响统计。"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "MacClean 会自动删除系统数据吗？",
+          "a": "不会。系统数据页只做测量和解释，处理按钮会跳到相应功能、系统设置或 Finder。实际清理需要你确认具体项目。"
+        },
+        {
+          "q": "系统数据很大，就说明 Mac 有问题吗？",
+          "a": "不能只凭分类大小判断。开发缓存、备份和应用数据都可能占用较多空间。先看实际可用空间与报告里的具体来源。"
+        },
+        {
+          "q": "为什么 MacClean 和系统设置的数字不同？",
+          "a": "两者统计与分类方式不同。权限不足、扫描未完成、可清除空间估算和 APFS 共享数据也会影响结果，不能把差值直接当成可删除垃圾。"
+        },
+        {
+          "q": "清理记录可以恢复清空废纸篓后的文件吗？",
+          "a": "不能。清理记录把仍在废纸篓中的项目移回原位置，不是独立备份。重要文件应另行备份。"
+        }
+      ],
+      "cta": "下载 MacClean，先用「存储地图 → 系统数据」做一次只读分析，再决定清理哪些项目。",
+      "sources": [
+        {
+          "label": "Apple：更改 Mac 储存空间设置",
+          "url": "https://support.apple.com/guide/mac-help/mchl3d437fbc/mac"
+        },
+        {
+          "label": "Apple：释放 Mac 上的储存空间",
+          "url": "https://support.apple.com/102624"
+        },
+        {
+          "label": "Apple：关于 Time Machine 本地快照",
+          "url": "https://support.apple.com/102154"
+        },
+        {
+          "label": "Apple：在 Mac 上删除文件和文件夹",
+          "url": "https://support.apple.com/guide/mac-help/mchlp1093/mac"
+        }
+      ]
+    },
+    "en": {
+      "title": "Mac System Data Too Large? Find What to Clean | MacClean",
+      "description": "Find what is using Mac System Data before deleting files. Review caches, Xcode data, backups and app storage with MacClean, including Trash recovery limits.",
+      "h1": "How to investigate and clean large System Data on a Mac",
+      "intro": "Identify the files behind System Data before choosing a cleanup action. MacClean measures and explains the sources it can access; its System Data scan does not delete anything.",
+      "sections": [
+        {
+          "id": "check-storage",
+          "title": "Start with the storage available to your Mac",
+          "paragraphs": [
+            "On macOS Ventura 13 or later, open Apple menu → System Settings → General → Storage. Note available space and inspect manageable categories. Apple's guide explains that System Data includes caches, logs and support data outside other categories.",
+            "Check the space needed for your next task; a large category does not identify disposable files."
+          ],
+          "steps": [
+            "Record available space and the space your task needs.",
+            "Inspect recognisable downloads, installers and personal files first.",
+            "Open MacClean → Storage Map → System Data for unexplained usage."
+          ]
+        },
+        {
+          "id": "read-report",
+          "title": "Read the scan as an explanation of specific sources",
+          "paragraphs": [
+            "MacClean shows system categories first, then measures applications, personal files and other comparison categories. Wait before interpreting Other Unclassified; stopping early leaves part of the report unfinished.",
+            "Expand larger categories to review explanations and paths. Xcode & Simulators, Application Caches and iPhone / iPad Backups lead to different actions. Application Containers & Support Data combines app support folders and containers to identify larger apps.",
+            "An access warning means part of a category was not fully measured. It does not mean zero usage. Follow the permission prompt and rescan, or start with files already identified.",
+            "Local Snapshots & Purgeable Space estimates purgeable storage from the difference between two available-space values reported by macOS. Snapshot names provide context; the estimate is not a precise sum of individual snapshots."
+          ]
+        },
+        {
+          "id": "choose-action",
+          "title": "Choose the action that matches the category",
+          "paragraphs": [
+            "Caches, logs and Trash: follow the link to Reclaim and review the actual selection. Quit the relevant app before handling its files.",
+            "Xcode & Simulators: open Dev Caches to inspect project build data and device symbols. Review Archives separately because they contain release artifacts.",
+            "Application Containers & Support Data: inspect the owning app in App Storage. Support folders may contain databases, offline documents and account data.",
+            "System-managed categories: follow the report's explanation for macOS files, system assets and virtual memory. Apple says Time Machine automatically removes local snapshots as space is needed. The analysis page does not automatically remove these items.",
+            "Personal files or unexplained usage: switch to Folder Map and identify a specific file or folder you recognise before taking action."
+          ]
+        },
+        {
+          "id": "verify-space",
+          "title": "Check available space and the recovery boundary",
+          "paragraphs": [
+            "Regular MacClean file cleanup moves selected items to Trash. When a cleanup session is recorded, Cleanup History can move remaining items back to their original paths. Missing trashed files, permission errors or an existing file at the destination can prevent restoration.",
+            "Moving files to Trash preserves a recovery opportunity but still uses storage. Check your apps and keep separate copies of important files before deciding to empty Trash. Emptying it permanently removes the files; Cleanup History is not an independent backup.",
+            "Check available space again and rescan if necessary. Totals can differ because of scan scope, permissions, APFS shared data and classification. Confirm the space your task can actually use."
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Does MacClean automatically delete System Data?",
+          "a": "No. It measures usage; actions open the relevant feature, Finder or System Settings. You choose cleanup targets."
+        },
+        {
+          "q": "Is large System Data always a problem?",
+          "a": "No. Backups, development data and app support files may explain it. Check available space and sources."
+        },
+        {
+          "q": "Why do MacClean and macOS show different totals?",
+          "a": "Classification, partial access, unfinished scans, purgeable estimates and APFS shared data can affect totals."
+        },
+        {
+          "q": "Can Cleanup History restore files after Trash is emptied?",
+          "a": "No. It restores files still in Trash. Keep an independent backup."
+        }
+      ],
+      "cta": "Download MacClean and run a read-only System Data scan in Storage Map before choosing what to clean.",
+      "sources": [
+        {
+          "label": "Apple: Change Storage settings on Mac",
+          "url": "https://support.apple.com/guide/mac-help/mchl3d437fbc/mac"
+        },
+        {
+          "label": "Apple: Free up storage space on Mac",
+          "url": "https://support.apple.com/102624"
+        },
+        {
+          "label": "Apple: About Time Machine local snapshots",
+          "url": "https://support.apple.com/102154"
+        },
+        {
+          "label": "Apple: Delete files and folders on Mac",
+          "url": "https://support.apple.com/guide/mac-help/mchlp1093/mac"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "wechat-storage-cleanup",
+    "sourceFiles": [
+      "MacClean/Core/FileManager/ChatMediaScanner.swift",
+      "MacClean/Features/ChatCleanup/ChatCleanupView.swift",
+      "MacClean/Features/ChatCleanup/ChatCleanupViewModel.swift",
+      "MacClean/Features/ChatCleanup/ChatCleanupComponents.swift",
+      "MacClean/Core/FileManager/CleanupManager.swift",
+      "MacClean/Core/FileManager/CleanupHistory.swift",
+      "MacClean/Resources/en.lproj/Localizable.strings"
+    ],
+    "zh": {
+      "title": "Mac 微信占用太大？按会话和日期清理媒体 | MacClean",
+      "description": "Mac 微信存储清理指南：扫描本机图片、视频和文件，先清缓存，再按日期选择媒体。了解微信 4.x 预览限制、文字记录与附件的区别及恢复条件。",
+      "h1": "Mac 微信占用太大，如何选择要清理的文件？",
+      "intro": "微信附件和缓存需要分别处理。MacClean 的「聊天清理」扫描本机媒体文件的大小和日期，不解密聊天数据库，也不读取消息内容。你可以先查看占用，再按类型、会话或月份选择，避免把仍需要的附件一起清掉。",
+      "sections": [
+        {
+          "id": "prepare",
+          "title": "确认账户，先保留重要附件",
+          "paragraphs": [
+            "合同、照片、视频和语音等附件即使很旧，也可能仍有价值。先从微信中把需要长期保存的资料另存到你管理的文件夹或备份设备。MacClean 的清理记录提供撤销机会，不能替代独立备份。",
+            "打开 MacClean →「聊天清理」，选择「微信」并扫描。如果发现多个本机账户，在结果中切换账户，确认当前要处理的是哪一个。切换账户会重置选择，之后仍要检查实际勾选项。",
+            "扫描提示无法读取部分目录时，先查看完整磁盘访问权限提示。未能读取的数据可能没有出现在结果里，空结果不一定说明微信没有占用。清理前退出微信；MacClean 会检查运行状态并阻止正在使用这些文件的微信被清理。"
+          ]
+        },
+        {
+          "id": "understand-results",
+          "title": "会话编号与微信 4.x 的限制",
+          "paragraphs": [
+            "由于不解密数据库，MacClean 不会自动读取真实联系人或群聊名称，会话以编号显示。识别后可以用铅笔图标添加本机名称；这个名称只保存在这台 Mac 上，不会改写微信联系人。",
+            "旧版微信的数据布局可能允许凭缩略图识别媒体。微信 4.x 的图片以加密格式保存，MacClean 无法预览；不要依赖看不到内容的编号来批量判断图片是否没用。",
+            "微信 4.x 的视频和收到的文件按月份存放，不区分会话，列在「视频、文件与缓存」。因此，某个会话占用小，并不代表属于它的视频和文件都很少。结果的分组受微信本机存储布局限制。"
+          ]
+        },
+        {
+          "id": "select-media",
+          "title": "先检查缓存，再选择旧媒体",
+          "paragraphs": [
+            "默认只勾选「缓存与缩略图」。图片、视频、文件和语音等附件需要主动选择。即使使用默认选择，也应查看汇总与确认提示。",
+            "快捷筛选用于帮助选择，不是无价值文件的判定。一年前的视频、半年前的图片可能仍重要；日期依据本机文件信息和月份分组，不等同于读取聊天消息时间。",
+            "按类型和月份逐步选择，再检查底部已选大小。大文件列表可以单独选择某个文件；如果整个分组已被选中，要重新核对最终选择范围。不要为了一个大视频直接选中所在账户的全部媒体。"
+          ],
+          "steps": [
+            "先检查默认选中的缓存与缩略图，取消不想处理的部分。",
+            "需要继续清理时，按会话、月份或快捷筛选找到候选项。",
+            "核对类型和已选汇总，保留重要图片、视频、文件及语音。",
+            "退出微信，查看删除影响说明后，再确认「移入废纸篓」。"
+          ]
+        },
+        {
+          "id": "restore",
+          "title": "文字记录保留，媒体访问会改变",
+          "paragraphs": [
+            "MacClean 的聊天清理避开聊天数据库及其相关文件，清理的是选中的媒体文件。文字记录保留不代表附件也保留：清理后，微信里对应的图片、视频和文件可能显示为「已过期」或「已被清理」。不要把再次下载作为保证。",
+            "确认后文件移入废纸篓。有可恢复的清理记录时，可从完成窗口撤销，或打开「清理记录」恢复。文件需要仍在废纸篓中；原路径冲突或权限问题可能使部分恢复失败。",
+            "先检查微信和需要的附件，再决定是否清空废纸篓。移入废纸篓期间仍占用磁盘，清空后才会去掉这部分文件占用，但清理记录也失去恢复它们的条件。Apple 的 Finder 文档也说明，废纸篓清空后的文件永久删除。",
+            "最后重新扫描，查看已选类别是否减少，并核对 Mac 的可用空间。缓存可能在使用微信后重新生成，不能把一次清理视为永久固定的占用。"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "清理微信会删除文字聊天记录吗？",
+          "a": "聊天清理针对识别出的媒体文件，避开聊天数据库。文字记录保留，但被清理的附件可能无法继续在微信中打开。"
+        },
+        {
+          "q": "为什么微信 4.x 图片没有预览？",
+          "a": "这类图片使用加密格式，MacClean 不解密聊天数据，所以无法预览。不要根据会话编号猜测图片内容。"
+        },
+        {
+          "q": "为什么看不到真实联系人或群名称？",
+          "a": "MacClean 不读取或解密聊天数据库。会话名称以编号显示，你可以添加仅在本机保存的自定义名称。"
+        },
+        {
+          "q": "不小心清理了视频，还能恢复吗？",
+          "a": "如果文件仍在废纸篓、对应清理记录还在且原路径可写，可以尝试恢复。清空废纸篓后，清理记录不能找回该文件。"
+        }
+      ],
+      "cta": "下载 MacClean，在「聊天清理」中扫描微信占用，先查看媒体类别和默认选择，再决定清理范围。",
+      "sources": [
+        {
+          "label": "Apple：在 Mac 上删除文件和文件夹",
+          "url": "https://support.apple.com/guide/mac-help/mchlp1093/mac"
+        }
+      ]
+    },
+    "en": {
+      "title": "Clean WeChat Storage on Mac by Media and Date | MacClean",
+      "description": "Review WeChat images, videos, files and caches on your Mac. Learn MacClean's selection workflow, WeChat 4.x preview limits and what Trash recovery can restore.",
+      "h1": "How to clean WeChat storage on a Mac",
+      "intro": "Treat caches and attachments separately. MacClean's Chat Cleanup measures local media files and dates without decrypting the chat database or reading messages. Review the usage before choosing attachments to remove.",
+      "sections": [
+        {
+          "id": "prepare",
+          "title": "Confirm the account and save important attachments",
+          "paragraphs": [
+            "Old attachments may still matter. Save important files from WeChat to a folder or backup you control before selecting media for removal. Cleanup History provides a recovery opportunity, not a separate backup.",
+            "Open MacClean → Chat Cleanup, choose WeChat and scan. If multiple local accounts appear, select the intended account. Switching accounts resets selection; review the checked items afterward.",
+            "If some storage cannot be read, follow the Full Disk Access prompt. An incomplete or empty result does not prove that WeChat uses no space. Quit WeChat before cleaning; MacClean checks its running state and blocks cleanup while the app is using those files."
+          ]
+        },
+        {
+          "id": "understand-results",
+          "title": "Understand conversation numbers and WeChat 4.x",
+          "paragraphs": [
+            "MacClean cannot retrieve names from the encrypted database. Conversations appear as numbered groups. Add a local label using the pencil control; it does not change your WeChat contacts.",
+            "Older storage layouts may allow thumbnails to help identify media. WeChat 4.x images use an encrypted format that MacClean cannot preview. Do not guess the content of images from a conversation number.",
+            "WeChat 4.x stores videos and received files by month without a conversation breakdown, under Videos, Files & Caches. A small conversation total does not include all its media; grouping follows local storage layout."
+          ]
+        },
+        {
+          "id": "select-media",
+          "title": "Review caches first, then select older media",
+          "paragraphs": [
+            "Only Caches & Thumbnails are selected by default. Other attachments need your selection. Review the summary even when using the defaults.",
+            "Quick filters help select candidates. Videos > 1 year old and Images > 6 months old do not identify files without value. Dates come from local files and month groups rather than reading chat message timestamps.",
+            "Use type and month groups to narrow the selection. Large files can be selected individually. When an entire group is selected, check the final scope before confirming."
+          ],
+          "steps": [
+            "Review the default cache selection and deselect anything you want to keep.",
+            "Find additional candidates by conversation, month or quick filter.",
+            "Check media types and the selected-size summary; keep important attachments.",
+            "Quit WeChat, read the attachment warning and confirm Move to Trash."
+          ]
+        },
+        {
+          "id": "restore",
+          "title": "Text history remains, but media access changes",
+          "paragraphs": [
+            "The chat scanner excludes database files and related extensions. Keeping text history does not preserve removed attachments: media may appear expired or cleaned in WeChat. Do not assume it can be downloaded again.",
+            "Selected files are moved to Trash. When a recoverable session is recorded, use Undo in the completion window or Cleanup History to restore them. Files must still be in Trash. A destination conflict or permission error can prevent restoration.",
+            "Check WeChat and important attachments before emptying Trash. Trashed files still occupy storage. Emptying Trash removes them permanently and removes the basis for Cleanup History recovery, as Apple's Finder guide explains.",
+            "Rescan and check your Mac's available space. Caches can return during normal WeChat use; one cleanup does not permanently fix their size."
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Does this delete text chat history?",
+          "a": "It targets recognised media and avoids the database. Text remains, but removed attachments may not open."
+        },
+        {
+          "q": "Why are WeChat 4.x images not previewed?",
+          "a": "They are encrypted. MacClean does not decrypt chat data."
+        },
+        {
+          "q": "Why are real contact names missing?",
+          "a": "It does not read the encrypted database. Custom labels are stored only on this Mac."
+        },
+        {
+          "q": "Can I restore a video I removed?",
+          "a": "Try Cleanup History while the file remains in Trash. Destination conflicts and missing records can prevent restoration."
+        }
+      ],
+      "cta": "Download MacClean and scan WeChat in Chat Cleanup. Review the media groups and default selection before choosing what to remove.",
+      "sources": [
+        {
+          "label": "Apple: Delete files and folders on Mac",
+          "url": "https://support.apple.com/guide/mac-help/mchlp1093/mac"
+        }
+      ]
+    }
+  },
+  {
+    "slug": "xcode-cache-cleanup",
+    "sourceFiles": [
+      "MacClean/Core/FileManager/DevCacheCatalog.swift",
+      "MacClean/ContentView.swift",
+      "MacClean/Core/FileManager/CleanupManager.swift",
+      "MacClean/Core/FileManager/CleanupHistory.swift",
+      "MacClean/Core/FileManager/SystemDataAnalyzer.swift",
+      "MacClean/Resources/en.lproj/Localizable.strings"
+    ],
+    "zh": {
+      "title": "Mac Xcode 缓存清理：DerivedData 与归档怎么选 | MacClean",
+      "description": "区分 Xcode DerivedData、设备符号、SwiftPM 缓存和 Archives。按项目清理可重建数据，保留发布归档与 dSYM，并了解重建成本和恢复边界。",
+      "h1": "Xcode 占用太大：哪些缓存可以清理，哪些归档应保留？",
+      "intro": "开发数据并非都能无代价地重建。DerivedData 是构建中间数据，Archives 则可能保存已发布构建及匹配的 dSYM。MacClean 的「开发缓存」把它们分别列出，便于按项目和用途选择。",
+      "sections": [
+        {
+          "id": "separate-data",
+          "title": "先区分构建数据、设备符号和发布归档",
+          "paragraphs": [
+            "DerivedData：MacClean 扫描默认路径 ~/Library/Developer/Xcode/DerivedData，按子目录列出项目。删除后，下次构建会生成所需的中间数据；重新构建和索引可能需要额外时间。",
+            "设备符号：iOS、watchOS、tvOS 和 visionOS 的 DeviceSupport 项用于对应系统版本的调试。Apple 说明系统符号与系统版本和架构有关。如果仍需要调试旧设备或分析旧版本问题，不应只凭日期清掉符号。",
+            "Archives：默认路径 ~/Library/Developer/Xcode/Archives 中的归档可能含发布构建与 dSYM。Apple 说明二进制与其 dSYM 通过构建 UUID 匹配。再次编译不保证得到原发布构建需要的符号，应保留仍在使用的发布归档。",
+            "SwiftPM、Xcode、文档和模拟器缓存也有各自的条目。包缓存清理后可能需要重新获取依赖；离线开发或即将演示时，要考虑重建与下载是否可行。"
+          ]
+        },
+        {
+          "id": "scan-projects",
+          "title": "在开发缓存中按项目检查",
+          "paragraphs": [
+            "打开 MacClean →「开发缓存」并扫描，再查看「Xcode 开发」分类。列表按占用排序，可以查看 DerivedData 项目的名称、大小、路径和说明。这里的项目名称从目录名推断，实际路径才是确认目标的依据。",
+            "扫描依据工具已知的默认目录。如果你在 Xcode 或构建脚本中自定义了 DerivedData 的位置，自定义路径可能不出现在这份列表中。Apple 的 Xcode 发布说明也采用逐项目清理默认 DerivedData 路径的做法；不要因此认为整个 Developer 文件夹都应删除。",
+            "MacClean 的开发缓存页还会扫描其他开发工具和闲置项目依赖。只想处理 Xcode 时，清理前取消其他分类中不准备处理的选项。"
+          ],
+          "steps": [
+            "保存工作，停止构建并退出 Xcode 和 Simulator。",
+            "扫描「开发缓存」，查看 Xcode 分类和具体路径。",
+            "先选择不再需要的项目 DerivedData，保留当前需要的设备符号。",
+            "逐项检查已选汇总，单独审查 Archives，再确认清理。"
+          ]
+        },
+        {
+          "id": "review-defaults",
+          "title": "理解默认勾选，不把默认当成备份",
+          "paragraphs": [
+            "DerivedData、Xcode 缓存和部分可重建项默认选中。对设备符号，MacClean 按最近修改时间默认保留一项；这不是根据你连接的设备判断兼容版本，也不保证其他版本的符号没有用途。",
+            "Archives 默认不选中。需要清理旧归档时，先确认发布、导出和崩溃分析是否仍需要它，并把应保留的归档另存到备份。开发缓存里的模拟器缓存条目也不能代表所有模拟器设备和运行时数据。"
+          ]
+        },
+        {
+          "id": "verify-build",
+          "title": "清理后验证实际开发流程",
+          "paragraphs": [
+            "重新打开需要的项目，完成一次构建和正常的测试流程。如果你使用 Swift 包，确认依赖能重新解析；如果要连接设备调试，确认所需设备和系统版本仍能使用。",
+            "第一次构建、索引或依赖下载变慢可能是缓存重建的成本。清理是为了处理确认的磁盘占用，不保证所有构建问题都会因此修复，也不保证持续加快开发工具。",
+            "检查被清理项目是否只是缓存，而没有包含手工保存在默认缓存目录里的独有文件。对无法重建的资料，必须先另存或备份。"
+          ]
+        },
+        {
+          "id": "recover",
+          "title": "恢复与真正腾出空间的区别",
+          "paragraphs": [
+            "常规开发缓存清理会把选中项目或目录内容移入废纸篓。有记录时，可以从「清理记录」恢复仍在废纸篓中的条目；恢复时原路径如果已被 Xcode 重建，同名冲突可能导致失败。先退出相关工具并查看失败提示，不要假定撤销一定成功。",
+            "废纸篓中的文件仍然占用磁盘。确认项目构建、调试和重要归档都正常后，再决定清空废纸篓。清空是永久删除，清理记录不能恢复已经消失的条目。最后核对 Mac 可用空间与重新扫描结果。"
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "删除 DerivedData 会删除项目源码吗？",
+          "a": "默认 DerivedData 保存构建派生数据，MacClean 按该路径清理。请先确认实际路径；如果自行把独有文件放进其中，工具不会知道哪些内容无法重建。"
+        },
+        {
+          "q": "Archives 可以像缓存一样重新生成吗？",
+          "a": "不能保证。归档可能包含已发布构建和匹配 dSYM，重新编译不保证产生相同 UUID。保留仍需分发或分析崩溃的归档。"
+        },
+        {
+          "q": "为什么清理后第一次构建更慢？",
+          "a": "构建工具需要重新生成中间数据、索引或获取依赖。先完成一次实际构建验证，再判断结果。"
+        },
+        {
+          "q": "清理记录能保证撤销吗？",
+          "a": "不能保证。文件需仍在废纸篓，原路径需可写且没有冲突；Xcode 已重新生成同名目录时，恢复可能失败。"
+        }
+      ],
+      "cta": "下载 MacClean，用「开发缓存」按项目查看 Xcode 占用，先处理确认可以重建的内容。",
+      "sources": [
+        {
+          "label": "Apple：Xcode 26 发布说明中的 DerivedData 路径",
+          "url": "https://developer.apple.com/documentation/xcode-release-notes/xcode-26-release-notes"
+        },
+        {
+          "label": "Apple：为崩溃报告添加可识别的符号名称",
+          "url": "https://developer.apple.com/documentation/xcode/adding-identifiable-symbol-names-to-a-crash-report"
+        },
+        {
+          "label": "Apple：构建包含调试信息的应用",
+          "url": "https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information"
+        },
+        {
+          "label": "Apple：在 Mac 上删除文件和文件夹",
+          "url": "https://support.apple.com/guide/mac-help/mchlp1093/mac"
+        }
+      ]
+    },
+    "en": {
+      "title": "Clean Xcode Caches: DerivedData vs Archives | MacClean",
+      "description": "Review Xcode DerivedData, device symbols, SwiftPM caches and Archives on your Mac. Clean by project while preserving release artifacts and matching dSYM files.",
+      "h1": "How to clean Xcode caches while keeping release archives",
+      "intro": "DerivedData contains generated build data. Archives may hold a released build and its matching dSYM. MacClean's Dev Caches lists them separately for review by project and purpose.",
+      "sections": [
+        {
+          "id": "separate-data",
+          "title": "Separate build data, device symbols and release artifacts",
+          "paragraphs": [
+            "DerivedData: MacClean scans ~/Library/Developer/Xcode/DerivedData and lists project subfolders. Required intermediate data is generated during later builds, which can add rebuild and indexing time.",
+            "Device symbols: DeviceSupport entries cover supported Apple device platforms. Apple's documentation explains that system symbols depend on OS version and architecture. Keep versions needed for debugging.",
+            "Archives: ~/Library/Developer/Xcode/Archives may contain released builds and dSYM files. Apple explains that a binary and its dSYM must have matching build UUIDs. Rebuilding does not guarantee the symbols required for an existing release.",
+            "SwiftPM, Xcode, documentation and simulator caches have separate entries. Check whether dependencies can be fetched again before cleaning package caches offline."
+          ]
+        },
+        {
+          "id": "scan-projects",
+          "title": "Inspect Xcode usage by project",
+          "paragraphs": [
+            "Open MacClean → Dev Caches, scan and inspect Xcode entries. Review each DerivedData project's size, path and explanation. Names come from folder names; confirm the actual path.",
+            "The catalog uses default directories. Custom DerivedData locations may not appear. Apple's Xcode release notes also reference project data under the default path, not deletion of the entire Developer folder.",
+            "Dev Caches includes other tools and idle project dependencies. Deselect unrelated categories when you only intend to clean Xcode data."
+          ],
+          "steps": [
+            "Save your work, stop builds and quit Xcode and Simulator.",
+            "Scan Dev Caches and inspect Xcode entries and paths.",
+            "Select project DerivedData you no longer need; keep required device symbols.",
+            "Review the selected summary and examine Archives separately before confirming."
+          ]
+        },
+        {
+          "id": "review-defaults",
+          "title": "Review defaults against your actual work",
+          "paragraphs": [
+            "DerivedData and several regenerable caches are selected by default. For device symbols, MacClean leaves the recently modified entry unchecked. This does not identify the devices or versions you need.",
+            "Archives are unchecked by default. Before selecting an old archive, confirm that distribution and crash investigation no longer need it and separately back up anything you must keep. The simulator cache entry does not represent every simulator device or runtime."
+          ]
+        },
+        {
+          "id": "verify-build",
+          "title": "Verify the development workflow afterward",
+          "paragraphs": [
+            "Reopen an active project and complete a build and your normal test workflow. If you use Swift packages, confirm dependency resolution. If you debug connected devices, check the versions you need.",
+            "A slower first build or renewed downloads can be the cost of regenerating caches. Cleanup addresses identified storage use; it does not guarantee a fix for every build problem or permanently faster tools.",
+            "Check that the selected paths did not contain unique files you placed there manually. Such files need a separate copy before cleanup."
+          ]
+        },
+        {
+          "id": "recover",
+          "title": "Distinguish recovery from available disk space",
+          "paragraphs": [
+            "Regular Dev Caches cleanup moves selected entries or folder contents to Trash. Cleanup History can restore recorded items that remain there. If Xcode has recreated the original path, a name conflict may prevent restoration. Quit related tools and inspect any restore errors.",
+            "Files in Trash still occupy disk space. Check builds, debugging and important archives before deciding to empty it. Emptying Trash permanently removes files and prevents Cleanup History from restoring them. Check available space and rescan afterward."
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "q": "Does deleting DerivedData delete project source?",
+          "a": "Not from the default folder. Confirm paths and back up any unique files placed there manually."
+        },
+        {
+          "q": "Can Archives always be regenerated?",
+          "a": "No. A new build may not match the UUID of a released binary and its dSYM."
+        },
+        {
+          "q": "Why is the first build slower after cleanup?",
+          "a": "Tools must regenerate build data and indexes or fetch dependencies."
+        },
+        {
+          "q": "Is undo guaranteed?",
+          "a": "No. Files must remain in Trash; permissions and regenerated paths can prevent restoration."
+        }
+      ],
+      "cta": "Download MacClean and inspect Xcode usage in Dev Caches. Start with project data you have confirmed can be regenerated.",
+      "sources": [
+        {
+          "label": "Apple: Xcode 26 release notes and DerivedData path",
+          "url": "https://developer.apple.com/documentation/xcode-release-notes/xcode-26-release-notes"
+        },
+        {
+          "label": "Apple: Adding identifiable symbol names to a crash report",
+          "url": "https://developer.apple.com/documentation/xcode/adding-identifiable-symbol-names-to-a-crash-report"
+        },
+        {
+          "label": "Apple: Building your app to include debugging information",
+          "url": "https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information"
+        },
+        {
+          "label": "Apple: Delete files and folders on Mac",
+          "url": "https://support.apple.com/guide/mac-help/mchlp1093/mac"
+        }
+      ]
+    }
+  }
+]

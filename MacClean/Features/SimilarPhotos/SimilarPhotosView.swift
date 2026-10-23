@@ -96,6 +96,7 @@ final class SimilarPhotosViewModel: ObservableObject {
         selected = []
         isScanning = false
         hasScanned = true
+        UsageAnalytics.shared.recordScanCompleted()
     }
 
     // MARK: - 选择

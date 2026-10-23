@@ -16,6 +16,7 @@ struct OnboardingView: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var scheduler = DiskAlertScheduler.shared
+    @ObservedObject private var usage = UsageAnalytics.shared
     @AppStorage(OnboardingKeys.hasCompleted) private var hasCompletedOnboarding = false
     @AppStorage(NotificationSettingsKey.lowDiskEnabled) private var lowDiskEnabled = true
 
@@ -82,7 +83,7 @@ struct OnboardingView: View {
                     insertion: .opacity.combined(with: .offset(x: 24)),
                     removal: .opacity
                 ))
-                .frame(height: 470)
+                .frame(height: step == .start ? 520 : 470)
 
                 // 步骤指示器
                 HStack(spacing: 14) {
@@ -106,7 +107,7 @@ struct OnboardingView: View {
                     .padding(.bottom, 32)
             }
         }
-        .frame(width: 600, height: 640)
+        .frame(width: 600, height: step == .start ? 700 : 640)
         .animation(.easeOut(duration: 0.25), value: currentStep)
         .task(id: currentStep) {
             // 停留在授权步骤时每 2 秒复查一次，用户在系统设置里勾选后立即反映
@@ -169,6 +170,16 @@ struct OnboardingView: View {
                 .buttonStyle(NeonOutlineButtonStyle())
                 .disabled(isRequestingNotifications)
             }
+        case .start:
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle("分享使用统计", isOn: Binding(get: { usage.isEnabled }, set: { usage.setEnabled($0) }))
+                Text("可选，默认关闭。仅发送随机安装标识、应用与系统版本，以及打开、活跃和首次完成扫描的事件时间；不上传文件信息或扫描结果。可随时在设置中关闭。")
+                    .font(.system(size: 11.5))
+                    .foregroundColor(AppTheme.textSecondary)
+                Link("查看隐私政策", destination: UsageAnalytics.privacyURL)
+                    .font(.system(size: 12))
+            }
+            .frame(maxWidth: 400)
         default:
             EmptyView()
         }

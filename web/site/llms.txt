@@ -1,0 +1,45 @@
+# MacClean
+
+> MacClean 是一款 macOS 本地清理与磁盘空间分析工具，用于排查 Mac 空间不足、整理微信媒体、开发缓存、应用残留与重复文件。官方网站：https://thulem.com/ 。MacClean is a local Mac cleaner and disk space analyzer for macOS 14 or later, on Apple silicon and Intel Macs.
+
+## 产品与使用帮助
+
+- [产品介绍](https://thulem.com/): 微信、QQ 和企业微信媒体整理，存储地图，开发缓存与本地 AI 模型整理，应用卸载，重复文件与相似照片。
+- [下载与安装](https://thulem.com/download.html): 系统要求、安装步骤、首次打开与权限设置。
+- [常见问题](https://thulem.com/support.html): 清理范围、恢复限制、试用、许可证及联系方式。
+- [隐私政策](https://thulem.com/privacy.html): 本地扫描与联网说明。
+- [用户协议与退款](https://thulem.com/terms.html): 许可与退款条款。
+
+## 产品事实与限制
+
+- 扫描与查看结果免费；首次启动后 7 天可试用全部功能，试用结束后清理需要许可证。最新价格见官网。
+- 扫描与文件分析在 Mac 本地进行。许可证激活、更新检查与下载需要网络。可选使用统计默认关闭，主动开启后仅发送随机安装标识、应用与系统版本和打开、活跃、首次完成扫描的事件时间，具体以隐私政策为准。
+- 普通文件清理先移入废纸篓，清空前可从清理记录恢复。清空废纸篓、Docker 清理与删除本地快照不能通过清理记录撤销。
+- 普通文件移入废纸篓后仍占用空间，清空后才可能释放相应空间；快照、共享数据和 macOS 统计更新也会影响结果。不保证固定释放多少 GB。
+- 找回文件依赖现有 APFS 快照或时间机器备份，不保证恢复成功。
+- 微信媒体可以按会话目录分组并添加备注，不读取聊天数据库，不等于自动识别联系人姓名。
+- 本地 AI 模型默认不选中，清理后再次使用可能需要重新下载。
+- MacClean 不是杀毒软件，不承诺性能加速。安装与首次打开的最新说明见下载页面。
+
+## English pages
+
+- [MacClean](https://thulem.com/en/): Product features and cleanup limitations.
+- [Download](https://thulem.com/en/download.html): Installation and system requirements.
+- [Support](https://thulem.com/en/support.html): Frequently asked questions.
+- [Privacy](https://thulem.com/en/privacy.html): Local scanning and network use.
+- [Terms](https://thulem.com/en/terms.html): License and refund policy.
+
+## 清理指南 / Cleanup guides
+
+- [Mac 清理指南](https://thulem.com/guides/): 系统数据、微信媒体和开发缓存的操作步骤与限制。
+- [Mac 系统数据](https://thulem.com/guides/mac-system-data-cleanup.html): 先分析类别，再检查文件与恢复条件。
+- [Mac 微信空间清理](https://thulem.com/guides/wechat-storage-cleanup.html): 按类型、月份检查媒体，保留重要附件。
+- [Xcode 缓存清理](https://thulem.com/guides/xcode-cache-cleanup.html): 区分 DerivedData、设备支持文件与 Archives。
+- [Cleanup guides](https://thulem.com/en/guides/): Practical steps and cleanup limitations.
+- [Mac System Data](https://thulem.com/en/guides/mac-system-data-cleanup.html): Understand storage categories before deleting files.
+- [WeChat storage on Mac](https://thulem.com/en/guides/wechat-storage-cleanup.html): Review media types and months; keep important attachments.
+- [Xcode cache cleanup](https://thulem.com/en/guides/xcode-cache-cleanup.html): Review DerivedData, device support and Archives separately.
+
+## English summary
+
+MacClean helps people review disk usage and selectively remove unwanted files. Features include chat media cleanup, a storage map, developer cache and local AI model cleanup, app removal, duplicate files and similar photos. Ordinary file cleanup uses the Trash and can be undone before it is emptied. Docker cleanup and local snapshot deletion have separate limitations. Scanning remains free after the seven-day full trial; cleanup requires a license. See the official pages above for current details.

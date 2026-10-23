@@ -1693,3 +1693,10 @@
 "显示详情" = "Show Details";
 "关闭详情" = "Close Details";
 "删除后，聊天中的原图可能无法打开。" = "After deletion, original images in chats may no longer open.";
+
+// MARK: - Optional usage statistics
+"隐私" = "Privacy";
+"分享使用统计" = "Share usage statistics";
+"查看隐私政策" = "View privacy policy";
+"默认关闭。开启后发送随机安装标识、应用与系统版本，以及首次打开、每日活跃和首次完成扫描的事件时间。不包含文件信息、扫描结果或许可证；关闭会停止上报并清空未发送事件。" = "Off by default. Sends a random installation ID, app and OS versions, and timestamps for first open, daily activity and the first completed scan. No file information, scan results or license data. Turning this off stops reporting and clears unsent events.";
+"可选，默认关闭。仅发送随机安装标识、应用与系统版本，以及打开、活跃和首次完成扫描的事件时间；不上传文件信息或扫描结果。可随时在设置中关闭。" = "Optional and off by default. Sends a random installation ID, app and OS versions, and timestamps for launches, activity and the first completed scan. No file information or scan results. Turn it off anytime in Settings.";

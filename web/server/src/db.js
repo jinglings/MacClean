@@ -113,6 +113,21 @@ const MIGRATIONS = [
   );
   CREATE INDEX audit_at ON audit_log(at);
   `,
+  `
+  -- Voluntary usage events. No raw installation UUID, IP, file data or license linkage.
+  CREATE TABLE usage_events (
+    installation_hash TEXT NOT NULL,
+    event TEXT NOT NULL CHECK(event IN ('first_open', 'daily_active', 'first_scan')),
+    dedupe_day TEXT NOT NULL,
+    day TEXT NOT NULL,
+    occurred_at TEXT NOT NULL,
+    received_at TEXT NOT NULL,
+    app_version TEXT NOT NULL,
+    os_version TEXT NOT NULL,
+    PRIMARY KEY (installation_hash, event, dedupe_day)
+  );
+  CREATE INDEX usage_events_day ON usage_events(day, event);
+  `,
 ];
 
 export function openDatabase(dbPath) {

@@ -62,6 +62,26 @@ Run the CLI as `macclean` so that files it creates keep the right owner. It is s
 
 ## Deploy (Ubuntu 24.04)
 
+For **updating the existing production host**, run from the MacClean project on your Mac:
+
+```sh
+bash web/deploy.sh --check            # local preparation only, no network access
+bash web/deploy.sh <ssh-host-alias>   # use the verified SSH alias for the thulem.com host
+```
+
+This uses existing SSH credentials and verified known-host keys; if needed SSH prompts for a
+password in your local terminal. No password is embedded or saved by the script.
+It checks the target's directories and service, verifies the upload with SHA-256, backs up the
+current site/server and a consistent SQLite snapshot under `/var/backups/macclean-web/usage-*`,
+updates code, restarts `macclean-server`, and verifies the endpoint, migration, retained records
+and four public Chinese/English pages. The SSH user needs root or passwordless sudo.
+Failures roll back code; the additive database migration stays compatible with the previous
+server, so automatic rollback never overwrites orders received after the snapshot. Environment,
+Caddy/systemd configuration and release DMGs are not replaced. The native app must still be
+rebuilt and released separately for users to send usage events.
+
+For the initial installation only:
+
 ```sh
 sudo useradd --system --home /var/lib/macclean --shell /usr/sbin/nologin macclean
 sudo install -d -o macclean -g macclean -m 750 /var/lib/macclean
@@ -99,7 +119,8 @@ sudo systemctl start macclean-server
 ## Endpoints
 
 Public: `GET /api/health`, `GET /api/public/config`, `POST /api/orders`, `GET /api/orders/:no?token=|email=`, `POST /api/orders/:no/notify`,
-`POST /api/licenses/{activate,validate,deactivate}` (form or JSON), `GET /download/latest`, `GET|HEAD /files/*` (Range), `GET /appcast.xml`.
+`POST /api/licenses/{activate,validate,deactivate}` (form or JSON), `POST /api/usage/events` (opt-in native usage statistics),
+`GET /download/latest`, `GET|HEAD /files/*` (Range), `GET /appcast.xml`.
 
 Admin (session cookie; mutations need `X-Requested-With: macclean-admin`):
 `GET /api/admin/session`, `POST /api/admin/{setup,login,logout,password}`, `GET /api/admin/stats`, `GET /api/admin/orders/summary`,
@@ -107,3 +128,39 @@ Admin (session cookie; mutations need `X-Requested-With: macclean-admin`):
 `GET|POST /api/admin/licenses`, `GET|PATCH /api/admin/licenses/:key`, `POST /api/admin/licenses/:key/{disable,enable}`,
 `DELETE /api/admin/licenses/:key/activations/:id`, `GET|POST /api/admin/releases` (multipart), `PATCH|DELETE /api/admin/releases/:id`,
 `POST /api/admin/releases/:id/latest`, `GET|PUT /api/admin/settings`, `POST|DELETE /api/admin/settings/qr/:kind`, `GET /api/admin/audit`.
+
+## Voluntary usage statistics
+
+Deploy the server and website before distributing the updated app. Startup appends migration 2 automatically;
+existing orders, licenses and downloads remain intact. The dashboard adds a separate usage section.
+No developer certificate is required for these events; signing/notarization remains a separate release task.
+
+The app sends nothing until the user enables **Share usage statistics** in onboarding or Settings → General → Privacy.
+It uses an app-local random UUID (not a hardware ID), persists retries for at most 30 days, and cancels uploads/clears
+unsent events when disabled. Already-received records cannot be retracted by toggling the switch.
+No scan history from before consent is reported. The UUID and sent-event deduplication markers remain locally
+after disabling so re-enabling does not count a new installation.
+
+`POST /api/usage/events` accepts JSON only in the following shape (max 40 events, rate-limited separately from licensing):
+
+```json
+{"installationId":"12345678-1234-4234-8234-123456789abc","events":[{"name":"first_open","occurredAt":"2026-10-23T08:00:00Z","appVersion":"1.2.0","osVersion":"26.0.1"}]}
+```
+
+Allowed events are `first_open`, `daily_active`, `first_scan`. The server deduplicates the first events per installation,
+and active events per installation/business day (`TIMEZONE=Asia/Shanghai` by default, matching the client's daily boundary).
+Event timestamps are UTC; the server rejects timestamps older than 35 days or more than 5 minutes in the future.
+Installation IDs are HMAC-SHA256 hashed with a persistent server salt before storage. No IP, license key,
+computer name, paths, file content, scan results or file counts enter the usage event table. Connections still
+expose IP addresses to the hosting infrastructure; the existing operational access-log policy applies.
+
+`GET /api/admin/stats` adds `usage` totals and `firstOpens`, `dailyActive`, `firstScans` to its daily series.
+These are **opt-in observations, not total installs**. First reports may come from upgrades; cancelled/failed scans
+do not count, successful empty scans do. `/download/latest` counts requests, not completed downloads.
+Old builds cannot retrospectively report their installations. Test the new handler without opening a port:
+
+```sh
+node --disable-warning=ExperimentalWarning --test test/usage.test.js
+# Full handler regression suite without binding local ports:
+MACCLEAN_TEST_IN_PROCESS=1 npm test
+```

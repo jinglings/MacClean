@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-site-locale="en">
+<head>
+  <meta charset="utf-8">
+  <title>Clean Xcode Caches: DerivedData vs Archives | MacClean</title>
+  <meta name="description" content="Review Xcode DerivedData, device symbols, SwiftPM caches and Archives on your Mac. Clean by project while preserving release artifacts and matching dSYM files.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:site_name" content="MacClean">
+<meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+<link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+<script>
+  (function () {
+    var d = document.documentElement, l = null;
+    d.className += ' js';
+    l = d.dataset.siteLocale || null;
+    if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
+    if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+    d.lang = l === 'zh' ? 'zh-CN' : 'en';
+    if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+  })();
+</script>
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/en/guides/xcode-cache-cleanup.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/guides/xcode-cache-cleanup.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/guides/xcode-cache-cleanup.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/guides/xcode-cache-cleanup.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/en/guides/xcode-cache-cleanup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Clean Xcode Caches: DerivedData vs Archives | MacClean">
+  <meta property="og:description" content="Review Xcode DerivedData, device symbols, SwiftPM caches and Archives on your Mac. Clean by project while preserving release artifacts and matching dSYM files.">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/en/guides/xcode-cache-cleanup.html#webpage","url":"https://thulem.com/en/guides/xcode-cache-cleanup.html","name":"Clean Xcode Caches: DerivedData vs Archives | MacClean","description":"Review Xcode DerivedData, device symbols, SwiftPM caches and Archives on your Mac. Clean by project while preserving release artifacts and matching dSYM files.","inLanguage":"en","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"Does deleting DerivedData delete project source?","acceptedAnswer":{"@type":"Answer","text":"Not from the default folder. Confirm paths and back up any unique files placed there manually."}},{"@type":"Question","name":"Can Archives always be regenerated?","acceptedAnswer":{"@type":"Answer","text":"No. A new build may not match the UUID of a released binary and its dSYM."}},{"@type":"Question","name":"Why is the first build slower after cleanup?","acceptedAnswer":{"@type":"Answer","text":"Tools must regenerate build data and indexes or fetch dependencies."}},{"@type":"Question","name":"Is undo guaranteed?","acceptedAnswer":{"@type":"Answer","text":"No. Files must remain in Trash; permissions and regenerated paths can prevent restoration."}}],"breadcrumb":{"@id":"https://thulem.com/en/guides/xcode-cache-cleanup.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://thulem.com/en/guides/xcode-cache-cleanup.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://thulem.com/en/"},{"@type":"ListItem","position":2,"name":"Cleanup guides","item":"https://thulem.com/en/guides/"},{"@type":"ListItem","position":3,"name":"Clean Xcode Caches: DerivedData vs Archives | MacClean","item":"https://thulem.com/en/guides/xcode-cache-cleanup.html"}]}]}</script>
+  <!-- /@seo -->
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
+<div class="announce" id="announce" hidden></div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/en/" aria-label="MacClean">
+      <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+      <span>MacClean</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
+      <li><a href="/en/#safety" data-i18n="nav.safety">Safety</a></li>
+      <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+      <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
+      <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
+      <li><a href="/en/support.html" data-i18n="nav.support">Support</a></li>
+    </ul>
+    <div class="nav-end">
+      <a class="lang-btn" href="/guides/xcode-cache-cleanup.html" id="lang-btn" aria-label="切换到中文" data-i18n-attr="aria-label:nav.langLabel">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"></use></svg><span data-i18n="nav.langShort">中文</span>
+      </a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/en/download.html" data-i18n="nav.cta">Download free</a>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menu" data-i18n-attr="aria-label:nav.menu">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"></use></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero guide-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span>/</span><a href="/en/guides/">Cleanup guides</a></nav><h1>How to clean Xcode caches while keeping release archives</h1><p>DerivedData contains generated build data. Archives may hold a released build and its matching dSYM. MacClean's Dev Caches lists them separately for review by project and purpose.</p></div></section>
+<div class="wrap"><article class="doc guide"><nav class="guide-toc" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#separate-data">Separate build data, device symbols and release artifacts</a></li><li><a href="#scan-projects">Inspect Xcode usage by project</a></li><li><a href="#review-defaults">Review defaults against your actual work</a></li><li><a href="#verify-build">Verify the development workflow afterward</a></li><li><a href="#recover">Distinguish recovery from available disk space</a></li></ol></nav>
+<figure class="guide-shot"><img src="/assets/img/screens/native/light-en-developer_tools.webp" width="1600" height="1030" alt="How to clean Xcode caches while keeping release archives — MacClean" decoding="async" loading="lazy"><figcaption>MacClean interface. File sizes shown are illustrative; your scan results will differ.</figcaption></figure>
+<section id="separate-data"><h2>Separate build data, device symbols and release artifacts</h2><p>DerivedData: MacClean scans ~/Library/Developer/Xcode/DerivedData and lists project subfolders. Required intermediate data is generated during later builds, which can add rebuild and indexing time.</p>
+<p>Device symbols: DeviceSupport entries cover supported Apple device platforms. Apple's documentation explains that system symbols depend on OS version and architecture. Keep versions needed for debugging.</p>
+<p>Archives: ~/Library/Developer/Xcode/Archives may contain released builds and dSYM files. Apple explains that a binary and its dSYM must have matching build UUIDs. Rebuilding does not guarantee the symbols required for an existing release.</p>
+<p>SwiftPM, Xcode, documentation and simulator caches have separate entries. Check whether dependencies can be fetched again before cleaning package caches offline.</p></section>
+<section id="scan-projects"><h2>Inspect Xcode usage by project</h2><p>Open MacClean → Dev Caches, scan and inspect Xcode entries. Review each DerivedData project's size, path and explanation. Names come from folder names; confirm the actual path.</p>
+<p>The catalog uses default directories. Custom DerivedData locations may not appear. Apple's Xcode release notes also reference project data under the default path, not deletion of the entire Developer folder.</p>
+<p>Dev Caches includes other tools and idle project dependencies. Deselect unrelated categories when you only intend to clean Xcode data.</p><ol><li>Save your work, stop builds and quit Xcode and Simulator.</li><li>Scan Dev Caches and inspect Xcode entries and paths.</li><li>Select project DerivedData you no longer need; keep required device symbols.</li><li>Review the selected summary and examine Archives separately before confirming.</li></ol></section>
+<section id="review-defaults"><h2>Review defaults against your actual work</h2><p>DerivedData and several regenerable caches are selected by default. For device symbols, MacClean leaves the recently modified entry unchecked. This does not identify the devices or versions you need.</p>
+<p>Archives are unchecked by default. Before selecting an old archive, confirm that distribution and crash investigation no longer need it and separately back up anything you must keep. The simulator cache entry does not represent every simulator device or runtime.</p></section>
+<section id="verify-build"><h2>Verify the development workflow afterward</h2><p>Reopen an active project and complete a build and your normal test workflow. If you use Swift packages, confirm dependency resolution. If you debug connected devices, check the versions you need.</p>
+<p>A slower first build or renewed downloads can be the cost of regenerating caches. Cleanup addresses identified storage use; it does not guarantee a fix for every build problem or permanently faster tools.</p>
+<p>Check that the selected paths did not contain unique files you placed there manually. Such files need a separate copy before cleanup.</p></section>
+<section id="recover"><h2>Distinguish recovery from available disk space</h2><p>Regular Dev Caches cleanup moves selected entries or folder contents to Trash. Cleanup History can restore recorded items that remain there. If Xcode has recreated the original path, a name conflict may prevent restoration. Quit related tools and inspect any restore errors.</p>
+<p>Files in Trash still occupy disk space. Check builds, debugging and important archives before deciding to empty it. Emptying Trash permanently removes files and prevents Cleanup History from restoring them. Check available space and rescan afterward.</p></section><section><h2>Questions about cleanup</h2><div class="faq"><details><summary>Does deleting DerivedData delete project source?</summary><div class="ans"><p>Not from the default folder. Confirm paths and back up any unique files placed there manually.</p></div></details>
+<details><summary>Can Archives always be regenerated?</summary><div class="ans"><p>No. A new build may not match the UUID of a released binary and its dSYM.</p></div></details>
+<details><summary>Why is the first build slower after cleanup?</summary><div class="ans"><p>Tools must regenerate build data and indexes or fetch dependencies.</p></div></details>
+<details><summary>Is undo guaranteed?</summary><div class="ans"><p>No. Files must remain in Trash; permissions and regenerated paths can prevent restoration.</p></div></details></div></section><section><h2>References</h2><ul><li><a href="https://developer.apple.com/documentation/xcode-release-notes/xcode-26-release-notes">Apple: Xcode 26 release notes and DerivedData path</a></li><li><a href="https://developer.apple.com/documentation/xcode/adding-identifiable-symbol-names-to-a-crash-report">Apple: Adding identifiable symbol names to a crash report</a></li><li><a href="https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information">Apple: Building your app to include debugging information</a></li><li><a href="https://support.apple.com/guide/mac-help/mchlp1093/mac">Apple: Delete files and folders on Mac</a></li></ul></section>
+<section class="guide-cta"><h2>Download MacClean</h2><p>Download MacClean and inspect Xcode usage in Dev Caches. Start with project data you have confirmed can be regenerated.</p><p><a class="btn btn-primary" href="/en/download.html">Download MacClean</a></p><p><a href="/en/support.html">Installation and common questions</a></p></section>
+<aside><h2>Related guides</h2><ul><li><a href="/en/guides/mac-system-data-cleanup.html">How to investigate and clean large System Data on a Mac</a></li><li><a href="/en/guides/wechat-storage-cleanup.html">How to clean WeChat storage on a Mac</a></li></ul></aside></article></div></main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/en/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+        <p data-i18n="foot.tag">A local Mac utility. Review the files before you clean.</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.product">Product</h4>
+        <ul>
+          <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
+          <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+          <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
+          <li><a href="/buy.html" data-i18n="foot.buy">Buy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.help">Help</h4>
+        <ul>
+          <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
+          <li><a href="/en/support.html" data-i18n="foot.faq">FAQ</a></li>
+          <li><a href="/order.html" data-i18n="foot.order">Find my order</a></li>
+          <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.legal">Legal</h4>
+        <ul>
+          <li><a href="/en/privacy.html" data-i18n="foot.privacy">Privacy policy</a></li>
+          <li><a href="/en/terms.html" data-i18n="foot.terms">Terms & refunds</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MacClean</span>
+      <span data-i18n="foot.mac">macOS is a trademark of Apple Inc. MacClean is not affiliated with Apple.</span>
+    </div>
+    <p data-i18n="foot.independent" style="margin-top:16px">MacClean is independently developed and is not affiliated with iMobie or its MacClean product.</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/assets/js/page.js?v=20261007.1"></script>
+</body>
+</html>

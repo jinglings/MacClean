@@ -204,11 +204,13 @@ final class SpaceLensViewModel: ObservableObject {
                     }
                 }
 
+                try Task.checkCancellation()
                 rootItem = result.root
                 diskInfo = result.diskInfo
                 unreadableCount = result.unreadableCount
                 scanProgress = 1
                 phase = .results
+                UsageAnalytics.shared.recordScanCompleted()
                 purgeableSpace = await Task.detached { DiskAnalyzer.purgeableSpace() }.value
             } catch is CancellationError {
                 phase = .intro

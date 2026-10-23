@@ -1,5 +1,5 @@
-import { boot, getConfig, planName, planFeatures, money, escapeHTML } from './common.js?v=20261002.1';
-import { t, onLangChange } from './i18n.js?v=20261002.1';
+import { boot, getConfig, planName, planFeatures, money, escapeHTML } from './common.js?v=20261023.1';
+import { t, onLangChange } from './i18n.js?v=20261023.1';
 
 boot();
 

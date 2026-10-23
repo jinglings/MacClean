@@ -3,6 +3,7 @@ import { getSetting, setSetting, transaction } from './db.js';
 import { HttpError, isEmail, str } from './http.js';
 import { KEY_ALPHABET, generateLicenseKey, normalizeLicenseKey, randomString, randomToken, safeEqual, sha256 } from './security.js';
 import { dayKey, lastDays } from './time.js';
+import { usageStats } from './usage.js';
 
 export const STORE_ID = 1;
 export const PRODUCT_ID = 1;
@@ -521,6 +522,8 @@ export function stats(db, config) {
   const today = days[days.length - 1];
   const since = new Date(Date.now() - 32 * 86400000).toISOString();
   const series = new Map(days.map((d) => [d, { day: d, orders: 0, paidOrders: 0, revenue: 0, downloads: 0, uniqueDownloads: 0, activations: 0 }]));
+  const usage = usageStats(db, days);
+  for (const [day, values] of usage.series) Object.assign(series.get(day), values);
 
   for (const o of db.prepare('SELECT created_at FROM orders WHERE created_at >= ?').all(since)) {
     const s = series.get(dayKey(o.created_at, tz));
@@ -571,6 +574,7 @@ export function stats(db, config) {
       downloads7d: last7.reduce((n, s) => n + s.downloads, 0),
       downloadsTotal: dl,
     },
+    usage: usage.totals,
     series: seriesList,
     today,
     timeZone: tz,

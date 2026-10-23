@@ -1,0 +1,28 @@
+.breadcrumbs { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-bottom:24px; color:var(--muted); font-size:14px; }
+.breadcrumbs a, .guide a { text-decoration:underline; text-underline-offset:3px; }
+.guide { padding-top:40px; overflow-wrap:anywhere; }
+.guide-hero h1 { max-width:900px; margin:auto; }
+.guide-hero p { max-width:760px; }
+.guide h2 { line-height:1.4; scroll-margin-top:100px; }
+.guide section { scroll-margin-top:100px; }
+.guide section + section { margin-top:36px; }
+.guide ol { padding-left:1.4em; margin:16px 0; }
+.guide li + li { margin-top:10px; }
+.guide-toc { padding:20px 0; border-block:1px solid var(--line); }
+.guide-toc strong { font-weight:600; }
+.guide-toc ol { margin-bottom:0; }
+.guide-shot { margin:32px 0; }
+.guide-shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:8px; }
+.guide-shot figcaption { margin-top:10px; font-size:13px; line-height:1.6; color:var(--muted); }
+.guide .faq { margin:16px 0 0; }
+.guide .faq summary { line-height:1.5; }
+.guide-cta { border-block:1px solid var(--line); margin-top:36px; padding:28px 0 32px; }
+.guide .btn { text-decoration:none; }
+.guide .btn-primary { color:#fff; }
+.guide-list { padding:0!important; list-style:none; }
+.guide-list > li { border-bottom:1px solid var(--line); padding:24px 0; margin:0; }
+.guide-list h2 { margin:0 0 12px; font-size:24px; }
+.guide-link-list { max-width:760px; margin-top:24px; list-style:none; padding:0; }
+.guide-link-list li { padding:16px 0; border-bottom:1px solid var(--line); }
+.guide-link-list a { color:var(--text); text-decoration:underline; text-underline-offset:4px; }
+@media(max-width:600px) { .guide { padding-top:24px; } .guide h2,.guide-list h2 { font-size:22px; } .guide-toc { padding:16px 0; } }

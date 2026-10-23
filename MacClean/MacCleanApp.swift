@@ -121,11 +121,23 @@ struct AppShellActions: ViewModifier {
 
 // MARK: - App Delegate
 class AppDelegate: NSObject, NSApplicationDelegate {
+    private var usageTimer: Timer?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppAppearance.current.apply()
         LicenseManager.shared.start()
         AppUpdater.shared.start()
         DiskAlertScheduler.shared.start()
+        UsageAnalytics.shared.start()
+        usageTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            Task { @MainActor in
+                if NSApp.isActive { UsageAnalytics.shared.recordActive() }
+            }
+        }
+    }
+
+    func applicationDidBecomeActive(_ notification: Notification) {
+        UsageAnalytics.shared.recordActive()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

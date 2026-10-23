@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="zh-CN" data-site-locale="zh">
+<head>
+  <meta charset="utf-8">
+  <title>Mac 微信占用太大？按会话和日期清理媒体 | MacClean</title>
+  <meta name="description" content="Mac 微信存储清理指南：扫描本机图片、视频和文件，先清缓存，再按日期选择媒体。了解微信 4.x 预览限制、文字记录与附件的区别及恢复条件。">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:site_name" content="MacClean">
+<meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+<link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+<script>
+  (function () {
+    var d = document.documentElement, l = null;
+    d.className += ' js';
+    l = d.dataset.siteLocale || null;
+    if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
+    if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+    d.lang = l === 'zh' ? 'zh-CN' : 'en';
+    if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+  })();
+</script>
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/guides/wechat-storage-cleanup.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/guides/wechat-storage-cleanup.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/guides/wechat-storage-cleanup.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/guides/wechat-storage-cleanup.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/guides/wechat-storage-cleanup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mac 微信占用太大？按会话和日期清理媒体 | MacClean">
+  <meta property="og:description" content="Mac 微信存储清理指南：扫描本机图片、视频和文件，先清缓存，再按日期选择媒体。了解微信 4.x 预览限制、文字记录与附件的区别及恢复条件。">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/guides/wechat-storage-cleanup.html#webpage","url":"https://thulem.com/guides/wechat-storage-cleanup.html","name":"Mac 微信占用太大？按会话和日期清理媒体 | MacClean","description":"Mac 微信存储清理指南：扫描本机图片、视频和文件，先清缓存，再按日期选择媒体。了解微信 4.x 预览限制、文字记录与附件的区别及恢复条件。","inLanguage":"zh-CN","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"清理微信会删除文字聊天记录吗？","acceptedAnswer":{"@type":"Answer","text":"聊天清理针对识别出的媒体文件，避开聊天数据库。文字记录保留，但被清理的附件可能无法继续在微信中打开。"}},{"@type":"Question","name":"为什么微信 4.x 图片没有预览？","acceptedAnswer":{"@type":"Answer","text":"这类图片使用加密格式，MacClean 不解密聊天数据，所以无法预览。不要根据会话编号猜测图片内容。"}},{"@type":"Question","name":"为什么看不到真实联系人或群名称？","acceptedAnswer":{"@type":"Answer","text":"MacClean 不读取或解密聊天数据库。会话名称以编号显示，你可以添加仅在本机保存的自定义名称。"}},{"@type":"Question","name":"不小心清理了视频，还能恢复吗？","acceptedAnswer":{"@type":"Answer","text":"如果文件仍在废纸篓、对应清理记录还在且原路径可写，可以尝试恢复。清空废纸篓后，清理记录不能找回该文件。"}}],"breadcrumb":{"@id":"https://thulem.com/guides/wechat-storage-cleanup.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://thulem.com/guides/wechat-storage-cleanup.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://thulem.com/"},{"@type":"ListItem","position":2,"name":"清理指南","item":"https://thulem.com/guides/"},{"@type":"ListItem","position":3,"name":"Mac 微信占用太大？按会话和日期清理媒体 | MacClean","item":"https://thulem.com/guides/wechat-storage-cleanup.html"}]}]}</script>
+  <!-- /@seo -->
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+<div class="announce" id="announce" hidden></div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="MacClean">
+      <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+      <span>MacClean</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+      <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+      <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+      <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+      <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
+      <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+    </ul>
+    <div class="nav-end">
+      <a class="lang-btn" href="/en/guides/wechat-storage-cleanup.html" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+      </a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-i18n="nav.cta">免费下载</a>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero guide-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="当前位置"><a href="/">首页</a><span>/</span><a href="/guides/">清理指南</a></nav><h1>Mac 微信占用太大，如何选择要清理的文件？</h1><p>微信附件和缓存需要分别处理。MacClean 的「聊天清理」扫描本机媒体文件的大小和日期，不解密聊天数据库，也不读取消息内容。你可以先查看占用，再按类型、会话或月份选择，避免把仍需要的附件一起清掉。</p></div></section>
+<div class="wrap"><article class="doc guide"><nav class="guide-toc" aria-label="本页内容"><strong>本页内容</strong><ol><li><a href="#prepare">确认账户，先保留重要附件</a></li><li><a href="#understand-results">会话编号与微信 4.x 的限制</a></li><li><a href="#select-media">先检查缓存，再选择旧媒体</a></li><li><a href="#restore">文字记录保留，媒体访问会改变</a></li></ol></nav>
+<figure class="guide-shot"><img src="/assets/img/screens/native/light-zh-chat_cleanup.webp" width="1600" height="1030" alt="Mac 微信占用太大，如何选择要清理的文件？ — MacClean" decoding="async" loading="lazy"><figcaption>MacClean 界面示例。图中大小仅作界面展示，以你的实际扫描结果为准。</figcaption></figure>
+<section id="prepare"><h2>确认账户，先保留重要附件</h2><p>合同、照片、视频和语音等附件即使很旧，也可能仍有价值。先从微信中把需要长期保存的资料另存到你管理的文件夹或备份设备。MacClean 的清理记录提供撤销机会，不能替代独立备份。</p>
+<p>打开 MacClean →「聊天清理」，选择「微信」并扫描。如果发现多个本机账户，在结果中切换账户，确认当前要处理的是哪一个。切换账户会重置选择，之后仍要检查实际勾选项。</p>
+<p>扫描提示无法读取部分目录时，先查看完整磁盘访问权限提示。未能读取的数据可能没有出现在结果里，空结果不一定说明微信没有占用。清理前退出微信；MacClean 会检查运行状态并阻止正在使用这些文件的微信被清理。</p></section>
+<section id="understand-results"><h2>会话编号与微信 4.x 的限制</h2><p>由于不解密数据库，MacClean 不会自动读取真实联系人或群聊名称，会话以编号显示。识别后可以用铅笔图标添加本机名称；这个名称只保存在这台 Mac 上，不会改写微信联系人。</p>
+<p>旧版微信的数据布局可能允许凭缩略图识别媒体。微信 4.x 的图片以加密格式保存，MacClean 无法预览；不要依赖看不到内容的编号来批量判断图片是否没用。</p>
+<p>微信 4.x 的视频和收到的文件按月份存放，不区分会话，列在「视频、文件与缓存」。因此，某个会话占用小，并不代表属于它的视频和文件都很少。结果的分组受微信本机存储布局限制。</p></section>
+<section id="select-media"><h2>先检查缓存，再选择旧媒体</h2><p>默认只勾选「缓存与缩略图」。图片、视频、文件和语音等附件需要主动选择。即使使用默认选择，也应查看汇总与确认提示。</p>
+<p>快捷筛选用于帮助选择，不是无价值文件的判定。一年前的视频、半年前的图片可能仍重要；日期依据本机文件信息和月份分组，不等同于读取聊天消息时间。</p>
+<p>按类型和月份逐步选择，再检查底部已选大小。大文件列表可以单独选择某个文件；如果整个分组已被选中，要重新核对最终选择范围。不要为了一个大视频直接选中所在账户的全部媒体。</p><ol><li>先检查默认选中的缓存与缩略图，取消不想处理的部分。</li><li>需要继续清理时，按会话、月份或快捷筛选找到候选项。</li><li>核对类型和已选汇总，保留重要图片、视频、文件及语音。</li><li>退出微信，查看删除影响说明后，再确认「移入废纸篓」。</li></ol></section>
+<section id="restore"><h2>文字记录保留，媒体访问会改变</h2><p>MacClean 的聊天清理避开聊天数据库及其相关文件，清理的是选中的媒体文件。文字记录保留不代表附件也保留：清理后，微信里对应的图片、视频和文件可能显示为「已过期」或「已被清理」。不要把再次下载作为保证。</p>
+<p>确认后文件移入废纸篓。有可恢复的清理记录时，可从完成窗口撤销，或打开「清理记录」恢复。文件需要仍在废纸篓中；原路径冲突或权限问题可能使部分恢复失败。</p>
+<p>先检查微信和需要的附件，再决定是否清空废纸篓。移入废纸篓期间仍占用磁盘，清空后才会去掉这部分文件占用，但清理记录也失去恢复它们的条件。Apple 的 Finder 文档也说明，废纸篓清空后的文件永久删除。</p>
+<p>最后重新扫描，查看已选类别是否减少，并核对 Mac 的可用空间。缓存可能在使用微信后重新生成，不能把一次清理视为永久固定的占用。</p></section><section><h2>常见问题</h2><div class="faq"><details><summary>清理微信会删除文字聊天记录吗？</summary><div class="ans"><p>聊天清理针对识别出的媒体文件，避开聊天数据库。文字记录保留，但被清理的附件可能无法继续在微信中打开。</p></div></details>
+<details><summary>为什么微信 4.x 图片没有预览？</summary><div class="ans"><p>这类图片使用加密格式，MacClean 不解密聊天数据，所以无法预览。不要根据会话编号猜测图片内容。</p></div></details>
+<details><summary>为什么看不到真实联系人或群名称？</summary><div class="ans"><p>MacClean 不读取或解密聊天数据库。会话名称以编号显示，你可以添加仅在本机保存的自定义名称。</p></div></details>
+<details><summary>不小心清理了视频，还能恢复吗？</summary><div class="ans"><p>如果文件仍在废纸篓、对应清理记录还在且原路径可写，可以尝试恢复。清空废纸篓后，清理记录不能找回该文件。</p></div></details></div></section><section><h2>参考资料</h2><ul><li><a href="https://support.apple.com/guide/mac-help/mchlp1093/mac">Apple：在 Mac 上删除文件和文件夹</a></li></ul></section>
+<section class="guide-cta"><h2>下载 MacClean</h2><p>下载 MacClean，在「聊天清理」中扫描微信占用，先查看媒体类别和默认选择，再决定清理范围。</p><p><a class="btn btn-primary" href="/download.html">下载 MacClean</a></p><p><a href="/support.html">安装说明与常见问题</a></p></section>
+<aside><h2>继续阅读</h2><ul><li><a href="/guides/mac-system-data-cleanup.html">Mac 系统数据太大，应该从哪里清理？</a></li><li><a href="/guides/xcode-cache-cleanup.html">Xcode 占用太大：哪些缓存可以清理，哪些归档应保留？</a></li></ul></aside></article></div></main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+        <p data-i18n="foot.tag">先查看、再确认的 Mac 本地清理工具。</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.product">产品</h4>
+        <ul>
+          <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+          <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+          <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+          <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.help">帮助</h4>
+        <ul>
+          <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
+          <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+          <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+          <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.legal">条款</h4>
+        <ul>
+          <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+          <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MacClean</span>
+      <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+    </div>
+    <p data-i18n="foot.independent" style="margin-top:16px">本产品独立开发，与 iMobie 及其 MacClean 产品无关联。</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/assets/js/page.js?v=20261007.1"></script>
+</body>
+</html>

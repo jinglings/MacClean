@@ -486,6 +486,7 @@ final class AppUninstallerViewModel: ObservableObject {
         scanResult = result
         scanProgress = 1
         state = .results
+        UsageAnalytics.shared.recordScanCompleted()
         startUpdateCheck(apps: result.apps, generation: generation)
     }
 

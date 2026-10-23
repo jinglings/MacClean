@@ -124,6 +124,7 @@ struct GeneralSettingsView: View {
     @AppStorage(SensorSettingsKey.showTemperatureInMenuBar) private var showsTemperatureInMenuBar = false
     @AppStorage(AppAppearance.storageKey) private var appearance = AppAppearance.system.rawValue
     @ObservedObject private var updater = AppUpdater.shared
+    @ObservedObject private var usage = UsageAnalytics.shared
 
     @State private var launchAtLogin = false
     @State private var loginItemStatus: SMAppService.Status = .notRegistered
@@ -178,6 +179,14 @@ struct GeneralSettingsView: View {
                         Button("立即重启") { AppLanguage.relaunch() }
                     }
                 }
+            }
+
+            Section("隐私") {
+                Toggle("分享使用统计", isOn: Binding(get: { usage.isEnabled }, set: { usage.setEnabled($0) }))
+                Text("默认关闭。开启后发送随机安装标识、应用与系统版本，以及首次打开、每日活跃和首次完成扫描的事件时间。不包含文件信息、扫描结果或许可证；关闭会停止上报并清空未发送事件。")
+                    .font(.caption)
+                    .foregroundColor(AppTheme.textSecondary)
+                Link("查看隐私政策", destination: UsageAnalytics.privacyURL)
             }
 
             Section("更新") {

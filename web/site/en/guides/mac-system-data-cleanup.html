@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-site-locale="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mac System Data Too Large? Find What to Clean | MacClean</title>
+  <meta name="description" content="Find what is using Mac System Data before deleting files. Review caches, Xcode data, backups and app storage with MacClean, including Trash recovery limits.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:site_name" content="MacClean">
+<meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+<link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+<script>
+  (function () {
+    var d = document.documentElement, l = null;
+    d.className += ' js';
+    l = d.dataset.siteLocale || null;
+    if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
+    if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+    d.lang = l === 'zh' ? 'zh-CN' : 'en';
+    if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+  })();
+</script>
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/en/guides/mac-system-data-cleanup.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/guides/mac-system-data-cleanup.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/guides/mac-system-data-cleanup.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/guides/mac-system-data-cleanup.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/en/guides/mac-system-data-cleanup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mac System Data Too Large? Find What to Clean | MacClean">
+  <meta property="og:description" content="Find what is using Mac System Data before deleting files. Review caches, Xcode data, backups and app storage with MacClean, including Trash recovery limits.">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/en/guides/mac-system-data-cleanup.html#webpage","url":"https://thulem.com/en/guides/mac-system-data-cleanup.html","name":"Mac System Data Too Large? Find What to Clean | MacClean","description":"Find what is using Mac System Data before deleting files. Review caches, Xcode data, backups and app storage with MacClean, including Trash recovery limits.","inLanguage":"en","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"Does MacClean automatically delete System Data?","acceptedAnswer":{"@type":"Answer","text":"No. It measures usage; actions open the relevant feature, Finder or System Settings. You choose cleanup targets."}},{"@type":"Question","name":"Is large System Data always a problem?","acceptedAnswer":{"@type":"Answer","text":"No. Backups, development data and app support files may explain it. Check available space and sources."}},{"@type":"Question","name":"Why do MacClean and macOS show different totals?","acceptedAnswer":{"@type":"Answer","text":"Classification, partial access, unfinished scans, purgeable estimates and APFS shared data can affect totals."}},{"@type":"Question","name":"Can Cleanup History restore files after Trash is emptied?","acceptedAnswer":{"@type":"Answer","text":"No. It restores files still in Trash. Keep an independent backup."}}],"breadcrumb":{"@id":"https://thulem.com/en/guides/mac-system-data-cleanup.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://thulem.com/en/guides/mac-system-data-cleanup.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://thulem.com/en/"},{"@type":"ListItem","position":2,"name":"Cleanup guides","item":"https://thulem.com/en/guides/"},{"@type":"ListItem","position":3,"name":"Mac System Data Too Large? Find What to Clean | MacClean","item":"https://thulem.com/en/guides/mac-system-data-cleanup.html"}]}]}</script>
+  <!-- /@seo -->
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
+<div class="announce" id="announce" hidden></div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/en/" aria-label="MacClean">
+      <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+      <span>MacClean</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
+      <li><a href="/en/#safety" data-i18n="nav.safety">Safety</a></li>
+      <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+      <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
+      <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
+      <li><a href="/en/support.html" data-i18n="nav.support">Support</a></li>
+    </ul>
+    <div class="nav-end">
+      <a class="lang-btn" href="/guides/mac-system-data-cleanup.html" id="lang-btn" aria-label="切换到中文" data-i18n-attr="aria-label:nav.langLabel">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"></use></svg><span data-i18n="nav.langShort">中文</span>
+      </a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/en/download.html" data-i18n="nav.cta">Download free</a>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menu" data-i18n-attr="aria-label:nav.menu">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"></use></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero guide-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span>/</span><a href="/en/guides/">Cleanup guides</a></nav><h1>How to investigate and clean large System Data on a Mac</h1><p>Identify the files behind System Data before choosing a cleanup action. MacClean measures and explains the sources it can access; its System Data scan does not delete anything.</p></div></section>
+<div class="wrap"><article class="doc guide"><nav class="guide-toc" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#check-storage">Start with the storage available to your Mac</a></li><li><a href="#read-report">Read the scan as an explanation of specific sources</a></li><li><a href="#choose-action">Choose the action that matches the category</a></li><li><a href="#verify-space">Check available space and the recovery boundary</a></li></ol></nav>
+<figure class="guide-shot"><img src="/assets/img/screens/native/light-en-disk_analysis.webp" width="1600" height="1030" alt="How to investigate and clean large System Data on a Mac — MacClean" decoding="async" loading="lazy"><figcaption>MacClean interface. File sizes shown are illustrative; your scan results will differ.</figcaption></figure>
+<section id="check-storage"><h2>Start with the storage available to your Mac</h2><p>On macOS Ventura 13 or later, open Apple menu → System Settings → General → Storage. Note available space and inspect manageable categories. Apple's guide explains that System Data includes caches, logs and support data outside other categories.</p>
+<p>Check the space needed for your next task; a large category does not identify disposable files.</p><ol><li>Record available space and the space your task needs.</li><li>Inspect recognisable downloads, installers and personal files first.</li><li>Open MacClean → Storage Map → System Data for unexplained usage.</li></ol></section>
+<section id="read-report"><h2>Read the scan as an explanation of specific sources</h2><p>MacClean shows system categories first, then measures applications, personal files and other comparison categories. Wait before interpreting Other Unclassified; stopping early leaves part of the report unfinished.</p>
+<p>Expand larger categories to review explanations and paths. Xcode &amp; Simulators, Application Caches and iPhone / iPad Backups lead to different actions. Application Containers &amp; Support Data combines app support folders and containers to identify larger apps.</p>
+<p>An access warning means part of a category was not fully measured. It does not mean zero usage. Follow the permission prompt and rescan, or start with files already identified.</p>
+<p>Local Snapshots &amp; Purgeable Space estimates purgeable storage from the difference between two available-space values reported by macOS. Snapshot names provide context; the estimate is not a precise sum of individual snapshots.</p></section>
+<section id="choose-action"><h2>Choose the action that matches the category</h2><p>Caches, logs and Trash: follow the link to Reclaim and review the actual selection. Quit the relevant app before handling its files.</p>
+<p>Xcode &amp; Simulators: open Dev Caches to inspect project build data and device symbols. Review Archives separately because they contain release artifacts.</p>
+<p>Application Containers &amp; Support Data: inspect the owning app in App Storage. Support folders may contain databases, offline documents and account data.</p>
+<p>System-managed categories: follow the report's explanation for macOS files, system assets and virtual memory. Apple says Time Machine automatically removes local snapshots as space is needed. The analysis page does not automatically remove these items.</p>
+<p>Personal files or unexplained usage: switch to Folder Map and identify a specific file or folder you recognise before taking action.</p></section>
+<section id="verify-space"><h2>Check available space and the recovery boundary</h2><p>Regular MacClean file cleanup moves selected items to Trash. When a cleanup session is recorded, Cleanup History can move remaining items back to their original paths. Missing trashed files, permission errors or an existing file at the destination can prevent restoration.</p>
+<p>Moving files to Trash preserves a recovery opportunity but still uses storage. Check your apps and keep separate copies of important files before deciding to empty Trash. Emptying it permanently removes the files; Cleanup History is not an independent backup.</p>
+<p>Check available space again and rescan if necessary. Totals can differ because of scan scope, permissions, APFS shared data and classification. Confirm the space your task can actually use.</p></section><section><h2>Questions about cleanup</h2><div class="faq"><details><summary>Does MacClean automatically delete System Data?</summary><div class="ans"><p>No. It measures usage; actions open the relevant feature, Finder or System Settings. You choose cleanup targets.</p></div></details>
+<details><summary>Is large System Data always a problem?</summary><div class="ans"><p>No. Backups, development data and app support files may explain it. Check available space and sources.</p></div></details>
+<details><summary>Why do MacClean and macOS show different totals?</summary><div class="ans"><p>Classification, partial access, unfinished scans, purgeable estimates and APFS shared data can affect totals.</p></div></details>
+<details><summary>Can Cleanup History restore files after Trash is emptied?</summary><div class="ans"><p>No. It restores files still in Trash. Keep an independent backup.</p></div></details></div></section><section><h2>References</h2><ul><li><a href="https://support.apple.com/guide/mac-help/mchl3d437fbc/mac">Apple: Change Storage settings on Mac</a></li><li><a href="https://support.apple.com/102624">Apple: Free up storage space on Mac</a></li><li><a href="https://support.apple.com/102154">Apple: About Time Machine local snapshots</a></li><li><a href="https://support.apple.com/guide/mac-help/mchlp1093/mac">Apple: Delete files and folders on Mac</a></li></ul></section>
+<section class="guide-cta"><h2>Download MacClean</h2><p>Download MacClean and run a read-only System Data scan in Storage Map before choosing what to clean.</p><p><a class="btn btn-primary" href="/en/download.html">Download MacClean</a></p><p><a href="/en/support.html">Installation and common questions</a></p></section>
+<aside><h2>Related guides</h2><ul><li><a href="/en/guides/wechat-storage-cleanup.html">How to clean WeChat storage on a Mac</a></li><li><a href="/en/guides/xcode-cache-cleanup.html">How to clean Xcode caches while keeping release archives</a></li></ul></aside></article></div></main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/en/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+        <p data-i18n="foot.tag">A local Mac utility. Review the files before you clean.</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.product">Product</h4>
+        <ul>
+          <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
+          <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+          <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
+          <li><a href="/buy.html" data-i18n="foot.buy">Buy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.help">Help</h4>
+        <ul>
+          <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
+          <li><a href="/en/support.html" data-i18n="foot.faq">FAQ</a></li>
+          <li><a href="/order.html" data-i18n="foot.order">Find my order</a></li>
+          <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.legal">Legal</h4>
+        <ul>
+          <li><a href="/en/privacy.html" data-i18n="foot.privacy">Privacy policy</a></li>
+          <li><a href="/en/terms.html" data-i18n="foot.terms">Terms & refunds</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MacClean</span>
+      <span data-i18n="foot.mac">macOS is a trademark of Apple Inc. MacClean is not affiliated with Apple.</span>
+    </div>
+    <p data-i18n="foot.independent" style="margin-top:16px">MacClean is independently developed and is not affiliated with iMobie or its MacClean product.</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/assets/js/page.js?v=20261007.1"></script>
+</body>
+</html>

@@ -64,6 +64,7 @@ final class LoginItemsViewModel: ObservableObject {
         isScanning = false
         hasScanned = true
         lastScannedAt = Date()
+        UsageAnalytics.shared.recordScanCompleted()
     }
 
     // MARK: - 启用 / 停用

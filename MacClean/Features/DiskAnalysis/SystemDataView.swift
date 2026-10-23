@@ -99,10 +99,12 @@ final class SystemDataViewModel: ObservableObject {
                         }
                     }
                 )
+                try Task.checkCancellation()
                 await MainActor.run {
                     guard model.generation == current else { return }
                     model.completedGeneration = current
                     model.show(report)
+                    UsageAnalytics.shared.recordScanCompleted()
                 }
             } catch {
                 await MainActor.run {

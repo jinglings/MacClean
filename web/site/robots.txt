@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /dev/
+Disallow: /files/
+Disallow: /download/
+
+Sitemap: https://thulem.com/sitemap.xml

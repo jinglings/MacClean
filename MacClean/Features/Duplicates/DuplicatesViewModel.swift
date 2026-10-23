@@ -220,6 +220,7 @@ final class DuplicatesViewModel: ObservableObject {
         isScanning = false
         guard let result else { return }
         apply(result, settings: settings)
+        UsageAnalytics.shared.recordScanCompleted()
     }
 
     /// 载入扫描结果：每组保留建议项，其余副本全部预选。

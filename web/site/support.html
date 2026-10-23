@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-site-locale="zh">
 <head>
   <meta charset="utf-8">
-  <title data-i18n="sp.title">支持 · MacClean</title>
-  <meta name="description" content="MacClean 常见问题、安装帮助、许可证与退款，以及联系方式。" data-i18n-attr="content:sp.desc">
+  <title data-i18n="sp.title">Mac 清理常见问题：微信、系统数据与开发缓存 - MacClean</title>
+  <meta name="description" content="Mac 空间不足怎么清理？了解微信媒体清理、系统数据分析、Xcode 缓存、应用卸载与重复文件整理的操作和限制，以及清理后空间变化、恢复、试用与许可证问题。" data-i18n-attr="content:sp.desc">
   <!-- @head -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
@@ -15,18 +15,34 @@
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
   <meta property="og:site_name" content="MacClean">
   <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
-  <link rel="stylesheet" href="/assets/css/site.css?v=20261002.1">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+  <link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
   <script>
     (function () {
       var d = document.documentElement, l = null;
       d.className += ' js';
-      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      l = d.dataset.siteLocale || null;
+      if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
       if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
       d.lang = l === 'zh' ? 'zh-CN' : 'en';
-      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+      if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
     })();
   </script>
   <!-- /@head -->
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/support.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/support.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/support.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/support.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/support.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mac 清理常见问题：微信、系统数据与开发缓存 - MacClean" data-i18n-attr="content:sp.title">
+  <meta property="og:description" content="Mac 空间不足怎么清理？了解微信媒体清理、系统数据分析、Xcode 缓存、应用卸载与重复文件整理的操作和限制，以及清理后空间变化、恢复、试用与许可证问题。" data-i18n-attr="content:sp.desc">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/support.html#webpage","url":"https://thulem.com/support.html","name":"Mac 清理常见问题：微信、系统数据与开发缓存 - MacClean","description":"Mac 空间不足怎么清理？了解微信媒体清理、系统数据分析、Xcode 缓存、应用卸载与重复文件整理的操作和限制，以及清理后空间变化、恢复、试用与许可证问题。","inLanguage":"zh-CN","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"Mac 磁盘空间不足，应该先清理什么？","acceptedAnswer":{"@type":"Answer","text":"先用存储地图查看哪些文件夹占用最多，再分别检查聊天媒体、应用缓存、旧安装包、重复文件和开发缓存。保留工作文件、重要聊天附件与仍需使用的备份，只选择确认不再需要的项目。MacClean 会展示本机扫描结果，能腾出多少空间取决于实际文件，不保证固定释放多少 GB。"}},{"@type":"Question","name":"Xcode DerivedData 和开发缓存可以清理吗？","acceptedAnswer":{"@type":"Answer","text":"在「开发工具」中查看 Xcode DerivedData、npm、pip、Gradle 等缓存的大小和说明，先退出相关开发工具，再选择不再需要的项目。构建缓存清理后可能需要重新编译或下载依赖；Xcode Archives 包含归档及调试符号，不应当作普通缓存随意删除，默认不选中。"}},{"@type":"Question","name":"Mac 清理缓存会影响使用吗？","acceptedAnswer":{"@type":"Answer","text":"缓存通常会在后续使用时重新生成，第一次打开应用或重新构建项目可能需要更久。缓存、登录 Cookie、收到的聊天文件和设备备份用途不同，不应一起当作垃圾删除。MacClean 会分开列出相关类别；先阅读说明，退出相关应用，再勾选确认不需要的项目。"}},{"@type":"Question","name":"Mac 卸载应用后，怎么检查残留文件？","acceptedAnswer":{"@type":"Answer","text":"在「应用管家」里查看应用及关联文件，卸载前先检查列出的数据；已经移走的应用，可以继续检查残留项目。关联数据可能包含个人设置或需要保留的内容，确认后再清理。MacClean 提供检查与选择，不承诺把每个应用的所有痕迹都彻底删除。"}},{"@type":"Question","name":"为什么清理后，Mac 可用空间没有马上增加？","acceptedAnswer":{"@type":"Answer","text":"普通文件清理会先移入废纸篓，仍占用磁盘空间，这是保留恢复机会的方式。确认文件不再需要后，清空废纸篓才可能真正释放相应空间；这一步无法通过清理记录撤销。macOS 储存空间统计也可能延后更新，快照或共享数据还可能影响最终可用空间，所以移入废纸篓的大小不一定等于立即增加的空间。"}},{"@type":"Question","name":"MacClean 安全吗？会不会删错东西？","acceptedAnswer":{"@type":"Answer","text":"扫描只读取文件信息，清理前由你查看并选择项目。普通文件先移入废纸篓，清空前可从「清理记录」恢复。清空废纸篓、Docker 清理和删除本地快照无法这样撤销，操作前会单独提示。"}},{"@type":"Question","name":"它到底会删除什么？","acceptedAnswer":{"@type":"Answer","text":"只删除你勾选的项目：应用与浏览器缓存、超过 7 天的日志、旧安装包、邮件附件的本地副本、你选中的设备备份、开发缓存等。每一类都写明了来源，以及删掉后会怎样（比如缓存会在需要时重新生成）。"}},{"@type":"Question","name":"清理后怎么撤销？","acceptedAnswer":{"@type":"Answer","text":"打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。清空之后，还可以用「找回文件」从本地快照或时间机器备份中尝试找回。"}},{"@type":"Question","name":"清空了废纸篓，还能找回文件吗？","acceptedAnswer":{"@type":"Answer","text":"有机会，但不能保证。MacClean 1.1 的「找回文件」可以从 APFS 本地快照和时间机器备份里把文件复制回来：开启时间机器时（或系统更新后），macOS 会保留最近约 24 小时的本地快照。如果文件删除时既不在快照里、也没有备份，就无法找回，MacClean 也不会假装能做到。这时可以看看 iCloud 云盘或「照片」里的「最近删除」。"}},{"@type":"Question","name":"怎样提高误删后找回的机会？","acceptedAnswer":{"@type":"Answer","text":"打开时间机器：它会定期备份，也会让 macOS 保留本地快照。发现误删后尽快找回，本地快照通常只保留约 24 小时。找回之前尽量不要往磁盘写入大量数据（比如下载大文件、安装应用），以免 macOS 为腾出空间提前清理快照。"}},{"@type":"Question","name":"安全中心能查杀病毒吗？","acceptedAnswer":{"@type":"Answer","text":"不能，MacClean 不是杀毒软件。macOS 自带 XProtect 等防护，会在后台检查已知的恶意软件。安全中心做的是检查这些自带防护是否开着、XProtect 的数据是否最新，并列出权限和签名上值得留意的地方，由你决定怎么处理。它只读取，不修改任何设置。"}},{"@type":"Question","name":"Mac 重复文件和相似照片，应该怎么选？","acceptedAnswer":{"@type":"Answer","text":"完全相同的文件按内容归组，每组至少保留一份，也可以手动改选保留项。相似照片并不一定是重复文件，请逐组预览后再决定。清理普通副本会移入废纸篓，清空前可从「清理记录」恢复。"}},{"@type":"Question","name":"Mac 微信占用太大，怎样清理图片、视频和缓存？","acceptedAnswer":{"@type":"Answer","text":"打开「聊天清理」，查看微信、QQ 或企业微信的媒体占用，按类型、月份选择不需要的图片、视频、附件和缓存。微信部分媒体支持按会话目录分组，不等于识别联系人姓名；MacClean 不读取聊天数据库。默认只勾选可重新生成的缓存与缩略图，重要附件先另行保存。退出聊天应用后再清理；移走的媒体可能在聊天中显示已过期，废纸篓未清空时可从清理记录恢复。"}},{"@type":"Question","name":"Mac 系统数据占用很大，哪些可以清理？","acceptedAnswer":{"@type":"Answer","text":"「系统数据」不全是垃圾，可能包含本地快照、备份、Spotlight 索引、开发缓存、本地 AI 模型和虚拟内存。先打开存储地图的「系统数据」视图，查看可测量的分类及大小，再前往对应功能处理不需要的缓存、备份或模型。分析本身只读，不会自动删除系统文件；需要额外权限或无法测量的项目会注明。不要为了让数字变小而删除仍需使用的数据。"}},{"@type":"Question","name":"Ollama、Hugging Face、LM Studio 模型占空间，能删吗？","acceptedAnswer":{"@type":"Answer","text":"删掉的模型下次用到时需要重新下载，MacClean 会在每一行写明要重新下载多少，并且默认一个都不勾选。Ollama 的多个模型会共用数据文件，可释放空间只计算没有其他模型在用的部分。文件会移到废纸篓，可以撤销；MacClean 不会执行 ollama rm，清理前需要先退出 Ollama。Hugging Face 令牌和你生成的图片不会被碰。"}},{"@type":"Question","name":"存储地图的暂存篮怎么用？","acceptedAnswer":{"@type":"Answer","text":"在文件夹地图里浏览时，把想删的文件或文件夹拖进暂存篮，或者用悬停按钮、右键菜单、按 B 键加入，顶部会实时显示一共能释放多少空间。加入一个文件夹时，里面已经加入的项目会自动合并，不会重复计算；系统目录、主目录下的顶层文件夹和 iCloud 云盘不能加入，会说明原因。确认清单、去掉不想删的之后，一次性移到废纸篓，可以撤销。文稿、桌面、图片里的项目和超过 10 GB 的项目会额外提醒。按空格键可以像访达一样快速查看。"}},{"@type":"Question","name":"免费试用有什么限制？","acceptedAnswer":{"@type":"Answer","text":"首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。"}},{"@type":"Question","name":"付款后多久能拿到许可证？","acceptedAnswer":{"@type":"Answer","text":"我们人工核对收款，通常在 24 小时内发放。付款时请务必在备注里填写付款码，这样我们才能对上你的订单。核对完成后，订单页面会直接显示许可证，打开订单链接或用订单号和邮箱查询即可。"}},{"@type":"Question","name":"付款时忘了填写备注怎么办？","acceptedAnswer":{"@type":"Answer","text":"没关系。把订单号、付款时间和金额发邮件给我们，我们会手动核对。"}},{"@type":"Question","name":"怎么激活许可证？","acceptedAnswer":{"@type":"Answer","text":"打开 MacClean，点侧边栏顶部的「升级」，选择「输入许可证」，粘贴以 MCLN- 开头的许可证密钥，点「激活」。激活需要联网一次。"}},{"@type":"Question","name":"一个许可证能用在几台 Mac 上？","acceptedAnswer":{"@type":"Answer","text":"终身版可以激活 2 台 Mac，家庭版可以激活 5 台。换电脑时，在旧 Mac 的设置里点「在此 Mac 上停用」，名额就腾出来了。"}},{"@type":"Question","name":"提示「已达到激活上限」怎么办？","acceptedAnswer":{"@type":"Answer","text":"在不再使用的那台 Mac 上打开 MacClean 设置里的「许可证」，点「在此 Mac 上停用」。如果那台 Mac 已经不在手边，写信告诉我们许可证密钥，我们帮你释放名额。"}},{"@type":"Question","name":"可以退款吗？","acceptedAnswer":{"@type":"Answer","text":"可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。"}},{"@type":"Question","name":"为什么需要「完全磁盘访问权限」？","acceptedAnswer":{"@type":"Answer","text":"macOS 会保护邮件、Safari 等应用的数据目录，没有这项权限，MacClean 看不到这些位置的缓存和历史记录。不授权也能用，只是部分文件扫描不到。授权方法见下载页。"}},{"@type":"Question","name":"第一次打开时提示「无法验证开发者」怎么办？","acceptedAnswer":{"@type":"Answer","text":"当前版本尚未完成 Apple 公证。确认从官网下载、文件未被修改且你信任来源后，先尝试打开一次，再到「系统设置 → 隐私与安全性」点击「仍要打开」并确认。若提示「会损坏电脑」或「已损坏」，请先停止并排查安装包。查看完整步骤。"}},{"@type":"Question","name":"为什么有些操作要输入管理员密码？","acceptedAnswer":{"@type":"Answer","text":"刷新 DNS、重建 Spotlight 索引、删除本地快照等系统维护命令需要管理员权限，这是 macOS 的要求。每条命令旁都标了「需要管理员密码」，只在你点「运行」时才会询问。"}},{"@type":"Question","name":"MacClean 会收集我的数据吗？","acceptedAnswer":{"@type":"Answer","text":"文件名、路径、文件内容和扫描结果留在本机。许可证、更新检查等功能需要联网；另有默认关闭的可选使用统计，开启后仅发送随机安装标识、应用与系统版本，以及首次打开、每日活跃和首次完成扫描的事件时间，可随时关闭。详见隐私政策。"}},{"@type":"Question","name":"怎么卸载 MacClean？","acceptedAnswer":{"@type":"Answer","text":"如果已经激活，先在设置的「许可证」里点「在此 Mac 上停用」，把名额留给别的 Mac。然后退出 MacClean，把它从「应用程序」拖到废纸篓即可。"}}]}]}</script>
+  <!-- /@seo -->
 </head>
 <body data-page="support">
   <!-- @nav -->
@@ -43,12 +59,13 @@
         <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
         <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
         <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
         <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
       </ul>
       <div class="nav-end">
-        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+        <a class="lang-btn" href="/en/support.html" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
           <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
-        </button>
+        </a>
         <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-i18n="nav.cta">免费下载</a>
         <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
           <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
@@ -61,8 +78,8 @@
     <section class="page-hero">
 
       <div class="wrap">
-        <h1 data-i18n="sp.h1">我们能帮上什么？</h1>
-        <p data-i18n="sp.sub">先看看下面的常见问题。没找到答案，就直接写信给我们，通常一个工作日内回复。</p>
+        <h1 data-i18n="sp.h1">Mac 清理与磁盘空间常见问题</h1>
+        <p data-i18n="sp.sub">先找到占用，再判断哪些文件不再需要。这里说明各项清理功能的用途、操作影响与恢复限制；仍有问题可以联系我们。</p>
       </div>
     </section>
 
@@ -88,17 +105,17 @@
 
         <div class="sec-head center"><h2 data-i18n="faq.h2">常见问题</h2></div>
 
-        <div class="faq">
-          <details><summary data-i18n="faq.q1">MacClean 安全吗？会不会删错东西？</summary><div class="ans"><p data-i18n="faq.a1">扫描只读取文件信息。清理时文件会被移到废纸篓，而不是直接删除；系统目录和个人文件夹受 PathGuard 白名单保护，不会出现在可清理列表里。万一删错，在「清理记录」里一键恢复即可。</p></div></details>
+        <div class="faq"><details><summary data-i18n="seo.q.space">Mac 磁盘空间不足，应该先清理什么？</summary><div class="ans"><p data-i18n="seo.a.space">先用存储地图查看哪些文件夹占用最多，再分别检查聊天媒体、应用缓存、旧安装包、重复文件和开发缓存。保留工作文件、重要聊天附件与仍需使用的备份，只选择确认不再需要的项目。MacClean 会展示本机扫描结果，能腾出多少空间取决于实际文件，不保证固定释放多少 GB。</p></div></details><details><summary data-i18n="seo.q.xcode">Xcode DerivedData 和开发缓存可以清理吗？</summary><div class="ans"><p data-i18n="seo.a.xcode">在「开发工具」中查看 Xcode DerivedData、npm、pip、Gradle 等缓存的大小和说明，先退出相关开发工具，再选择不再需要的项目。构建缓存清理后可能需要重新编译或下载依赖；Xcode Archives 包含归档及调试符号，不应当作普通缓存随意删除，默认不选中。</p></div></details><details><summary data-i18n="seo.q.cache">Mac 清理缓存会影响使用吗？</summary><div class="ans"><p data-i18n="seo.a.cache">缓存通常会在后续使用时重新生成，第一次打开应用或重新构建项目可能需要更久。缓存、登录 Cookie、收到的聊天文件和设备备份用途不同，不应一起当作垃圾删除。MacClean 会分开列出相关类别；先阅读说明，退出相关应用，再勾选确认不需要的项目。</p></div></details><details><summary data-i18n="seo.q.uninstall">Mac 卸载应用后，怎么检查残留文件？</summary><div class="ans"><p data-i18n="seo.a.uninstall">在「应用管家」里查看应用及关联文件，卸载前先检查列出的数据；已经移走的应用，可以继续检查残留项目。关联数据可能包含个人设置或需要保留的内容，确认后再清理。MacClean 提供检查与选择，不承诺把每个应用的所有痕迹都彻底删除。</p></div></details><details><summary data-i18n="seo.q.spaceAfter">为什么清理后，Mac 可用空间没有马上增加？</summary><div class="ans"><p data-i18n="seo.a.spaceAfter">普通文件清理会先移入废纸篓，仍占用磁盘空间，这是保留恢复机会的方式。确认文件不再需要后，清空废纸篓才可能真正释放相应空间；这一步无法通过清理记录撤销。macOS 储存空间统计也可能延后更新，快照或共享数据还可能影响最终可用空间，所以移入废纸篓的大小不一定等于立即增加的空间。</p></div></details>
+          <details><summary data-i18n="faq.q1">MacClean 安全吗？会不会删错东西？</summary><div class="ans"><p data-i18n="faq.a1">扫描只读取文件信息，清理前由你查看并选择项目。普通文件先移入废纸篓，清空前可从「清理记录」恢复。清空废纸篓、Docker 清理和删除本地快照无法这样撤销，操作前会单独提示。</p></div></details>
           <details><summary data-i18n="faq.q2">它到底会删除什么？</summary><div class="ans"><p data-i18n="faq.a2">只删除你勾选的项目：应用与浏览器缓存、超过 7 天的日志、旧安装包、邮件附件的本地副本、你选中的设备备份、开发缓存等。每一类都写明了来源，以及删掉后会怎样（比如缓存会在需要时重新生成）。</p></div></details>
           <details><summary data-i18n="faq.q3">清理后怎么撤销？</summary><div class="ans"><p data-i18n="faq.a3">打开 MacClean 的「清理记录」，选择某一次清理，点「恢复」，文件会被放回原来的位置。只要你还没有清空废纸篓，就能恢复。清空之后，还可以用「找回文件」从本地快照或时间机器备份中尝试找回。</p></div></details>
           <details><summary data-i18n="faq.q11">清空了废纸篓，还能找回文件吗？</summary><div class="ans"><p data-i18n="faq.a11">有机会，但不能保证。MacClean 1.1 的「找回文件」可以从 APFS 本地快照和时间机器备份里把文件复制回来：开启时间机器时（或系统更新后），macOS 会保留最近约 24 小时的本地快照。如果文件删除时既不在快照里、也没有备份，就无法找回，MacClean 也不会假装能做到。这时可以看看 iCloud 云盘或「照片」里的「最近删除」。</p></div></details>
           <details><summary data-i18n="faq.q12">怎样提高误删后找回的机会？</summary><div class="ans"><p data-i18n="faq.a12">打开时间机器：它会定期备份，也会让 macOS 保留本地快照。发现误删后尽快找回，本地快照通常只保留约 24 小时。找回之前尽量不要往磁盘写入大量数据（比如下载大文件、安装应用），以免 macOS 为腾出空间提前清理快照。</p></div></details>
           <details><summary data-i18n="faq.q13">安全中心能查杀病毒吗？</summary><div class="ans"><p data-i18n="faq.a13">不能，MacClean 不是杀毒软件。macOS 自带 XProtect 等防护，会在后台检查已知的恶意软件。安全中心做的是检查这些自带防护是否开着、XProtect 的数据是否最新，并列出权限和签名上值得留意的地方，由你决定怎么处理。它只读取，不修改任何设置。</p></div></details>
-          <details><summary data-i18n="faq.q14">重复文件会不会删错？</summary><div class="ans"><p data-i18n="faq.a14">「完全相同的文件」只把内容逐字节相同的文件归为一组，每组都会自动保留一份，整组永远不能全删；你也可以改选保留哪一份。删掉的副本会移到废纸篓，在「清理记录」里一键恢复。</p></div></details>
-          <details><summary data-i18n="faq.q15">微信占了几十 GB，能安全清理吗？</summary><div class="ans"><p data-i18n="faq.a15">可以，用「聊天清理」。它按会话、日期和类型清理微信、QQ 和企业微信里的图片、视频、文件和缓存，从不碰聊天文字记录，也不解密或读取聊天数据库。默认只勾选可以重新生成的缓存和缩略图，收到的文件需要你自己勾选；清理前要先退出聊天应用，文件会移到废纸篓，可以撤销。清理掉的图片和视频在聊天里会显示为「已过期」或「已清理」。</p></div></details>
-          <details><summary data-i18n="faq.q16">「系统数据」为什么这么大？MacClean 能帮我做什么？</summary><div class="ans"><p data-i18n="faq.a16">「系统数据」是 macOS 把很多东西归在一起的结果：本地快照和可清除空间、Spotlight 索引、照片分析缓存、iOS 备份、Xcode 和模拟器、Docker 与虚拟机、本地 AI 模型、应用缓存、日志、虚拟内存等。存储地图的「系统数据」模式会逐项列出它们在你这台 Mac 上的大小，标注正常、偏大或异常及判断标准，并给出安全的下一步，比如 Spotlight 索引异常时去「系统维护」重建。它只读，不会自己删除任何东西；需要管理员权限才能测量的部分会如实标注。</p></div></details>
-          <details><summary data-i18n="faq.q17">本地 AI 模型占了很多空间，删了会怎样？</summary><div class="ans"><p data-i18n="faq.a17">删掉的模型下次用到时需要重新下载，MacClean 会在每一行写明要重新下载多少，并且默认一个都不勾选。Ollama 的多个模型会共用数据文件，可释放空间只计算没有其他模型在用的部分。文件会移到废纸篓，可以撤销；MacClean 不会执行 ollama rm，清理前需要先退出 Ollama。Hugging Face 令牌和你生成的图片不会被碰。</p></div></details>
+          <details><summary data-i18n="faq.q14">Mac 重复文件和相似照片，应该怎么选？</summary><div class="ans"><p data-i18n="faq.a14">完全相同的文件按内容归组，每组至少保留一份，也可以手动改选保留项。相似照片并不一定是重复文件，请逐组预览后再决定。清理普通副本会移入废纸篓，清空前可从「清理记录」恢复。</p></div></details>
+          <details><summary data-i18n="faq.q15">Mac 微信占用太大，怎样清理图片、视频和缓存？</summary><div class="ans"><p data-i18n="faq.a15">打开「聊天清理」，查看微信、QQ 或企业微信的媒体占用，按类型、月份选择不需要的图片、视频、附件和缓存。微信部分媒体支持按会话目录分组，不等于识别联系人姓名；MacClean 不读取聊天数据库。默认只勾选可重新生成的缓存与缩略图，重要附件先另行保存。退出聊天应用后再清理；移走的媒体可能在聊天中显示已过期，废纸篓未清空时可从清理记录恢复。</p></div></details>
+          <details><summary data-i18n="faq.q16">Mac 系统数据占用很大，哪些可以清理？</summary><div class="ans"><p data-i18n="faq.a16">「系统数据」不全是垃圾，可能包含本地快照、备份、Spotlight 索引、开发缓存、本地 AI 模型和虚拟内存。先打开存储地图的「系统数据」视图，查看可测量的分类及大小，再前往对应功能处理不需要的缓存、备份或模型。分析本身只读，不会自动删除系统文件；需要额外权限或无法测量的项目会注明。不要为了让数字变小而删除仍需使用的数据。</p></div></details>
+          <details><summary data-i18n="faq.q17">Ollama、Hugging Face、LM Studio 模型占空间，能删吗？</summary><div class="ans"><p data-i18n="faq.a17">删掉的模型下次用到时需要重新下载，MacClean 会在每一行写明要重新下载多少，并且默认一个都不勾选。Ollama 的多个模型会共用数据文件，可释放空间只计算没有其他模型在用的部分。文件会移到废纸篓，可以撤销；MacClean 不会执行 ollama rm，清理前需要先退出 Ollama。Hugging Face 令牌和你生成的图片不会被碰。</p></div></details>
           <details><summary data-i18n="faq.q18">存储地图的暂存篮怎么用？</summary><div class="ans"><p data-i18n="faq.a18">在文件夹地图里浏览时，把想删的文件或文件夹拖进暂存篮，或者用悬停按钮、右键菜单、按 B 键加入，顶部会实时显示一共能释放多少空间。加入一个文件夹时，里面已经加入的项目会自动合并，不会重复计算；系统目录、主目录下的顶层文件夹和 iCloud 云盘不能加入，会说明原因。确认清单、去掉不想删的之后，一次性移到废纸篓，可以撤销。文稿、桌面、图片里的项目和超过 10 GB 的项目会额外提醒。按空格键可以像访达一样快速查看。</p></div></details>
           <details><summary data-i18n="faq.q4">免费试用有什么限制？</summary><div class="ans"><p data-i18n="faq.a4">首次启动后 7 天内可以使用全部功能。试用结束后，扫描和查看结果仍然免费，清理需要购买许可证。</p></div></details>
           <details><summary data-i18n="sp.q.after">付款后多久能拿到许可证？</summary><div class="ans"><p data-i18n="sp.a.after">我们人工核对收款，通常在 24 小时内发放。付款时请务必在备注里填写付款码，这样我们才能对上你的订单。核对完成后，订单页面会直接显示许可证，打开订单链接或用订单号和邮箱<a href="/order.html">查询</a>即可。</p></div></details>
@@ -108,13 +125,14 @@
           <details><summary data-i18n="sp.q.limit">提示「已达到激活上限」怎么办？</summary><div class="ans"><p data-i18n="sp.a.limit">在不再使用的那台 Mac 上打开 MacClean 设置里的「许可证」，点「在此 Mac 上停用」。如果那台 Mac 已经不在手边，写信告诉我们许可证密钥，我们帮你释放名额。</p></div></details>
           <details><summary data-i18n="faq.q5">可以退款吗？</summary><div class="ans"><p data-i18n="faq.a5">可以。购买后 30 天内，发邮件告诉我们订单号即可全额退款，不需要理由。退款后许可证会被停用。</p></div></details>
           <details><summary data-i18n="faq.q7">为什么需要「完全磁盘访问权限」？</summary><div class="ans"><p data-i18n="faq.a7">macOS 会保护邮件、Safari 等应用的数据目录，没有这项权限，MacClean 看不到这些位置的缓存和历史记录。不授权也能用，只是部分文件扫描不到。授权方法见<a href="/download.html#fda">下载页</a>。</p></div></details>
-          <details><summary data-i18n="faq.q8">第一次打开时提示「无法验证开发者」怎么办？</summary><div class="ans"><p data-i18n="faq.a8">MacClean 目前还没有经过 Apple 公证，所以 macOS 会在第一次打开时拦一下。在「应用程序」文件夹里按住 Control 点按 MacClean，选择「打开」；或者到「系统设置 › 隐私与安全性」里点「仍要打开」。<a href="/download.html#install">查看图解</a>。</p></div></details>
+          <details><summary data-i18n="faq.q8">第一次打开时提示「无法验证开发者」怎么办？</summary><div class="ans"><p data-i18n="faq.a8">当前版本尚未完成 Apple 公证。确认从官网下载、文件未被修改且你信任来源后，先尝试打开一次，再到「系统设置 → 隐私与安全性」点击「仍要打开」并确认。若提示「会损坏电脑」或「已损坏」，请先停止并排查安装包。<a href="/download.html#install">查看完整步骤</a>。</p></div></details>
           <details><summary data-i18n="sp.q.admin">为什么有些操作要输入管理员密码？</summary><div class="ans"><p data-i18n="sp.a.admin">刷新 DNS、重建 Spotlight 索引、删除本地快照等系统维护命令需要管理员权限，这是 macOS 的要求。每条命令旁都标了「需要管理员密码」，只在你点「运行」时才会询问。</p></div></details>
-          <details><summary data-i18n="faq.q9">MacClean 会收集我的数据吗？</summary><div class="ans"><p data-i18n="faq.a9">不会。所有扫描都在你的 Mac 本地完成，文件名、路径、浏览记录都不会离开你的电脑。只有激活许可证和检查更新时会联网，内容见<a href="/privacy.html">隐私政策</a>。</p></div></details>
+          <details><summary data-i18n="faq.q9">MacClean 会收集我的数据吗？</summary><div class="ans"><p data-i18n="faq.a9">文件名、路径、文件内容和扫描结果留在本机。许可证、更新检查等功能需要联网；另有默认关闭的可选使用统计，开启后仅发送随机安装标识、应用与系统版本，以及首次打开、每日活跃和首次完成扫描的事件时间，可随时关闭。详见<a href="/privacy.html">隐私政策</a>。</p></div></details>
           <details><summary data-i18n="sp.q.uninstall">怎么卸载 MacClean？</summary><div class="ans"><p data-i18n="sp.a.uninstall">如果已经激活，先在设置的「许可证」里点「在此 Mac 上停用」，把名额留给别的 Mac。然后退出 MacClean，把它从「应用程序」拖到废纸篓即可。</p></div></details>
         </div>
       </div>
     </section>
+<section class="section tight" id="guides"><div class="wrap"><div class="section-heading"><h2 data-i18n="guides.home.h">按你的空间问题，逐项检查。</h2><p data-i18n="guides.home.p">查看操作步骤、文件用途和清理影响，再决定删除哪些数据。</p></div><ul class="guide-link-list"><li><a href="/guides/mac-system-data-cleanup.html" data-i18n="guides.system">Mac 系统数据太大？先查看哪些内容</a></li><li><a href="/guides/wechat-storage-cleanup.html" data-i18n="guides.wechat">Mac 微信占用太大：先检查媒体，再清理</a></li><li><a href="/guides/xcode-cache-cleanup.html" data-i18n="guides.xcode">Xcode 缓存清理：DerivedData、Archives 与注意事项</a></li></ul><p style="margin-top:24px"><a class="text-link" href="/guides/" data-i18n="guides.all">查看全部清理指南</a></p></div></section>
   </main>
   <!-- @footer -->
   <footer class="footer">
@@ -122,7 +140,7 @@
       <div class="foot-grid">
         <div class="foot-brand">
           <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
-          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+          <p data-i18n="foot.tag">先查看、再确认的 Mac 本地清理工具。</p>
         </div>
         <div>
           <h4 data-i18n="foot.product">产品</h4>
@@ -136,6 +154,7 @@
         <div>
           <h4 data-i18n="foot.help">帮助</h4>
           <ul>
+            <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
             <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
             <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
             <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
@@ -153,10 +172,11 @@
         <span>© 2026 MacClean</span>
         <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
       </div>
+      <p data-i18n="foot.independent" style="margin-top:16px">本产品独立开发，与 iMobie 及其 MacClean 产品无关联。</p>
     </div>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- /@footer -->
-  <script type="module" src="/assets/js/page.js?v=20261002.1"></script>
+  <script type="module" src="/assets/js/page.js?v=20261023.1"></script>
 </body>
 </html>

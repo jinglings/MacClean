@@ -30,6 +30,7 @@ final class SmartCareViewModel: ObservableObject {
 
     @Published private(set) var hasScanned = false
     @Published private(set) var lastScannedAt: Date?
+    private var scanFailed = false
 
     /// 大文件扫描已遍历的条目数（用于进度展示）。
     @Published var largeFileScanProgress = 0
@@ -40,7 +41,10 @@ final class SmartCareViewModel: ObservableObject {
 
     /// 四个模块各自结束时调用，全部结束后记录扫描时间。
     private func moduleFinished() {
-        if !isScanningAny { lastScannedAt = Date() }
+        if !isScanningAny {
+            lastScannedAt = Date()
+            if !scanFailed { UsageAnalytics.shared.recordScanCompleted() }
+        }
     }
 
     // MARK: - 扫描
@@ -49,6 +53,7 @@ final class SmartCareViewModel: ObservableObject {
         guard !isScanningAny else { return }
 
         hasScanned = true
+        scanFailed = false
         isScanningJunk = true
         isScanningDuplicates = true
         isScanningLargeFiles = true
@@ -77,8 +82,17 @@ final class SmartCareViewModel: ObservableObject {
                 home.appendingPathComponent("Desktop"),
                 home.appendingPathComponent("Downloads"),
             ]
-            let items = IgnoreList.filter((try? await DuplicateFinder.findDuplicates(in: directories)) ?? [])
+            let items: [CleanableItem]
+            let succeeded: Bool
+            do {
+                items = IgnoreList.filter(try await DuplicateFinder.findDuplicates(in: directories))
+                succeeded = true
+            } catch {
+                items = []
+                succeeded = false
+            }
             await MainActor.run {
+                if !succeeded { self?.scanFailed = true }
                 self?.duplicateItems = items
                 self?.isScanningDuplicates = false
                 self?.moduleFinished()
@@ -87,13 +101,22 @@ final class SmartCareViewModel: ObservableObject {
 
         largeFileScanProgress = 0
         Task.detached(priority: .userInitiated) { [weak self] in
-            let found = (try? await LargeFileFinder.findLargeFiles(under: home, progress: { count in
-                Task { @MainActor [weak self] in
-                    self?.largeFileScanProgress = count
-                }
-            })) ?? []
+            let found: [CleanableItem]
+            let succeeded: Bool
+            do {
+                found = try await LargeFileFinder.findLargeFiles(under: home, progress: { count in
+                    Task { @MainActor [weak self] in
+                        self?.largeFileScanProgress = count
+                    }
+                })
+                succeeded = true
+            } catch {
+                found = []
+                succeeded = false
+            }
             let items = IgnoreList.filter(found)
             await MainActor.run {
+                if !succeeded { self?.scanFailed = true }
                 self?.largeFileItems = items
                 self?.isScanningLargeFiles = false
                 self?.moduleFinished()

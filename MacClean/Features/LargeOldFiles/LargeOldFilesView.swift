@@ -84,6 +84,7 @@ final class LargeOldFilesViewModel: ObservableObject {
         isScanning = false
         hasScanned = true
         lastScannedAt = Date()
+        UsageAnalytics.shared.recordScanCompleted()
         pruneSelection()
     }
 

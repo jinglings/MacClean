@@ -197,7 +197,10 @@ final class CleanGroupsViewModel: ObservableObject {
         groups[index].items = items
         groups[index].isScanning = false
         groups[index].hasScanned = true
-        if !isScanning { lastScannedAt = Date() }
+        if !isScanning {
+            lastScannedAt = Date()
+            UsageAnalytics.shared.recordScanCompleted()
+        }
         refreshRunningApps()
     }
 

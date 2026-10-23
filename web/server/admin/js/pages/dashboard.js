@@ -35,11 +35,14 @@ export default {
 
     async function load() {
       try {
-        const [{ totals: t, series }, summary] = await Promise.all([get('/api/admin/stats'), get('/api/admin/orders/summary')]);
+        const [{ totals: t, series, usage: u }, summary] = await Promise.all([get('/api/admin/stats'), get('/api/admin/orders/summary')]);
         const sum = (key, days = 30) => series.slice(-days).reduce((n, d) => n + (Number(d[key]) || 0), 0);
         const revenueKeys = [{ key: 'revenue', label: '收入', color: MINT, color2: TEAL }];
         const dlKeys = [{ key: 'downloads', label: '下载次数', color: TEAL }, { key: 'uniqueDownloads', label: '独立 IP', color: MINT, dashed: true }];
         const actKeys = [{ key: 'activations', label: '新激活', color: MINT }];
+        const usageKeys = [{ key: 'firstOpens', label: '首次打开', color: TEAL },
+          { key: 'dailyActive', label: '每日活跃', color: MINT },
+          { key: 'firstScans', label: '首次完成扫描', color: '#8B5CF6', dashed: true }];
 
         append(clear(body),
           h('div', { class: 'kpis' },
@@ -50,11 +53,20 @@ export default {
             kpi({ label: '今日收入', value: fmtMoney(t.revenueToday), iconName: 'yuan', foot: `近 30 天 ${fmtMoney(sum('revenue'))}` }),
             kpi({ label: '累计收入', value: fmtMoney(t.revenueTotal), iconName: 'yuan', tone: 'teal', foot: `${fmtInt(t.ordersPaid)} 笔已付款订单` }),
             kpi({ label: '已售许可证', value: fmtInt(t.licensesSold), iconName: 'key', foot: `共 ${fmtInt(t.licensesTotal)} 个（含手动签发）`, href: '#/licenses' }),
-            kpi({ label: '活跃设备', value: fmtInt(t.activeDevices), iconName: 'laptop', tone: 'teal', foot: `近 7 天联网校验 ${fmtInt(t.devicesSeen7d)} 台` }),
+            kpi({ label: '已激活设备', value: fmtInt(t.activeDevices), iconName: 'laptop', tone: 'teal', foot: `近 7 天联网校验 ${fmtInt(t.devicesSeen7d)} 台` }),
             kpi({ label: '今日下载', value: fmtInt(t.downloadsToday), iconName: 'download', foot: `独立 IP ${fmtInt(t.uniqueDownloadsToday)}` }),
             kpi({ label: '近 7 日下载', value: fmtInt(t.downloads7d), iconName: 'download', tone: 'teal', foot: `近 30 天 ${fmtInt(sum('downloads'))}` }),
-            kpi({ label: '累计下载', value: fmtInt(t.downloadsTotal), iconName: 'releases', foot: '统计 /download/latest 次数', href: '#/releases' })),
+            kpi({ label: '累计下载请求', value: fmtInt(t.downloadsTotal), iconName: 'releases', foot: '请求下载链接，不代表下载完成或安装', href: '#/releases' })),
+          h('div', { class: 'card', style: { padding: '20px' } },
+            h('h3', { class: 'card-title' }, '使用统计（自愿开启）'),
+            h('p', { class: 'card-sub' }, '仅覆盖新版中主动开启使用统计的用户；随机安装标识去重，不等于全部安装人数。首次打开是首次收到上报，可能来自升级用户；旧版本无法追溯。每日活跃指启动或切回前台。日期按后台业务时区统计。')),
+          h('div', { class: 'kpis' },
+            kpi({ label: '累计首次打开', value: fmtInt(u.firstOpensTotal), iconName: 'laptop', foot: `今日 ${fmtInt(u.firstOpensToday)}` }),
+            kpi({ label: '今日活跃', value: fmtInt(u.dailyActiveToday), iconName: 'laptop', tone: 'teal', foot: `近 7 日去重活跃 ${fmtInt(u.active7d)}` }),
+            kpi({ label: '累计首次完成扫描', value: fmtInt(u.firstScansTotal), iconName: 'check', foot: `今日 ${fmtInt(u.firstScansToday)} · 取消或失败不计入` })),
           h('div', { class: 'charts' },
+            chartCard('打开与扫描', '近 30 天 · 仅包含开启使用统计的用户', usageKeys,
+              chart({ series, kind: 'line', keys: usageKeys, format: (v) => fmtInt(v) }), true),
             chartCard('收入', '近 30 天，按确认收款日期', revenueKeys,
               chart({ series, kind: 'bar', keys: revenueKeys, format: (v, axis) => (axis ? `¥${fmtInt(v)}` : fmtMoney(v)) })),
             pendingCard(summary.latest, t.ordersPending),

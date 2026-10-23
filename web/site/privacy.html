@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-site-locale="zh">
 <head>
   <meta charset="utf-8">
   <title data-i18n="pv.title">隐私政策 · MacClean</title>
@@ -15,18 +15,34 @@
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
   <meta property="og:site_name" content="MacClean">
   <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
-  <link rel="stylesheet" href="/assets/css/site.css?v=20261002.1">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+  <link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
   <script>
     (function () {
       var d = document.documentElement, l = null;
       d.className += ' js';
-      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      l = d.dataset.siteLocale || null;
+      if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
       if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
       d.lang = l === 'zh' ? 'zh-CN' : 'en';
-      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+      if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
     })();
   </script>
   <!-- /@head -->
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/privacy.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/privacy.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/privacy.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/privacy.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/privacy.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="隐私政策 · MacClean" data-i18n-attr="content:pv.title">
+  <meta property="og:description" content="MacClean 的隐私政策：扫描在本地完成，文件信息不会上传。" data-i18n-attr="content:pv.desc">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"WebPage","@id":"https://thulem.com/privacy.html#webpage","url":"https://thulem.com/privacy.html","name":"隐私政策 · MacClean","description":"MacClean 的隐私政策：扫描在本地完成，文件信息不会上传。","inLanguage":"zh-CN","isPartOf":{"@id":"https://thulem.com/#website"}}]}</script>
+  <!-- /@seo -->
 </head>
 <body data-page="privacy">
   <!-- @nav -->
@@ -43,12 +59,13 @@
         <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
         <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
         <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
         <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
       </ul>
       <div class="nav-end">
-        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+        <a class="lang-btn" href="/en/privacy.html" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
           <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
-        </button>
+        </a>
         <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-i18n="nav.cta">免费下载</a>
         <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
           <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
@@ -67,7 +84,7 @@
     </section>
     <div class="wrap">
       <article class="doc">
-        <p class="updated" data-i18n="doc.updated">最后更新：2026 年 10 月 1 日</p>
+        <p class="updated" data-i18n="pv.updated">最后更新：2026 年 10 月 23 日</p>
 
         <h2 data-i18n="pv.h.app">MacClean 应用</h2>
         <p data-i18n="pv.app1">MacClean 的扫描、分析和清理全部在你的 Mac 本地完成。文件名、路径、文件内容、照片、浏览记录和扫描结果都不会离开你的电脑。应用里没有广告，也没有第三方统计或崩溃上报 SDK。</p>
@@ -78,7 +95,11 @@
           <li data-i18n="pv.net2"><b>检查 MacClean 更新</b>：向 thulem.com 请求更新信息，请求中包含当前版本号。</li>
           <li data-i18n="pv.net3"><b>检查其他应用的更新</b>（仅在「应用管家」里使用这个功能时）：访问这些应用的开发者自己提供的更新地址，与这些应用自己检查更新时的请求相同。</li>
           <li data-i18n="pv.net4"><b>安全中心检查证书是否被吊销</b>：macOS 会联系 Apple 的证书状态服务，与系统打开应用时做的检查相同。其余检查都在本地读取系统设置、权限记录和签名信息。</li>
+          <li data-i18n="pv.net5"><b>可选的使用统计（默认关闭）</b>：仅在你主动开启后，向 thulem.com 发送随机安装标识、MacClean 版本、macOS 版本，以及首次成功打开、每日活跃和首次完成扫描的事件名称与时间。每日活跃指启动或切回前台；空结果的成功扫描也会计入，取消或失败不会计入。不会发送文件名、路径、内容、扫描结果、电脑名称、硬件序列号或许可证密钥。统计与订单、许可证记录分开保存，事件表不保存 IP，随机标识在服务端加密散列后用于去重。</li>
         </ul>
+
+        <p data-i18n="pv.usageControl">你可以在首次引导或「设置 → 通用 → 隐私 → 分享使用统计」中开启或关闭。关闭会取消正在发送的请求、停止后续上报并清空尚未发送的事件，但无法撤回服务器已经收到的事件。随机标识与已发送记录的去重标记仍保存在本机，避免重复计数。离线事件在本机最多保留 30 天，并在开启统计时重试发送；关闭期间的活动不补报。</p>
+        <p data-i18n="pv.usageLimits">这些统计用于了解成功打开、日常使用与首次完成扫描的情况，只覆盖支持统计且主动开启的版本；首次收到上报也可能来自升级用户，不代表新安装。旧版本的安装情况无法追溯，下载请求也不能证明下载完成或安装成功。</p>
 
         <h2 data-i18n="pv.h.site">网站与购买</h2>
         <ul>
@@ -102,7 +123,7 @@
       <div class="foot-grid">
         <div class="foot-brand">
           <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
-          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+          <p data-i18n="foot.tag">先查看、再确认的 Mac 本地清理工具。</p>
         </div>
         <div>
           <h4 data-i18n="foot.product">产品</h4>
@@ -116,6 +137,7 @@
         <div>
           <h4 data-i18n="foot.help">帮助</h4>
           <ul>
+            <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
             <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
             <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
             <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
@@ -133,10 +155,11 @@
         <span>© 2026 MacClean</span>
         <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
       </div>
+      <p data-i18n="foot.independent" style="margin-top:16px">本产品独立开发，与 iMobie 及其 MacClean 产品无关联。</p>
     </div>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- /@footer -->
-  <script type="module" src="/assets/js/page.js?v=20261002.1"></script>
+  <script type="module" src="/assets/js/page.js?v=20261023.1"></script>
 </body>
 </html>

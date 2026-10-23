@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN" data-site-locale="zh">
+<head>
+  <meta charset="utf-8">
+  <title>Mac Xcode 缓存清理：DerivedData 与归档怎么选 | MacClean</title>
+  <meta name="description" content="区分 Xcode DerivedData、设备符号、SwiftPM 缓存和 Archives。按项目清理可重建数据，保留发布归档与 dSYM，并了解重建成本和恢复边界。">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:site_name" content="MacClean">
+<meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+<link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+<script>
+  (function () {
+    var d = document.documentElement, l = null;
+    d.className += ' js';
+    l = d.dataset.siteLocale || null;
+    if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
+    if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+    d.lang = l === 'zh' ? 'zh-CN' : 'en';
+    if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+  })();
+</script>
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/guides/xcode-cache-cleanup.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/guides/xcode-cache-cleanup.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/guides/xcode-cache-cleanup.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/guides/xcode-cache-cleanup.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/guides/xcode-cache-cleanup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mac Xcode 缓存清理：DerivedData 与归档怎么选 | MacClean">
+  <meta property="og:description" content="区分 Xcode DerivedData、设备符号、SwiftPM 缓存和 Archives。按项目清理可重建数据，保留发布归档与 dSYM，并了解重建成本和恢复边界。">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/guides/xcode-cache-cleanup.html#webpage","url":"https://thulem.com/guides/xcode-cache-cleanup.html","name":"Mac Xcode 缓存清理：DerivedData 与归档怎么选 | MacClean","description":"区分 Xcode DerivedData、设备符号、SwiftPM 缓存和 Archives。按项目清理可重建数据，保留发布归档与 dSYM，并了解重建成本和恢复边界。","inLanguage":"zh-CN","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"删除 DerivedData 会删除项目源码吗？","acceptedAnswer":{"@type":"Answer","text":"默认 DerivedData 保存构建派生数据，MacClean 按该路径清理。请先确认实际路径；如果自行把独有文件放进其中，工具不会知道哪些内容无法重建。"}},{"@type":"Question","name":"Archives 可以像缓存一样重新生成吗？","acceptedAnswer":{"@type":"Answer","text":"不能保证。归档可能包含已发布构建和匹配 dSYM，重新编译不保证产生相同 UUID。保留仍需分发或分析崩溃的归档。"}},{"@type":"Question","name":"为什么清理后第一次构建更慢？","acceptedAnswer":{"@type":"Answer","text":"构建工具需要重新生成中间数据、索引或获取依赖。先完成一次实际构建验证，再判断结果。"}},{"@type":"Question","name":"清理记录能保证撤销吗？","acceptedAnswer":{"@type":"Answer","text":"不能保证。文件需仍在废纸篓，原路径需可写且没有冲突；Xcode 已重新生成同名目录时，恢复可能失败。"}}],"breadcrumb":{"@id":"https://thulem.com/guides/xcode-cache-cleanup.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://thulem.com/guides/xcode-cache-cleanup.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://thulem.com/"},{"@type":"ListItem","position":2,"name":"清理指南","item":"https://thulem.com/guides/"},{"@type":"ListItem","position":3,"name":"Mac Xcode 缓存清理：DerivedData 与归档怎么选 | MacClean","item":"https://thulem.com/guides/xcode-cache-cleanup.html"}]}]}</script>
+  <!-- /@seo -->
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+<div class="announce" id="announce" hidden></div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="MacClean">
+      <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+      <span>MacClean</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+      <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+      <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+      <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+      <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
+      <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+    </ul>
+    <div class="nav-end">
+      <a class="lang-btn" href="/en/guides/xcode-cache-cleanup.html" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+      </a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-i18n="nav.cta">免费下载</a>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero guide-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="当前位置"><a href="/">首页</a><span>/</span><a href="/guides/">清理指南</a></nav><h1>Xcode 占用太大：哪些缓存可以清理，哪些归档应保留？</h1><p>开发数据并非都能无代价地重建。DerivedData 是构建中间数据，Archives 则可能保存已发布构建及匹配的 dSYM。MacClean 的「开发缓存」把它们分别列出，便于按项目和用途选择。</p></div></section>
+<div class="wrap"><article class="doc guide"><nav class="guide-toc" aria-label="本页内容"><strong>本页内容</strong><ol><li><a href="#separate-data">先区分构建数据、设备符号和发布归档</a></li><li><a href="#scan-projects">在开发缓存中按项目检查</a></li><li><a href="#review-defaults">理解默认勾选，不把默认当成备份</a></li><li><a href="#verify-build">清理后验证实际开发流程</a></li><li><a href="#recover">恢复与真正腾出空间的区别</a></li></ol></nav>
+<figure class="guide-shot"><img src="/assets/img/screens/native/light-zh-developer_tools.webp" width="1600" height="1030" alt="Xcode 占用太大：哪些缓存可以清理，哪些归档应保留？ — MacClean" decoding="async" loading="lazy"><figcaption>MacClean 界面示例。图中大小仅作界面展示，以你的实际扫描结果为准。</figcaption></figure>
+<section id="separate-data"><h2>先区分构建数据、设备符号和发布归档</h2><p>DerivedData：MacClean 扫描默认路径 ~/Library/Developer/Xcode/DerivedData，按子目录列出项目。删除后，下次构建会生成所需的中间数据；重新构建和索引可能需要额外时间。</p>
+<p>设备符号：iOS、watchOS、tvOS 和 visionOS 的 DeviceSupport 项用于对应系统版本的调试。Apple 说明系统符号与系统版本和架构有关。如果仍需要调试旧设备或分析旧版本问题，不应只凭日期清掉符号。</p>
+<p>Archives：默认路径 ~/Library/Developer/Xcode/Archives 中的归档可能含发布构建与 dSYM。Apple 说明二进制与其 dSYM 通过构建 UUID 匹配。再次编译不保证得到原发布构建需要的符号，应保留仍在使用的发布归档。</p>
+<p>SwiftPM、Xcode、文档和模拟器缓存也有各自的条目。包缓存清理后可能需要重新获取依赖；离线开发或即将演示时，要考虑重建与下载是否可行。</p></section>
+<section id="scan-projects"><h2>在开发缓存中按项目检查</h2><p>打开 MacClean →「开发缓存」并扫描，再查看「Xcode 开发」分类。列表按占用排序，可以查看 DerivedData 项目的名称、大小、路径和说明。这里的项目名称从目录名推断，实际路径才是确认目标的依据。</p>
+<p>扫描依据工具已知的默认目录。如果你在 Xcode 或构建脚本中自定义了 DerivedData 的位置，自定义路径可能不出现在这份列表中。Apple 的 Xcode 发布说明也采用逐项目清理默认 DerivedData 路径的做法；不要因此认为整个 Developer 文件夹都应删除。</p>
+<p>MacClean 的开发缓存页还会扫描其他开发工具和闲置项目依赖。只想处理 Xcode 时，清理前取消其他分类中不准备处理的选项。</p><ol><li>保存工作，停止构建并退出 Xcode 和 Simulator。</li><li>扫描「开发缓存」，查看 Xcode 分类和具体路径。</li><li>先选择不再需要的项目 DerivedData，保留当前需要的设备符号。</li><li>逐项检查已选汇总，单独审查 Archives，再确认清理。</li></ol></section>
+<section id="review-defaults"><h2>理解默认勾选，不把默认当成备份</h2><p>DerivedData、Xcode 缓存和部分可重建项默认选中。对设备符号，MacClean 按最近修改时间默认保留一项；这不是根据你连接的设备判断兼容版本，也不保证其他版本的符号没有用途。</p>
+<p>Archives 默认不选中。需要清理旧归档时，先确认发布、导出和崩溃分析是否仍需要它，并把应保留的归档另存到备份。开发缓存里的模拟器缓存条目也不能代表所有模拟器设备和运行时数据。</p></section>
+<section id="verify-build"><h2>清理后验证实际开发流程</h2><p>重新打开需要的项目，完成一次构建和正常的测试流程。如果你使用 Swift 包，确认依赖能重新解析；如果要连接设备调试，确认所需设备和系统版本仍能使用。</p>
+<p>第一次构建、索引或依赖下载变慢可能是缓存重建的成本。清理是为了处理确认的磁盘占用，不保证所有构建问题都会因此修复，也不保证持续加快开发工具。</p>
+<p>检查被清理项目是否只是缓存，而没有包含手工保存在默认缓存目录里的独有文件。对无法重建的资料，必须先另存或备份。</p></section>
+<section id="recover"><h2>恢复与真正腾出空间的区别</h2><p>常规开发缓存清理会把选中项目或目录内容移入废纸篓。有记录时，可以从「清理记录」恢复仍在废纸篓中的条目；恢复时原路径如果已被 Xcode 重建，同名冲突可能导致失败。先退出相关工具并查看失败提示，不要假定撤销一定成功。</p>
+<p>废纸篓中的文件仍然占用磁盘。确认项目构建、调试和重要归档都正常后，再决定清空废纸篓。清空是永久删除，清理记录不能恢复已经消失的条目。最后核对 Mac 可用空间与重新扫描结果。</p></section><section><h2>常见问题</h2><div class="faq"><details><summary>删除 DerivedData 会删除项目源码吗？</summary><div class="ans"><p>默认 DerivedData 保存构建派生数据，MacClean 按该路径清理。请先确认实际路径；如果自行把独有文件放进其中，工具不会知道哪些内容无法重建。</p></div></details>
+<details><summary>Archives 可以像缓存一样重新生成吗？</summary><div class="ans"><p>不能保证。归档可能包含已发布构建和匹配 dSYM，重新编译不保证产生相同 UUID。保留仍需分发或分析崩溃的归档。</p></div></details>
+<details><summary>为什么清理后第一次构建更慢？</summary><div class="ans"><p>构建工具需要重新生成中间数据、索引或获取依赖。先完成一次实际构建验证，再判断结果。</p></div></details>
+<details><summary>清理记录能保证撤销吗？</summary><div class="ans"><p>不能保证。文件需仍在废纸篓，原路径需可写且没有冲突；Xcode 已重新生成同名目录时，恢复可能失败。</p></div></details></div></section><section><h2>参考资料</h2><ul><li><a href="https://developer.apple.com/documentation/xcode-release-notes/xcode-26-release-notes">Apple：Xcode 26 发布说明中的 DerivedData 路径</a></li><li><a href="https://developer.apple.com/documentation/xcode/adding-identifiable-symbol-names-to-a-crash-report">Apple：为崩溃报告添加可识别的符号名称</a></li><li><a href="https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information">Apple：构建包含调试信息的应用</a></li><li><a href="https://support.apple.com/guide/mac-help/mchlp1093/mac">Apple：在 Mac 上删除文件和文件夹</a></li></ul></section>
+<section class="guide-cta"><h2>下载 MacClean</h2><p>下载 MacClean，用「开发缓存」按项目查看 Xcode 占用，先处理确认可以重建的内容。</p><p><a class="btn btn-primary" href="/download.html">下载 MacClean</a></p><p><a href="/support.html">安装说明与常见问题</a></p></section>
+<aside><h2>继续阅读</h2><ul><li><a href="/guides/mac-system-data-cleanup.html">Mac 系统数据太大，应该从哪里清理？</a></li><li><a href="/guides/wechat-storage-cleanup.html">Mac 微信占用太大，如何选择要清理的文件？</a></li></ul></aside></article></div></main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+        <p data-i18n="foot.tag">先查看、再确认的 Mac 本地清理工具。</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.product">产品</h4>
+        <ul>
+          <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+          <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+          <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+          <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.help">帮助</h4>
+        <ul>
+          <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
+          <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+          <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+          <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.legal">条款</h4>
+        <ul>
+          <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+          <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MacClean</span>
+      <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+    </div>
+    <p data-i18n="foot.independent" style="margin-top:16px">本产品独立开发，与 iMobie 及其 MacClean 产品无关联。</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/assets/js/page.js?v=20261007.1"></script>
+</body>
+</html>

@@ -2,6 +2,7 @@ import path from 'node:path';
 import { buildAppcast } from '../appcast.js';
 import { HttpError, enforceLimit, redirect, sendJson, sendText } from '../http.js';
 import { safeJoin, serveFile } from '../static.js';
+import { recordUsage } from '../usage.js';
 import {
   createOrder, latestRelease, notifyPaid, orderForBuyer, publicConfig, publicOrder, recordDownload,
 } from '../store.js';
@@ -9,6 +10,11 @@ import {
 export function publicRoutes({ db, config, limiters }) {
   return [
     ['GET', '/api/health', () => ({ ok: true })],
+
+    ['POST', '/api/usage/events', ({ body, ip }) => {
+      enforceLimit(limiters.usage, ip);
+      return recordUsage(db, config, body);
+    }],
 
     ['GET', '/api/public/config', ({ res }) => {
       // Short shared cache: Cloudflare/browsers can hold it briefly, edits show up within a minute.

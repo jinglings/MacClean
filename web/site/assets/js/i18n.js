@@ -12,39 +12,69 @@
 // dev/check-i18n.mjs verifies that every key used anywhere has both languages.
 
 export const EN = {
+  "dl.noticeH": "Blocked by a “developer cannot be verified” alert?",
+  "dl.noticeP": "This release has not been notarized by Apple. Continue only if you downloaded it from this site, the package has not been altered, and you trust its source.",
+  "dl.noticeLink": "See the four steps for the first launch",
+  "dl.done": "Done",
+  "dl.confirmT": "Do you want to open MacClean?",
+  "dl.warningH": "If macOS says “will damage your computer” or “is damaged”",
+  "dl.warningP": "Stop opening the app. Check that it came from the official site, downloaded completely, and has no signing problems. These alerts must not be treated as ordinary unsigned-app warnings. If a fresh download has the same problem, contact support with a screenshot.",
+  "dl.appleHelp": "Read Apple’s official safety guidance",
+  "pv.updated": "Last updated: October 23, 2026",
+  "pv.net5": "<b>Optional usage statistics (off by default)</b>: only after you enable them, MacClean sends thulem.com a random installation ID, MacClean and macOS versions, and event names and timestamps for first successful open, daily activity and the first completed scan. Daily activity means launching or using the app in the foreground. A completed scan with no results counts; cancelled or failed scans do not. No file names, paths, contents, scan results, computer names, hardware serial numbers or license keys are sent. Statistics are stored separately from orders and licenses. The event table does not store IP addresses, and installation IDs are keyed-hashed on the server for deduplication.",
+  "pv.usageControl": "Enable or disable this in the welcome guide or Settings → General → Privacy → Share usage statistics. Turning it off cancels in-flight requests, stops future reporting and clears unsent events; it cannot retract events already received by the server. The random ID and deduplication markers for sent events remain on your Mac to avoid recounting. Offline events stay locally for up to 30 days and are retried while statistics are enabled. Activity while disabled is not reported later.",
+  "pv.usageLimits": "These statistics help us understand successful launches, daily use and first completed scans. They cover only supported versions whose users opted in. The first report may come from an upgrade and is not evidence of a new installation. Older versions cannot be measured retrospectively, and a download request does not prove a completed download or installation.",
+
+  'nav.guides': 'Guides',
+  'guides.home.h': 'Start with the storage problem you see.',
+  'guides.home.p': 'Follow the steps, review the files and understand what cleanup changes.',
+  'guides.system': 'Mac System Data: what to check before cleaning',
+  'guides.wechat': 'WeChat storage on Mac: review media before removing it',
+  'guides.xcode': 'Xcode caches: DerivedData, Archives and cleanup limits',
+  'guides.all': 'All cleanup guides',
+  "seo.a.spaceAfter": "Ordinary cleanup moves files to the Trash, where they still occupy disk space so you can restore them. Emptying the Trash after confirming you no longer need the files may release that space; this cannot be undone through Cleanup History. macOS storage figures may also update later, and snapshots or shared data can affect the result. Bytes moved to the Trash do not necessarily equal an immediate increase in available space.",
+  "seo.q.spaceAfter": "Why has available space not increased immediately after cleanup?",
+  "seo.a.uninstall": "Use App Manager to review an app and its associated files before uninstalling it. If the app has already been removed, review the leftover items. Related data can include preferences or content you want to keep, so inspect it before cleaning. MacClean supports review and selection; it does not promise to erase every trace of every app.",
+  "seo.q.uninstall": "How do I check for leftovers after uninstalling a Mac app?",
+  "seo.a.cache": "Caches are often regenerated as you use apps again, so the next launch or project build may take longer. Caches, login cookies, received chat files and device backups serve different purposes and should not all be treated as junk. MacClean lists these categories separately. Read the notes, quit the relevant apps, and select only what you no longer need.",
+  "seo.q.cache": "Will clearing Mac caches affect my apps?",
+  "seo.a.xcode": "In Developer Tools, review the size and notes for Xcode DerivedData, npm, pip and Gradle caches. Quit the relevant tools before selecting unwanted items. Removing build caches can require rebuilding or downloading dependencies again. Xcode Archives contain release archives and debug symbols; they are not ordinary caches and are not selected by default.",
+  "seo.q.xcode": "Can I clean Xcode DerivedData and developer caches?",
+  "seo.a.space": "Start with Storage Map to see which folders use the most space, then review chat media, app caches, old installers, duplicates and developer caches. Keep work files, important attachments and backups you still need. Only select items you no longer need. MacClean shows scan results from your Mac; reclaimable space depends on the actual files, with no fixed GB guarantee.",
+  "seo.q.space": "What should I clean first when my Mac storage is full?",
   "new.eyebrow": "MacClean \u00b7 Made for macOS",
-  "new.h1a": "See what takes up space.",
-  "new.h1b": "Keep what matters.",
-  "new.intro": "Chat media, developer caches, duplicate files. Find what is taking up space, review the details, and choose what to remove.",
+  "new.h1a": "Free up space",
+  "new.h1b": "on your Mac.",
+  "new.intro": "MacClean shows what is taking up disk space. Remove unwanted WeChat photos and videos, app caches and duplicate files to make room for your work and new downloads. Review each item before cleaning.",
   "new.explore": "Explore the features",
   "new.preview": "New interface preview \u00b7 Screenshot data is illustrative",
   "new.tab0": "Chat cleanup",
-  "new.f0.h": "Clean up chat media, not the whole app.",
-  "new.f0.p": "Browse WeChat, QQ and WeCom media by type and month. WeChat also groups supported media by conversation folder, with your own labels. Message databases are never read.",
-  "new.f0.note": "Only regenerable caches are preselected. You choose which received files to remove.",
+  "new.f0.h": "Clean up WeChat storage on your Mac.",
+  "new.f0.p": "Review photos, videos, files and caches from WeChat, QQ and WeCom by type and month. Choose media you no longer need. Supported WeChat media can be grouped by conversation folder with your own labels; message databases are not read.",
+  "new.f0.note": "Removed media may no longer open in the chat. Keep important attachments before cleaning.",
   "new.tab1": "Storage map",
-  "new.f1.h": "From the whole disk to one folder.",
-  "new.f1.p": "Explore folder sizes and collect items in a cleanup basket. System Data explains space used by snapshots, backups and caches.",
+  "new.f1.h": "Analyze disk usage and understand System Data.",
+  "new.f1.p": "When your Mac is running low on storage, explore folder sizes in Storage Map to locate large files. The System Data view breaks down snapshots, backups and caches so you can decide what to inspect next.",
   "new.f1.note": "Review the list before confirming. Press Space for Quick Look.",
   "new.tab2": "Developer caches",
-  "new.f2.h": "Keep your projects. Clear the build leftovers.",
-  "new.f2.p": "Review Xcode, npm, pip and Gradle caches, plus local models from Ollama, Hugging Face and LM Studio.",
+  "new.f2.h": "Clean Xcode caches and review local AI models.",
+  "new.f2.p": "Review Xcode DerivedData, npm, pip and Gradle caches, plus local models from Ollama, Hugging Face and LM Studio. Choose what to remove by size and purpose instead of deleting all developer data.",
   "new.f2.note": "Models are never preselected and need downloading again after removal.",
   "new.tab3": "Reclaim space",
-  "new.f3.h": "Know what each item is before removing it.",
-  "new.f3.p": "Caches, old logs, installers, Mail attachments and device backups are listed separately, with their source and the effect of removing them.",
+  "new.f3.h": "Review Mac caches, logs and old installers.",
+  "new.f3.p": "App caches, old logs, installers, Mail attachments and device backups are listed separately. Review their source and cleanup impact, then choose items you no longer need.",
   "new.f3.note": "Items that need extra care, such as device backups, are not preselected.",
   "new.tab4": "App manager",
-  "new.f4.h": "The app, and the files it leaves behind.",
-  "new.f4.p": "See the space used by apps and their related files. Uninstall unused apps, review leftovers, and check updates for apps that support Sparkle.",
+  "new.f4.h": "Uninstall Mac apps and review leftover files.",
+  "new.f4.p": "See the space used by an app and its related files. Uninstall unused apps and review leftovers from apps already removed. Inspect the associated data before confirming cleanup.",
   "new.f4.note": "Review related files before confirming an uninstall.",
   "new.tab5": "Duplicates & photos",
-  "new.f5.h": "Find the copies. Choose what to keep.",
-  "new.f5.p": "Find identical files and similar photos. Keep one in each group, and change the suggested choice whenever you need.",
+  "new.f5.h": "Find duplicate files and organize similar photos.",
+  "new.f5.p": "Review repeated downloads, duplicate documents and similar photos in groups. Distinguish identical copies from similar images, then inspect each group and keep the files you want.",
   "new.f5.note": "At least one copy in each duplicate group is always kept.",
   "new.features.label": "EVERYDAY MAINTENANCE",
-  "new.features.h": "Start where the space goes.",
-  "new.features.p": "Choose a feature to see how it works.",
+  "new.features.h": "From disk space analysis to cleanup.",
+  "new.features.p": "Too much WeChat storage, confusing System Data or growing developer caches? Choose a feature to review disk usage and understand what cleanup changes.",
   "new.extra0.h": "Browser privacy",
   "new.extra0.p": "Clear history, cookies and sessions, while keeping passwords and bookmarks.",
   "new.extra1.h": "Menu bar",
@@ -62,8 +92,8 @@ export const EN = {
   "new.safety.note": "Emptying the Trash, Docker cleanup and deleting local snapshots cannot be undone through Cleanup History; these actions have separate warnings. MacClean is not antivirus software and does not promise a faster computer.",
   "new.privacy": "Read about privacy and network access",
   "new.help": "More help",
-  "new.last.h": "Take a look at your Mac.",
-  "new.last.p": "Download and scan. No account required.",
+  "new.last.h": "Find out what is taking up space.",
+  "new.last.p": "Download MacClean for a free scan of disk usage. Review items before cleaning; no account required.",
 
   /* nav & footer */
   'nav.skip': 'Skip to content',
@@ -76,7 +106,7 @@ export const EN = {
   'nav.langLabel': '切换到中文',
   'nav.cta': 'Download free',
   'nav.menu': 'Menu',
-  'foot.tag': 'Safe, transparent, undoable cleaning for your Mac. All on device.',
+  'foot.tag': 'A local Mac utility. Review the files before you clean.',
   'foot.product': 'Product',
   'foot.buy': 'Buy',
   'foot.help': 'Help',
@@ -87,12 +117,13 @@ export const EN = {
   'foot.privacy': 'Privacy policy',
   'foot.terms': 'Terms & refunds',
   'foot.mac': 'macOS is a trademark of Apple Inc. MacClean is not affiliated with Apple.',
+  'foot.independent': 'MacClean is independently developed and is not affiliated with iMobie or its MacClean product.',
   'cta.download': 'Download free',
   'cta.buy': 'Buy a license',
 
   /* home */
-  'home.title': 'MacClean: safe, transparent, undoable Mac cleaning',
-  'home.desc': 'MacClean scans your Mac locally for caches, logs, duplicates and developer leftovers. Ordinary file cleanup moves items to the Trash, where they can be restored before it is emptied. For macOS 14 and later, Apple silicon and Intel.',
+  "home.title": "MacClean — Mac Cleaner, Disk Space Analyzer & WeChat Cleanup",
+  "home.desc": "Running out of Mac storage? Analyze disk usage, clean WeChat media and Xcode caches, find duplicate files, and uninstall apps with leftover review. Free scans and a 7-day full trial. macOS 14+.",
   'hero.h1a': 'See it all. Pick what goes.',
   'hero.h1b': 'Undo anything.',
   'hero.sub': 'MacClean scans your Mac on device for caches, logs, duplicates and developer leftovers, and shows you where your space went. Everything you clean goes to the Trash first, and Cleanup History puts it back in one click.',
@@ -177,10 +208,10 @@ export const EN = {
   'b.chat.t1': 'WeChat',
   'b.chat.t2': 'WeCom',
   'b.chat.t3': 'Messages never read',
-  'faq.q15': 'WeChat takes up tens of gigabytes. Can I clean it safely?',
-  'faq.a15': 'Yes, with Chat Cleanup. It clears images, videos, files and caches from WeChat, QQ and WeCom by chat, date and type. It never touches your chat history and never decrypts or reads the chat database. Only regenerable caches and thumbnails are selected by default; received files are yours to tick. You quit the chat app before cleaning, and files go to the Trash, so you can undo. Cleaned images and videos show as expired or cleared in the chat.',
-  'faq.q16': 'Why is “System Data” so big, and how can MacClean help?',
-  'faq.a16': '“System Data” is where macOS lumps many things together: local snapshots and purgeable space, the Spotlight index, photo-analysis caches, iOS backups, Xcode and simulators, Docker and virtual machines, local AI models, app caches, logs, virtual memory and more. Storage Map’s System Data mode lists each one with its size on your Mac, marks it normal, large or abnormal with the thresholds, and suggests a safe next step, such as rebuilding the Spotlight index in Maintenance when it’s bloated. It’s read-only and never deletes anything by itself, and anything it can’t measure without admin rights is labelled as such.',
+  "faq.q15": "How do I clean up WeChat photos, videos and caches on Mac?",
+  "faq.a15": "Open Chat Cleanup to review WeChat, QQ or WeCom media, then select unwanted photos, videos, attachments and caches by type and month. Supported WeChat media can be grouped by conversation folder; this does not identify contact names. MacClean does not read message databases. Only regenerable caches and thumbnails are preselected. Save important attachments and quit the chat app before cleaning. Removed media may appear expired in chats; restore ordinary files from Cleanup History before emptying the Trash.",
+  "faq.q16": "Why is Mac System Data so large, and what can I clean?",
+  "faq.a16": "System Data is not all junk. It can include local snapshots, backups, Spotlight indexes, developer caches, local AI models and virtual memory. Start with the System Data view in Storage Map to review measurable categories and sizes, then use the relevant feature for unwanted caches, backups or models. Analysis is read-only and does not automatically delete system files. Items that need more permissions or cannot be measured are identified. Do not remove data you still need just to reduce the number.",
   'pv.chat': 'Chat Cleanup reads only the names, sizes and dates of files in the WeChat, QQ and WeCom data folders, and makes thumbnails on your Mac. It never reads chat databases or message contents, and nothing is uploaded.',
   'b.storage.t4': 'Basket',
   'ai.alt': 'Local AI models in Dev Caches',
@@ -189,7 +220,7 @@ export const EN = {
   'ai.b1': 'One row per model: how much removing it frees, how much you’d have to download again, and when it was last modified. Nothing is selected by default',
   'ai.b2': 'Ollama models share data files, so the space shown only counts data no other model uses, and deleting several at once frees shared data only once',
   'ai.b3': 'Files go to the Trash and can be undone; MacClean never runs ollama rm, and you quit Ollama first. Hugging Face tokens and generated images are never touched',
-  'faq.q17': 'Local AI models take up a lot of space. What happens if I delete them?',
+  "faq.q17": "Can I remove local Ollama, Hugging Face or LM Studio models?",
   'faq.a17': 'You’ll need to download a model again the next time you use it. MacClean shows how much that would be on every row, and nothing is selected by default. Ollama models share data files, so the space shown only counts data no other model uses. Files go to the Trash and can be undone; MacClean never runs ollama rm, and you quit Ollama before cleaning. Hugging Face tokens and images you generated are never touched.',
   'faq.q18': 'How does the Basket in Storage Map work?',
   'faq.a18': 'While browsing the Folder Map, drag files or folders you want gone into the Basket, or add them with the hover button, the right-click menu or the B key. A running total shows how much you can free. Adding a folder absorbs anything inside it that’s already in the Basket, so nothing is counted twice. System folders, top-level home folders and iCloud Drive can’t be added, and you’re told why. Review the list, take out anything you want to keep, then move it all to the Trash at once, which you can undo. Items in Documents, Desktop or Pictures, and anything over 10 GB, get an extra warning. Press the Space bar for Quick Look, just like in Finder.',
@@ -326,7 +357,7 @@ export const EN = {
 
   'faq.h2': 'Questions',
   'faq.q1': 'Is MacClean safe? Could it delete the wrong thing?',
-  'faq.a1': 'Scans only read file information. Cleaning moves files to the Trash instead of erasing them, and system and personal folders are protected by the PathGuard allowlist, so they never show up as cleanable. If you remove something by mistake, restore it from Cleanup History in one click.',
+  'faq.a1': 'Scans only read file information. Review and select items before cleaning. Ordinary files move to the Trash and can be restored from Cleanup History before it is emptied. Emptying the Trash, Docker cleanup and deleting local snapshots cannot be undone this way; these actions show a separate warning.',
   'faq.q2': 'What exactly does it delete?',
   'faq.a2': 'Only what you tick: app and browser caches, logs older than 7 days, old installers, local copies of Mail attachments, device backups you select, developer caches and so on. Each category explains where it comes from and what deleting it means (caches, for example, are rebuilt when needed).',
   'faq.q3': 'How do I undo a cleanup?',
@@ -337,8 +368,8 @@ export const EN = {
   'faq.a12': 'Turn on Time Machine: it backs up regularly and lets macOS keep local snapshots. Act quickly when you notice a mistake, since local snapshots usually last only about 24 hours. Until you’ve recovered the file, avoid writing lots of data (big downloads, installing apps), which can make macOS purge snapshots early to free space.',
   'faq.q13': 'Can Security find and remove viruses?',
   'faq.a13': 'No. MacClean isn’t antivirus. macOS has built-in protections such as XProtect that check for known malware in the background. Security checks that those protections are on and that XProtect’s data is current, and lists permissions and signatures worth a look so you can decide. It only reads and changes no settings.',
-  'faq.q14': 'Could duplicate cleaning delete the wrong file?',
-  'faq.a14': 'Exact Duplicates only groups files whose contents match byte for byte. Each group keeps one copy automatically and can never be deleted entirely, and you can choose which copy to keep. Removed copies go to the Trash and can be restored from Cleanup History in one click.',
+  "faq.q14": "How should I choose duplicate files and similar photos to remove?",
+  "faq.a14": "Identical files are grouped by content, with at least one copy kept in each group; you can change which one is kept. Similar photos are not necessarily duplicates, so preview each group before deciding. Ordinary removed copies go to the Trash and can be restored from Cleanup History before it is emptied.",
   'faq.q4': 'What are the trial limits?',
   'faq.a4': 'Every feature works for 7 days after the first launch. After that, scanning and viewing results stay free; cleaning needs a license.',
   'faq.q5': 'Can I get a refund?',
@@ -348,9 +379,9 @@ export const EN = {
   'faq.q7': 'Why does it need Full Disk Access?',
   'faq.a7': 'macOS protects the data folders of apps like Mail and Safari. Without this permission MacClean can’t see the caches and history stored there. It still works without it, just with some files missing from scans. See the <a href="/download.html#fda">download page</a> for how to grant it.',
   'faq.q8': 'macOS says it can’t verify the developer. What now?',
-  'faq.a8': 'MacClean isn’t notarized by Apple yet, so macOS stops it the first time you open it. In Applications, Control-click MacClean and choose Open, or go to System Settings › Privacy & Security and click Open Anyway. <a href="/download.html#install">See the illustrated guide</a>.',
+  "faq.a8": "This release has not been notarized by Apple. If you downloaded it from the official site, the file has not been altered, and you trust its source, try opening it once, then go to System Settings → Privacy & Security, click Open Anyway and confirm. If macOS says it will damage your computer or is damaged, stop and check the package first. <a href=\"/download.html#install\">See the full instructions</a>.",
   'faq.q9': 'Does MacClean collect my data?',
-  'faq.a9': 'No. Every scan runs on your Mac; file names, paths and browsing history never leave it. It only goes online to activate a license and check for updates. Details are in the <a href="/privacy.html">privacy policy</a>.',
+  "faq.a9": "File names, paths, file contents and scan results stay on your Mac. Licensing and update checks use the network. Optional usage statistics are off by default; if enabled, they send a random installation ID, app and OS versions, and timestamps for first open, daily activity and first completed scan. You can turn this off at any time. See the <a href=\"/privacy.html\">privacy policy</a>.",
   'faq.q10': 'Will it make my Mac faster?',
   'faq.a10': 'We don’t promise that. MacClean helps you see and reclaim disk space, tidy login items and run maintenance commands. Freeing space helps when your disk is nearly full, but we won’t scare you with “speed-up” claims.',
 
@@ -358,10 +389,10 @@ export const EN = {
   'final.p': 'Download free and use every feature for 7 days. Scanning is always free.',
 
   /* download */
-  'dl.title': 'Download MacClean',
-  'dl.desc': 'Download MacClean for macOS 14 and later, on Apple silicon and Intel. Includes install steps, first-launch help and Full Disk Access setup.',
+  "dl.title": "Download MacClean — Mac Cleaner for Apple Silicon & Intel",
+  "dl.desc": "Download MacClean to scan Mac disk usage for free and try WeChat cleanup, cache cleaning, app removal and duplicate file cleanup. For macOS 14+, Apple silicon and Intel. Installation and permissions guide included.",
   'dl.h1': 'Download MacClean',
-  'dl.sub': 'Free to download, every feature for 7 days. No account needed.',
+  "dl.sub": "Download free to scan disk usage and try cache cleanup, WeChat cleanup, app removal and duplicate file cleanup. All features are available for 7 days after first launch, with no account required.",
   'dl.btn': 'Download DMG',
   'dl.started': 'Your download has started. Nothing happening?',
   'dl.retry': 'Try again',
@@ -373,29 +404,29 @@ export const EN = {
   'dl.req3': 'Chinese & English',
   'dl.req3s': 'Follows your system language',
   'dl.req4': 'Works offline',
-  'dl.req4s': 'Online only to activate and check updates',
-  'dl.instH': 'Install in three steps',
-  'dl.instP': 'Just like any other Mac app, with one extra click the first time you open it.',
-  'dl.s1': 'Open the DMG',
-  'dl.s1p': 'Double-click <b>MacClean.dmg</b> in your Downloads folder. A window with MacClean in it appears.',
+  "dl.req4s": "Optional usage statistics are off by default",
+  "dl.instH": "Install and open MacClean",
+  "dl.instP": "For macOS 14 and later. Check the package source first. These steps apply only to “developer cannot be verified” or “Apple cannot check for malicious software” alerts.",
+  "dl.s1": "Open the DMG and drag to Applications",
+  "dl.s1p": "Double-click the downloaded <b>MacClean.dmg</b> and drag MacClean to Applications. Eject the DMG after copying finishes.",
   'dl.downloads': 'Downloads',
   'dl.other': 'Other files',
-  'dl.s2': 'Drag to Applications',
-  'dl.s2p': 'Drag the MacClean icon onto the Applications folder on the right. Once it’s copied, you can eject the DMG.',
+  "dl.s2": "Try opening MacClean once",
+  "dl.s2p": "Double-click MacClean in Applications. If macOS says the developer cannot be verified or Apple cannot check for malicious software, dismiss the alert and continue below.",
   'dl.apps': 'Applications',
-  'dl.s3': 'Open it the first time',
-  'dl.s3p': 'MacClean isn’t notarized by Apple yet, so the first time you open it macOS may say it can’t verify the developer. That’s expected. Open it once as shown below and macOS won’t ask again.',
-  'dl.s3a': '<b>macOS 14:</b> In Applications, hold <span class="kbd">Control</span> and click MacClean (or right-click), choose Open, then click Open again in the dialog.',
-  'dl.dlgT': 'macOS cannot verify the developer of “MacClean”. Are you sure you want to open it?',
-  'dl.dlgP': 'By opening this app, you will be overriding system security.',
+  "dl.s3": "Open Privacy & Security",
+  "dl.s3p": "Open <b>System Settings → Privacy & Security</b>, scroll down to Security, find the notice about MacClean being blocked, and click <b>Open Anyway</b>.",
+  "dl.s3a": "If the button is missing, first try opening MacClean from Applications, then return here. On a managed Mac, contact your administrator if needed.",
+  "dl.dlgT": "macOS cannot verify the developer of “MacClean”.",
+  "dl.dlgP": "Check the source first, then use Privacy & Security.",
   'dl.open': 'Open',
   'dl.cancel': 'Cancel',
   'dl.showPkg': 'Show Package Contents',
   'dl.trash': 'Move to Trash',
   'dl.info': 'Get Info',
-  'dl.s3b': 'macOS 15 or later',
-  'dl.s3bp': 'Newer macOS no longer offers Open in the right-click menu. Double-click MacClean and click Done when warned. Then open <b>System Settings › Privacy & Security</b>, scroll to Security, click <b>Open Anyway</b> next to MacClean and confirm with your password.',
-  'dl.s3bn': 'You only do this once. If you don’t see Open Anyway, double-click MacClean once more and come back.',
+  "dl.s3b": "Confirm that you want to open it",
+  "dl.s3bp": "Enter your password or use Touch ID if asked. If you still want to run it, click <b>Open</b> in the next dialog. This adds an exception for MacClean, so subsequent launches will usually work by double-clicking.",
+  "dl.s3bn": "You do not need to turn off system-wide security. Full Disk Access is a separate permission, explained below.",
   'dl.privSec': 'Privacy & Security',
   'dl.security': 'Security',
   'dl.allowFrom': 'Allow applications from',
@@ -496,10 +527,10 @@ export const EN = {
   'tm.contact': 'For refunds or anything else, email',
 
   /* support */
-  'sp.title': 'Support · MacClean',
-  'sp.desc': 'MacClean FAQ, install help, licenses and refunds, and how to reach us.',
-  'sp.h1': 'How can we help?',
-  'sp.sub': 'Start with the questions below. Didn’t find the answer? Email us; we usually reply within one business day.',
+  "sp.title": "Mac Cleanup FAQ: WeChat, System Data & Developer Caches — MacClean",
+  "sp.desc": "Mac storage full? Learn about WeChat cleanup, System Data, Xcode caches, app removal and duplicate files, including cleanup limits, disk space changes, undo, trials and licenses.",
+  "sp.h1": "Mac cleanup and disk space questions",
+  "sp.sub": "Find what takes up space, then decide which files you no longer need. Learn what each cleanup feature does, its impact and its recovery limits. Contact us if you need more help.",
   'sp.mail': 'Email us',
   'sp.order': 'Find your order & license',
   'sp.orderSub': 'Recover your license with order number and email',
@@ -661,6 +692,8 @@ const listeners = new Set();
 let lang = detect();
 
 function detect() {
+  const fixed = globalThis.document?.documentElement.dataset.siteLocale;
+  if (fixed === 'zh' || fixed === 'en') return fixed;
   let saved = null;
   try { saved = localStorage.getItem(STORE); } catch { /* storage blocked */ }
   if (saved === 'zh' || saved === 'en') return saved;
@@ -701,12 +734,28 @@ export function apply(root = document) {
       if (v != null) el.setAttribute(attr, v);
     }
   });
+  if (document.documentElement.dataset.siteLocale === 'en') {
+    const localizedPaths = new Set(['/', '/index.html', '/download.html', '/support.html', '/privacy.html', '/terms.html']);
+    root.querySelectorAll('a[href]').forEach(link => {
+      if (link.id === 'lang-btn') return;
+      const target = new URL(link.getAttribute('href'), location.href);
+      if (target.origin === location.origin && localizedPaths.has(target.pathname)) {
+        link.setAttribute('href', '/en' + target.pathname.replace(/\/index\.html$/, '/') + target.search + target.hash);
+      }
+    });
+  }
   document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
   document.documentElement.classList.remove('i18n-pending');
 }
 
 export function setLang(next) {
   if (next !== 'zh' && next !== 'en' || next === lang) return;
+  if (document.documentElement.dataset.siteLocale) {
+    const current = location.pathname.replace(/^\/en(?=\/)/, '').replace(/\/index\.html$/, '/');
+    try { localStorage.setItem(STORE, next); } catch { /* storage blocked */ }
+    location.assign((next === 'en' ? '/en' : '') + current + location.search + location.hash);
+    return;
+  }
   lang = next;
   try { localStorage.setItem(STORE, next); } catch { /* storage blocked */ }
   apply();
@@ -716,6 +765,9 @@ export function setLang(next) {
 export function onLangChange(fn) { listeners.add(fn); }
 
 export function initI18n() {
+  if (document.documentElement.dataset.siteLocale) {
+    try { localStorage.setItem(STORE, lang); } catch { /* storage blocked */ }
+  }
   take(document);
   apply();
 }

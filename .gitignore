@@ -4,3 +4,24 @@ xcuserdata/
 build/
 DerivedData/
 *.profraw
+
+# Local credentials, databases and generated delivery material
+.env
+.env.*
+!.env.example
+*.env
+*.p12
+*.pfx
+*.pem
+*.key
+.private/
+node_modules/
+.data/
+*.db
+*.db-wal
+*.db-shm
+.claude/
+.codex/
+promotion/
+reports/evidence/
+reports/macclean-community-promotion-log.md

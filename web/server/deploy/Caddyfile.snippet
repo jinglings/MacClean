@@ -1,6 +1,18 @@
 # Merge into the existing thulem.com site block in /etc/caddy/Caddyfile.
 # Leave the x-ui / xray / frps sites untouched.
 thulem.com {
+	# Consolidate the homepage URL.
+	redir /index.html / 301
+	redir /en/index.html /en/ 301
+	# Existing indexed URLs with equivalent destinations.
+	redir /privacy/ /privacy.html 301
+	redir /terms/ /terms.html 301
+	redir /contact/ /support.html 301
+
+	# Transactional pages must remain crawlable so crawlers can see noindex.
+	@noindex path /admin /admin/* /api/* /buy.html /order.html /404.html /files/* /download/*
+	header @noindex X-Robots-Tag "noindex, nofollow"
+
 	# Backend: license API, orders, admin SPA, appcast, downloads and uploaded files.
 	@backend path /api/* /admin /admin/* /appcast.xml /download/* /files/*
 

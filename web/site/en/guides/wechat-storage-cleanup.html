@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" data-site-locale="en">
+<head>
+  <meta charset="utf-8">
+  <title>Clean WeChat Storage on Mac by Media and Date | MacClean</title>
+  <meta name="description" content="Review WeChat images, videos, files and caches on your Mac. Learn MacClean&#x27;s selection workflow, WeChat 4.x preview limits and what Trash recovery can restore.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:site_name" content="MacClean">
+<meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+<link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+<script>
+  (function () {
+    var d = document.documentElement, l = null;
+    d.className += ' js';
+    l = d.dataset.siteLocale || null;
+    if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
+    if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+    d.lang = l === 'zh' ? 'zh-CN' : 'en';
+    if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+  })();
+</script>
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/en/guides/wechat-storage-cleanup.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/guides/wechat-storage-cleanup.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/guides/wechat-storage-cleanup.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/guides/wechat-storage-cleanup.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/en/guides/wechat-storage-cleanup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Clean WeChat Storage on Mac by Media and Date | MacClean">
+  <meta property="og:description" content="Review WeChat images, videos, files and caches on your Mac. Learn MacClean&amp;#x27;s selection workflow, WeChat 4.x preview limits and what Trash recovery can restore.">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/en/guides/wechat-storage-cleanup.html#webpage","url":"https://thulem.com/en/guides/wechat-storage-cleanup.html","name":"Clean WeChat Storage on Mac by Media and Date | MacClean","description":"Review WeChat images, videos, files and caches on your Mac. Learn MacClean&#x27;s selection workflow, WeChat 4.x preview limits and what Trash recovery can restore.","inLanguage":"en","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"Does this delete text chat history?","acceptedAnswer":{"@type":"Answer","text":"It targets recognised media and avoids the database. Text remains, but removed attachments may not open."}},{"@type":"Question","name":"Why are WeChat 4.x images not previewed?","acceptedAnswer":{"@type":"Answer","text":"They are encrypted. MacClean does not decrypt chat data."}},{"@type":"Question","name":"Why are real contact names missing?","acceptedAnswer":{"@type":"Answer","text":"It does not read the encrypted database. Custom labels are stored only on this Mac."}},{"@type":"Question","name":"Can I restore a video I removed?","acceptedAnswer":{"@type":"Answer","text":"Try Cleanup History while the file remains in Trash. Destination conflicts and missing records can prevent restoration."}}],"breadcrumb":{"@id":"https://thulem.com/en/guides/wechat-storage-cleanup.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://thulem.com/en/guides/wechat-storage-cleanup.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://thulem.com/en/"},{"@type":"ListItem","position":2,"name":"Cleanup guides","item":"https://thulem.com/en/guides/"},{"@type":"ListItem","position":3,"name":"Clean WeChat Storage on Mac by Media and Date | MacClean","item":"https://thulem.com/en/guides/wechat-storage-cleanup.html"}]}]}</script>
+  <!-- /@seo -->
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">Skip to content</a>
+<div class="announce" id="announce" hidden></div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/en/" aria-label="MacClean">
+      <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+      <span>MacClean</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
+      <li><a href="/en/#safety" data-i18n="nav.safety">Safety</a></li>
+      <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+      <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
+      <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
+      <li><a href="/en/support.html" data-i18n="nav.support">Support</a></li>
+    </ul>
+    <div class="nav-end">
+      <a class="lang-btn" href="/guides/wechat-storage-cleanup.html" id="lang-btn" aria-label="切换到中文" data-i18n-attr="aria-label:nav.langLabel">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"></use></svg><span data-i18n="nav.langShort">中文</span>
+      </a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/en/download.html" data-i18n="nav.cta">Download free</a>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="Menu" data-i18n-attr="aria-label:nav.menu">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"></use></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero guide-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/en/">Home</a><span>/</span><a href="/en/guides/">Cleanup guides</a></nav><h1>How to clean WeChat storage on a Mac</h1><p>Treat caches and attachments separately. MacClean's Chat Cleanup measures local media files and dates without decrypting the chat database or reading messages. Review the usage before choosing attachments to remove.</p></div></section>
+<div class="wrap"><article class="doc guide"><nav class="guide-toc" aria-label="On this page"><strong>On this page</strong><ol><li><a href="#prepare">Confirm the account and save important attachments</a></li><li><a href="#understand-results">Understand conversation numbers and WeChat 4.x</a></li><li><a href="#select-media">Review caches first, then select older media</a></li><li><a href="#restore">Text history remains, but media access changes</a></li></ol></nav>
+<figure class="guide-shot"><img src="/assets/img/screens/native/light-en-chat_cleanup.webp" width="1600" height="1030" alt="How to clean WeChat storage on a Mac — MacClean" decoding="async" loading="lazy"><figcaption>MacClean interface. File sizes shown are illustrative; your scan results will differ.</figcaption></figure>
+<section id="prepare"><h2>Confirm the account and save important attachments</h2><p>Old attachments may still matter. Save important files from WeChat to a folder or backup you control before selecting media for removal. Cleanup History provides a recovery opportunity, not a separate backup.</p>
+<p>Open MacClean → Chat Cleanup, choose WeChat and scan. If multiple local accounts appear, select the intended account. Switching accounts resets selection; review the checked items afterward.</p>
+<p>If some storage cannot be read, follow the Full Disk Access prompt. An incomplete or empty result does not prove that WeChat uses no space. Quit WeChat before cleaning; MacClean checks its running state and blocks cleanup while the app is using those files.</p></section>
+<section id="understand-results"><h2>Understand conversation numbers and WeChat 4.x</h2><p>MacClean cannot retrieve names from the encrypted database. Conversations appear as numbered groups. Add a local label using the pencil control; it does not change your WeChat contacts.</p>
+<p>Older storage layouts may allow thumbnails to help identify media. WeChat 4.x images use an encrypted format that MacClean cannot preview. Do not guess the content of images from a conversation number.</p>
+<p>WeChat 4.x stores videos and received files by month without a conversation breakdown, under Videos, Files &amp; Caches. A small conversation total does not include all its media; grouping follows local storage layout.</p></section>
+<section id="select-media"><h2>Review caches first, then select older media</h2><p>Only Caches &amp; Thumbnails are selected by default. Other attachments need your selection. Review the summary even when using the defaults.</p>
+<p>Quick filters help select candidates. Videos &gt; 1 year old and Images &gt; 6 months old do not identify files without value. Dates come from local files and month groups rather than reading chat message timestamps.</p>
+<p>Use type and month groups to narrow the selection. Large files can be selected individually. When an entire group is selected, check the final scope before confirming.</p><ol><li>Review the default cache selection and deselect anything you want to keep.</li><li>Find additional candidates by conversation, month or quick filter.</li><li>Check media types and the selected-size summary; keep important attachments.</li><li>Quit WeChat, read the attachment warning and confirm Move to Trash.</li></ol></section>
+<section id="restore"><h2>Text history remains, but media access changes</h2><p>The chat scanner excludes database files and related extensions. Keeping text history does not preserve removed attachments: media may appear expired or cleaned in WeChat. Do not assume it can be downloaded again.</p>
+<p>Selected files are moved to Trash. When a recoverable session is recorded, use Undo in the completion window or Cleanup History to restore them. Files must still be in Trash. A destination conflict or permission error can prevent restoration.</p>
+<p>Check WeChat and important attachments before emptying Trash. Trashed files still occupy storage. Emptying Trash removes them permanently and removes the basis for Cleanup History recovery, as Apple's Finder guide explains.</p>
+<p>Rescan and check your Mac's available space. Caches can return during normal WeChat use; one cleanup does not permanently fix their size.</p></section><section><h2>Questions about cleanup</h2><div class="faq"><details><summary>Does this delete text chat history?</summary><div class="ans"><p>It targets recognised media and avoids the database. Text remains, but removed attachments may not open.</p></div></details>
+<details><summary>Why are WeChat 4.x images not previewed?</summary><div class="ans"><p>They are encrypted. MacClean does not decrypt chat data.</p></div></details>
+<details><summary>Why are real contact names missing?</summary><div class="ans"><p>It does not read the encrypted database. Custom labels are stored only on this Mac.</p></div></details>
+<details><summary>Can I restore a video I removed?</summary><div class="ans"><p>Try Cleanup History while the file remains in Trash. Destination conflicts and missing records can prevent restoration.</p></div></details></div></section><section><h2>References</h2><ul><li><a href="https://support.apple.com/guide/mac-help/mchlp1093/mac">Apple: Delete files and folders on Mac</a></li></ul></section>
+<section class="guide-cta"><h2>Download MacClean</h2><p>Download MacClean and scan WeChat in Chat Cleanup. Review the media groups and default selection before choosing what to remove.</p><p><a class="btn btn-primary" href="/en/download.html">Download MacClean</a></p><p><a href="/en/support.html">Installation and common questions</a></p></section>
+<aside><h2>Related guides</h2><ul><li><a href="/en/guides/mac-system-data-cleanup.html">How to investigate and clean large System Data on a Mac</a></li><li><a href="/en/guides/xcode-cache-cleanup.html">How to clean Xcode caches while keeping release archives</a></li></ul></aside></article></div></main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/en/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+        <p data-i18n="foot.tag">A local Mac utility. Review the files before you clean.</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.product">Product</h4>
+        <ul>
+          <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
+          <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+          <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
+          <li><a href="/buy.html" data-i18n="foot.buy">Buy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.help">Help</h4>
+        <ul>
+          <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
+          <li><a href="/en/support.html" data-i18n="foot.faq">FAQ</a></li>
+          <li><a href="/order.html" data-i18n="foot.order">Find my order</a></li>
+          <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">Contact us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.legal">Legal</h4>
+        <ul>
+          <li><a href="/en/privacy.html" data-i18n="foot.privacy">Privacy policy</a></li>
+          <li><a href="/en/terms.html" data-i18n="foot.terms">Terms & refunds</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MacClean</span>
+      <span data-i18n="foot.mac">macOS is a trademark of Apple Inc. MacClean is not affiliated with Apple.</span>
+    </div>
+    <p data-i18n="foot.independent" style="margin-top:16px">MacClean is independently developed and is not affiliated with iMobie or its MacClean product.</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/assets/js/page.js?v=20261007.1"></script>
+</body>
+</html>

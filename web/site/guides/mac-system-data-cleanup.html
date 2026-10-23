@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN" data-site-locale="zh">
+<head>
+  <meta charset="utf-8">
+  <title>Mac 系统数据太大？先查占用，再清理 | MacClean</title>
+  <meta name="description" content="Mac 系统数据为什么很大、哪些文件能清理？用 MacClean 只读分析缓存、Xcode、备份和应用数据，区分系统管理项，清理前确认恢复边界。">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161617" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon-192.png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<meta property="og:site_name" content="MacClean">
+<meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+<link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+<script>
+  (function () {
+    var d = document.documentElement, l = null;
+    d.className += ' js';
+    l = d.dataset.siteLocale || null;
+    if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
+    if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+    d.lang = l === 'zh' ? 'zh-CN' : 'en';
+    if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+  })();
+</script>
+  <!-- @seo -->
+  <link rel="canonical" href="https://thulem.com/guides/mac-system-data-cleanup.html">
+  <link rel="alternate" hreflang="zh-CN" href="https://thulem.com/guides/mac-system-data-cleanup.html">
+  <link rel="alternate" hreflang="en" href="https://thulem.com/en/guides/mac-system-data-cleanup.html">
+  <link rel="alternate" hreflang="x-default" href="https://thulem.com/guides/mac-system-data-cleanup.html">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta property="og:url" content="https://thulem.com/guides/mac-system-data-cleanup.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mac 系统数据太大？先查占用，再清理 | MacClean">
+  <meta property="og:description" content="Mac 系统数据为什么很大、哪些文件能清理？用 MacClean 只读分析缓存、Xcode、备份和应用数据，区分系统管理项，清理前确认恢复边界。">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="MacClean product information">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://thulem.com/#website","url":"https://thulem.com/","name":"MacClean"},{"@type":"FAQPage","@id":"https://thulem.com/guides/mac-system-data-cleanup.html#webpage","url":"https://thulem.com/guides/mac-system-data-cleanup.html","name":"Mac 系统数据太大？先查占用，再清理 | MacClean","description":"Mac 系统数据为什么很大、哪些文件能清理？用 MacClean 只读分析缓存、Xcode、备份和应用数据，区分系统管理项，清理前确认恢复边界。","inLanguage":"zh-CN","isPartOf":{"@id":"https://thulem.com/#website"},"mainEntity":[{"@type":"Question","name":"MacClean 会自动删除系统数据吗？","acceptedAnswer":{"@type":"Answer","text":"不会。系统数据页只做测量和解释，处理按钮会跳到相应功能、系统设置或 Finder。实际清理需要你确认具体项目。"}},{"@type":"Question","name":"系统数据很大，就说明 Mac 有问题吗？","acceptedAnswer":{"@type":"Answer","text":"不能只凭分类大小判断。开发缓存、备份和应用数据都可能占用较多空间。先看实际可用空间与报告里的具体来源。"}},{"@type":"Question","name":"为什么 MacClean 和系统设置的数字不同？","acceptedAnswer":{"@type":"Answer","text":"两者统计与分类方式不同。权限不足、扫描未完成、可清除空间估算和 APFS 共享数据也会影响结果，不能把差值直接当成可删除垃圾。"}},{"@type":"Question","name":"清理记录可以恢复清空废纸篓后的文件吗？","acceptedAnswer":{"@type":"Answer","text":"不能。清理记录把仍在废纸篓中的项目移回原位置，不是独立备份。重要文件应另行备份。"}}],"breadcrumb":{"@id":"https://thulem.com/guides/mac-system-data-cleanup.html#breadcrumb"}},{"@type":"BreadcrumbList","@id":"https://thulem.com/guides/mac-system-data-cleanup.html#breadcrumb","itemListElement":[{"@type":"ListItem","position":1,"name":"首页","item":"https://thulem.com/"},{"@type":"ListItem","position":2,"name":"清理指南","item":"https://thulem.com/guides/"},{"@type":"ListItem","position":3,"name":"Mac 系统数据太大？先查占用，再清理 | MacClean","item":"https://thulem.com/guides/mac-system-data-cleanup.html"}]}]}</script>
+  <!-- /@seo -->
+</head>
+<body>
+<a class="skip" href="#main" data-i18n="nav.skip">跳到正文</a>
+<div class="announce" id="announce" hidden></div>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="MacClean">
+      <img src="/assets/img/icon-256.webp" width="30" height="30" alt="">
+      <span>MacClean</span>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+      <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
+      <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+      <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+      <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
+      <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
+    </ul>
+    <div class="nav-end">
+      <a class="lang-btn" href="/en/guides/mac-system-data-cleanup.html" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
+      </a>
+      <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-i18n="nav.cta">免费下载</a>
+      <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
+        <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main"><section class="page-hero guide-hero"><div class="wrap"><nav class="breadcrumbs" aria-label="当前位置"><a href="/">首页</a><span>/</span><a href="/guides/">清理指南</a></nav><h1>Mac 系统数据太大，应该从哪里清理？</h1><p>先找出具体的占用来源，再决定处理哪一项。系统设置里的「系统数据」是一个汇总分类，不能把整块空间都当成垃圾。MacClean 的系统数据分析先测量、解释和提供下一步入口，扫描本身不会删除文件。</p></div></section>
+<div class="wrap"><article class="doc guide"><nav class="guide-toc" aria-label="本页内容"><strong>本页内容</strong><ol><li><a href="#check-storage">先看 macOS 的存储情况</a></li><li><a href="#read-report">用只读报告定位具体类别</a></li><li><a href="#choose-action">按类别选择处理入口</a></li><li><a href="#verify-space">清理后核对可用空间与恢复条件</a></li></ol></nav>
+<figure class="guide-shot"><img src="/assets/img/screens/native/light-zh-disk_analysis.webp" width="1600" height="1030" alt="Mac 系统数据太大，应该从哪里清理？ — MacClean" decoding="async" loading="lazy"><figcaption>MacClean 界面示例。图中大小仅作界面展示，以你的实际扫描结果为准。</figcaption></figure>
+<section id="check-storage"><h2>先看 macOS 的存储情况</h2><p>在 macOS Ventura 13 或更高版本，打开苹果菜单 → 系统设置 → 通用 → 储存空间。先记下可用空间，再查看文稿、应用程序等可管理的类别。Apple 说明「系统数据」包含未归入其他类别的日志、缓存和支持数据等；这个分类的大小会随 Mac 的使用状态变化。</p>
+<p>判断是否需要清理时，把安装更新、复制文件等任务所需的空间放在前面。仅凭系统数据的颜色块很大，无法判断其中哪些文件可以删除。</p><ol><li>记录当前可用空间和你需要腾出的空间。</li><li>查看可管理类别中的大文件，先识别明确不用的下载、安装包或个人文件。</li><li>对仍无法解释的占用，再进入 MacClean 的「存储地图」→「系统数据」。</li></ol></section>
+<section id="read-report"><h2>用只读报告定位具体类别</h2><p>开始扫描后，MacClean 先显示系统数据类别，再继续测量应用程序、个人文件和其他用户等对照项。等待后续测量结束后，再看「其他未分类」。如果提前停止，对照项可能仍未完成。</p>
+<p>展开较大的类别，查看占用、说明和具体路径。例如「Xcode 与模拟器」「应用缓存」「iPhone / iPad 备份」需要不同的处理方式。「应用容器与支持数据」会聚合应用支持目录、容器和组容器，并列出占用最多的应用。</p>
+<p>如果报告提示某个路径需要完整磁盘访问权限或管理员权限，表示那部分没有完整测量，不能当成零占用。按提示补齐访问权限后重新扫描，或先处理已经可以确认的部分。</p>
+<p>报告中的「本地快照与可清除空间」以系统报告的两种可用空间数值之差估算可清除空间，并显示找到的快照名称。这个数字不是把每个快照文件相加得到的精确容量。</p></section>
+<section id="choose-action"><h2>按类别选择处理入口</h2><p>应用缓存、日志和废纸篓：从报告进入「释放空间」，查看具体项目和勾选范围。缓存与日志用途不同，仍应先退出相关应用、确认选中的内容。</p>
+<p>Xcode 与模拟器：进入「开发缓存」，按项目查看 DerivedData、设备符号和其他缓存。Archives 含发布归档，不应按普通缓存一并删除。</p>
+<p>应用容器与支持数据：进入「应用占用」查看归属。这些目录可能包含数据库、离线资料或账户数据；目录很大并不说明里面全是缓存。</p>
+<p>macOS 系统本身、系统资源和虚拟内存等系统管理项：遵循报告的说明。Time Machine 快照由系统按需要回收；Apple 也说明快照空间可计入可用空间。MacClean 的分析页不会把这些类别自动删除。</p>
+<p>个人文件或其他未分类占用：切换「目录地图」，继续定位到认识的文件和目录。不要因为父目录很大就直接删掉整个资源库。</p></section>
+<section id="verify-space"><h2>清理后核对可用空间与恢复条件</h2><p>MacClean 的常规文件清理会把选中项目移入废纸篓，并在有记录时支持从「清理记录」恢复。文件必须仍在废纸篓里，恢复才能进行；原位置已有同名文件或权限不足时，恢复可能失败。</p>
+<p>移入废纸篓保留了撤销机会，也会继续占用磁盘。确认应用和资料都正常、需要的文件已另行保存后，再决定是否清空废纸篓。清空是永久删除，MacClean 的清理记录无法恢复已被清空的文件。</p>
+<p>最后回到系统设置核对可用空间，必要时重新扫描。优先看实际可用空间与目标任务能否完成，不要求两个工具的分类数字完全一致。扫描范围、权限、APFS 共享数据和系统分类都会影响统计。</p></section><section><h2>常见问题</h2><div class="faq"><details><summary>MacClean 会自动删除系统数据吗？</summary><div class="ans"><p>不会。系统数据页只做测量和解释，处理按钮会跳到相应功能、系统设置或 Finder。实际清理需要你确认具体项目。</p></div></details>
+<details><summary>系统数据很大，就说明 Mac 有问题吗？</summary><div class="ans"><p>不能只凭分类大小判断。开发缓存、备份和应用数据都可能占用较多空间。先看实际可用空间与报告里的具体来源。</p></div></details>
+<details><summary>为什么 MacClean 和系统设置的数字不同？</summary><div class="ans"><p>两者统计与分类方式不同。权限不足、扫描未完成、可清除空间估算和 APFS 共享数据也会影响结果，不能把差值直接当成可删除垃圾。</p></div></details>
+<details><summary>清理记录可以恢复清空废纸篓后的文件吗？</summary><div class="ans"><p>不能。清理记录把仍在废纸篓中的项目移回原位置，不是独立备份。重要文件应另行备份。</p></div></details></div></section><section><h2>参考资料</h2><ul><li><a href="https://support.apple.com/guide/mac-help/mchl3d437fbc/mac">Apple：更改 Mac 储存空间设置</a></li><li><a href="https://support.apple.com/102624">Apple：释放 Mac 上的储存空间</a></li><li><a href="https://support.apple.com/102154">Apple：关于 Time Machine 本地快照</a></li><li><a href="https://support.apple.com/guide/mac-help/mchlp1093/mac">Apple：在 Mac 上删除文件和文件夹</a></li></ul></section>
+<section class="guide-cta"><h2>下载 MacClean</h2><p>下载 MacClean，先用「存储地图 → 系统数据」做一次只读分析，再决定清理哪些项目。</p><p><a class="btn btn-primary" href="/download.html">下载 MacClean</a></p><p><a href="/support.html">安装说明与常见问题</a></p></section>
+<aside><h2>继续阅读</h2><ul><li><a href="/guides/wechat-storage-cleanup.html">Mac 微信占用太大，如何选择要清理的文件？</a></li><li><a href="/guides/xcode-cache-cleanup.html">Xcode 占用太大：哪些缓存可以清理，哪些归档应保留？</a></li></ul></aside></article></div></main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
+        <p data-i18n="foot.tag">先查看、再确认的 Mac 本地清理工具。</p>
+      </div>
+      <div>
+        <h4 data-i18n="foot.product">产品</h4>
+        <ul>
+          <li><a href="/#features" data-i18n="nav.features">功能</a></li>
+          <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+          <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+          <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.help">帮助</h4>
+        <ul>
+          <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
+          <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
+          <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+          <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 data-i18n="foot.legal">条款</h4>
+        <ul>
+          <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
+          <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 MacClean</span>
+      <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
+    </div>
+    <p data-i18n="foot.independent" style="margin-top:16px">本产品独立开发，与 iMobie 及其 MacClean 产品无关联。</p>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="/assets/js/page.js?v=20261007.1"></script>
+</body>
+</html>

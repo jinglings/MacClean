@@ -85,6 +85,7 @@ final class PrivacyViewModel: ObservableObject {
             hasScanned = true
             isScanning = false
             lastScannedAt = Date()
+            UsageAnalytics.shared.recordScanCompleted()
         }
     }
 

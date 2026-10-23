@@ -44,6 +44,7 @@ export function createApp(config, { logger = console } = {}) {
     notify: new RateLimiter(10, 3600_000),
     license: new RateLimiter(60, 3600_000),
     login: new RateLimiter(10, 900_000),
+    usage: new RateLimiter(240, 3600_000),
   };
   const state = { setupToken: null };
   const ctx = { config, db, limiters, state, logger };

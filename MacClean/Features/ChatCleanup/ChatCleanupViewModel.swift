@@ -171,6 +171,7 @@ final class ChatCleanupViewModel: ObservableObject {
         scanningApp = nil
         guard let result else { return }
         apply(result)
+        UsageAnalytics.shared.recordScanCompleted()
     }
 
     /// 写入扫描结果并恢复默认勾选（测试也直接调用）。

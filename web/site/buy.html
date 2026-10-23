@@ -16,15 +16,17 @@
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
   <meta property="og:site_name" content="MacClean">
   <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
-  <link rel="stylesheet" href="/assets/css/site.css?v=20261002.1">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
+  <link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
   <script>
     (function () {
       var d = document.documentElement, l = null;
       d.className += ' js';
-      try { l = localStorage.getItem('mc.lang'); } catch (e) {}
+      l = d.dataset.siteLocale || null;
+      if (!l) { try { l = localStorage.getItem('mc.lang'); } catch (e) {} }
       if (l !== 'zh' && l !== 'en') l = /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
       d.lang = l === 'zh' ? 'zh-CN' : 'en';
-      if (l === 'en') { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
+      if (l === 'en' && !d.dataset.siteLocale) { d.className += ' i18n-pending'; setTimeout(function () { d.classList.remove('i18n-pending'); }, 1500); }
     })();
   </script>
   <!-- /@head -->
@@ -44,12 +46,13 @@
         <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
         <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
         <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
+        <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
         <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
       </ul>
       <div class="nav-end">
-        <button class="lang-btn" type="button" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
+        <a class="lang-btn" href="/en/" id="lang-btn" aria-label="Switch to English" data-i18n-attr="aria-label:nav.langLabel">
           <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#globe"/></svg><span data-i18n="nav.langShort">English</span>
-        </button>
+        </a>
         <a class="btn btn-primary btn-sm nav-cta" href="/download.html" data-i18n="nav.cta">免费下载</a>
         <button class="menu-btn" type="button" id="menu-btn" aria-expanded="false" aria-controls="nav-links" aria-label="菜单" data-i18n-attr="aria-label:nav.menu">
           <svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#menu"/></svg>
@@ -136,7 +139,7 @@
       <div class="foot-grid">
         <div class="foot-brand">
           <a class="brand" href="/"><img src="/assets/img/icon-256.webp" width="30" height="30" alt="" loading="lazy"><span>MacClean</span></a>
-          <p data-i18n="foot.tag">安全、透明、可撤销的 Mac 本地清理工具。</p>
+          <p data-i18n="foot.tag">先查看、再确认的 Mac 本地清理工具。</p>
         </div>
         <div>
           <h4 data-i18n="foot.product">产品</h4>
@@ -150,6 +153,7 @@
         <div>
           <h4 data-i18n="foot.help">帮助</h4>
           <ul>
+            <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
             <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
             <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
             <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
@@ -167,10 +171,11 @@
         <span>© 2026 MacClean</span>
         <span data-i18n="foot.mac">macOS 是 Apple Inc. 的商标。MacClean 与 Apple 无关联。</span>
       </div>
+      <p data-i18n="foot.independent" style="margin-top:16px">本产品独立开发，与 iMobie 及其 MacClean 产品无关联。</p>
     </div>
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- /@footer -->
-  <script type="module" src="/assets/js/buy.js?v=20261002.1"></script>
+  <script type="module" src="/assets/js/buy.js?v=20261023.1"></script>
 </body>
 </html>

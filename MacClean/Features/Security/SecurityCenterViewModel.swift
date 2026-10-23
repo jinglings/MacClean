@@ -90,6 +90,7 @@ final class SecurityCenterViewModel: ObservableObject {
             self.isScanning = false
             self.hasScanned = true
             self.lastScannedAt = Date()
+            UsageAnalytics.shared.recordScanCompleted()
             await self.checkRevocation(results.2.revocationCandidates)
         }
     }

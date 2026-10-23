@@ -1,5 +1,19 @@
 /* MacClean website. Native Clarity: mint to teal, glass, calm type. */
 
+.install-notice {
+  max-width: 760px;
+  margin: 24px auto 0;
+  padding: 20px 24px;
+  text-align: left;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--brand-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.install-notice p { margin: 8px 0; color: var(--text-2); }
+.install-warning { max-width: none; border-inline-start: 3px solid var(--warn); }
+
 /* ---------- tokens ---------- */
 :root {
   --mint: #0071E3;
