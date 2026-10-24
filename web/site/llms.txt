@@ -44,4 +44,6 @@
 
 
 
-MacClean 1.6: free for personal and internal business use, all features, no activation or device limit. Selling original or modified copies or integrating code into paid products requires a separate commercial agreement. Source repository currently private. Community license: https://thulem.com/license.txt
+MacClean 1.6: free for personal and internal business use, all features, no activation or device limit. Selling original or modified copies or integrating code into paid products requires a separate commercial agreement. Source repository public: https://github.com/jinglings/MacClean. Community license: https://thulem.com/license.txt
+
+源码：https://github.com/jinglings/MacClean。个人和企业内部使用免费，商业分发另行授权。

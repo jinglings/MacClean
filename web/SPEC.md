@@ -19,7 +19,7 @@ Caddy routes: `/api/*`, `/admin*`, `/appcast.xml`, `/download/*`, `/files/*` →
 
 ## Current policy (MacClean 1.6, 2026-10-24)
 
-Personal and internal business use, deployment and modifications are free, with all features included, no trial, device limit or activation. Selling original/modified copies or integrating code into a paid product requires a separate written paid commercial agreement. See `../LICENSE`. This is a community source-available license, not OSI open source. The repository remains private.
+Personal and internal business use, deployment and modifications are free, with all features included, no trial, device limit or activation. Selling original/modified copies or integrating code into a paid product requires a separate written paid commercial agreement. See `../LICENSE`. This is a community source-available license, not OSI open source. The repository is public at https://github.com/jinglings/MacClean. Public config reports sourcePublic: true and sourceUrl.
 
 Production `salesEnabled` defaults to false and is not enabled through an environment variable. Public config returns `salesEnabled: false`, `plans: []`, empty payment details and license policy metadata. `POST /api/orders` returns 410 without creating a record. Historical order lookup, refunds, the admin desk and old client license endpoints remain compatible. The order creation contract below describes legacy behavior exercised only by explicit test overrides.
 

@@ -70,7 +70,7 @@ export function publicConfig(db, config = {}) {
   const announcement = str(getSetting(db, 'announcement', ''), 2000);
   return {
     salesEnabled: config.salesEnabled === true,
-    license: { name: 'MacClean Community License 1.0', personalUse: 'free', internalBusinessUse: 'free', commercialDistribution: 'separate-paid-agreement', termsUrl: '/terms.html', sourcePublic: false },
+    license: { name: 'MacClean Community License 1.0', personalUse: 'free', internalBusinessUse: 'free', commercialDistribution: 'separate-paid-agreement', termsUrl: '/terms.html', sourcePublic: true, sourceUrl: 'https://github.com/jinglings/MacClean' },
     plans: config.salesEnabled === true ? getPlans(db).map(({ id, name, nameEn, price, currency, devices, features, featuresEn, highlight }) =>
       ({ id, name, nameEn, price, currency, devices, features, featuresEn, highlight })) : [],
     payment: config.salesEnabled === true ? {

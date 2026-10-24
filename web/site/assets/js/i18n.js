@@ -12,6 +12,9 @@
 // dev/check-i18n.mjs verifies that every key used anywhere has both languages.
 
 export const EN = {
+  "source.view": "View source",
+  "source.github": "Source on GitHub",
+  "source.free": "Source code is public. Personal and internal business use are free. Selling or integrating the code into paid products requires a separate commercial agreement.",
   "home.title": "MacClean — Free Mac Cleaner and Disk Space Analyzer",
   "home.desc": "Analyze disk usage, clean chat media and app or developer caches, and review duplicate files. Free for personal and internal business use, with all features included and no activation. Requires macOS 14+.",
   "license.freeH": "Free use",
@@ -21,7 +24,7 @@ export const EN = {
   "license.contact": "Discuss commercial licensing",
   "license.full": "Read the full license terms",
   "license.sourceH": "Source availability",
-  "license.sourceP": "The repository remains private and source code is not yet public. The community license permits free use and sharing, with commercial distribution restrictions; it is not an OSI-approved open-source license.",
+  "license.sourceP": "Source code is public on GitHub and free for personal and internal business use. The community license permits free use, modification and sharing, with commercial distribution restrictions; it is not an OSI-approved open-source license.",
   "faq.a9": "File names, paths, contents and scan results stay on your Mac. Version 1.6 removes license activation and validation requests. Updates and certificate checks may use the network. Optional usage reporting is off by default and sends minimal events only after you enable it. See the <a href=\"/privacy.html\">privacy policy</a>.",
   "dl.sub": "Free for personal and internal business use. All features are included, with no registration, purchase or activation. Scan, clean, uninstall apps and organize files directly. Selling or integrating it into a paid product requires commercial licensing.",
   "dl.desc": "Download MacClean 1.6 for free. All features are free for personal and internal business use, with no activation. Supports macOS 14+, Apple silicon and Intel.",
@@ -147,7 +150,7 @@ export const EN = {
   'hero.h1a': 'See it all. Pick what goes.',
   'hero.h1b': 'Undo anything.',
   'hero.sub': 'MacClean scans your Mac on device for caches, logs, duplicates and developer leftovers, and shows you where your space went. Everything you clean goes to the Trash first, and Cleanup History puts it back in one click.',
-  'hero.meta': "macOS 14+ · Apple silicon and Intel · All features free to use",
+  'hero.meta': "macOS 14+ · Apple silicon and Intel · Free for personal and internal business use",
   'hero.shotAlt': 'MacClean Checkup screen',
   'chip.freed': '12.4 GB freed',
   'chip.freedSub': 'This cleanup',
@@ -373,7 +376,7 @@ export const EN = {
 
   'price.h2': "Free for you. Free for your team.",
   'price.p': "Starting with 1.6, every feature is included. No trial period, device limits or activation.",
-  'price.note': "Licensed under the MacClean Community License. The source repository is currently private. Selling the app or integrating its code into a paid product requires a separate commercial agreement.",
+  'price.note': "Source code is public on GitHub under the MacClean Community License. Personal and internal business use are free; selling or integrating the code into paid products requires a separate commercial agreement.",
 
   'faq.h2': 'Questions',
   'faq.q1': 'Is MacClean safe? Could it delete the wrong thing?',
@@ -560,7 +563,7 @@ export const EN = {
   'sp.q.activate': "Does the new version need activation?",
   'sp.a.activate': "No. MacClean 1.6 removes the activation screen, trial countdown and payment gates. Upgrade an older version from the download page; previous license or trial state does not restrict the new version.",
   'sp.q.limit': "Is this open-source software?",
-  'sp.a.limit': "MacClean uses a community source-available license with commercial distribution restrictions, not an OSI-approved open-source license. The source repository remains private and is not yet public. The website will be updated when source access is available.",
+  'sp.a.limit': "MacClean source code is public on GitHub and free for personal and internal business use. It uses a community license with commercial distribution restrictions, not an OSI-approved open-source license. Selling or integrating its code into a paid product requires separate commercial licensing.",
   'sp.q.admin': 'Why do some actions ask for an administrator password?',
   'sp.a.admin': 'Maintenance commands like flushing DNS, rebuilding the Spotlight index and deleting local snapshots need administrator rights; macOS requires it. Each one is marked “Requires admin password” and only asks when you click Run.',
   'sp.q.uninstall': 'How do I uninstall MacClean?',

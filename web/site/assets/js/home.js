@@ -1,4 +1,4 @@
-import { boot } from './common.js?v=20261024.1';
+import { boot } from './common.js?v=20261024.2';
 
 boot();
 

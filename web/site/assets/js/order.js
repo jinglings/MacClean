@@ -1,7 +1,7 @@
-import { boot, escapeHTML } from './common.js?v=20261024.1';
-import { errorMessage } from './api.js?v=20261024.1';
-import { t, onLangChange } from './i18n.js?v=20261024.1';
-import { mountOrder, fetchOrder, renderSavedOrders } from './order-view.js?v=20261024.1';
+import { boot, escapeHTML } from './common.js?v=20261024.2';
+import { errorMessage } from './api.js?v=20261024.2';
+import { t, onLangChange } from './i18n.js?v=20261024.2';
+import { mountOrder, fetchOrder, renderSavedOrders } from './order-view.js?v=20261024.2';
 
 boot();
 

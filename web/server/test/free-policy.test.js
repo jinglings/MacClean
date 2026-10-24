@@ -18,7 +18,8 @@ test('free product hides checkout, rejects new paid orders and retains previous 
     assert.equal(cfg.payment.alipayQr, null);
     assert.equal(cfg.license.internalBusinessUse, 'free');
     assert.equal(cfg.license.commercialDistribution, 'separate-paid-agreement');
-    assert.equal(cfg.license.sourcePublic, false);
+    assert.equal(cfg.license.sourcePublic, true);
+    assert.equal(cfg.license.sourceUrl, 'https://github.com/jinglings/MacClean');
     const res = await srv.fetch('/api/orders', json({ plan: 'lifetime', email: 'new@example.com', payMethod: 'wechat' }));
     assert.equal(res.status, 410);
     assert.equal(srv.app.db.prepare('SELECT COUNT(*) AS n FROM orders').get().n, 1);
