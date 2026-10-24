@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <title data-i18n="buy.title">购买 MacClean</title>
-  <meta name="description" content="购买 MacClean 许可证：终身版或家庭版，一次付费，支持微信支付与支付宝，30 天内可退款。" data-i18n-attr="content:buy.desc">
+  <title>MacClean · 免费使用与商业授权</title>
+  <meta name="description" content="MacClean 个人与企业内部使用免费。对外销售与收费集成请咨询商业授权。">
   <meta name="robots" content="noindex">
   <!-- @head -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -16,8 +16,8 @@
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
   <meta property="og:site_name" content="MacClean">
   <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
-  <link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
-  <link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20261024.1">
+  <link rel="stylesheet" href="/assets/css/guides.css?v=20261024.1">
   <script>
     (function () {
       var d = document.documentElement, l = null;
@@ -44,7 +44,7 @@
       <ul class="nav-links" id="nav-links">
         <li><a href="/#features" data-i18n="nav.features">功能</a></li>
         <li><a href="/#safety" data-i18n="nav.safety">安全</a></li>
-        <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+        <li><a href="/#pricing" data-i18n="nav.pricing">使用许可</a></li>
         <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
         <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
         <li><a href="/support.html" data-i18n="nav.support">支持</a></li>
@@ -62,76 +62,7 @@
   </header>
   <!-- /@nav -->
 
-  <main id="main">
-    <section class="page-hero">
-
-      <div class="wrap">
-        <h1 data-i18n="buy.h1">购买 MacClean</h1>
-        <p data-i18n="buy.sub">一次付费，长期使用。扫码付款后，我们核对到账即发放许可证。</p>
-      </div>
-    </section>
-
-    <section class="section tight" style="padding-top:0">
-      <div class="wrap">
-        <div class="panel" id="saved" hidden style="margin-bottom:24px">
-          <h2 data-i18n="buy.yours">你的订单</h2>
-          <p data-i18n="buy.yoursP">在这台设备上创建过的订单，点开查看付款状态和许可证。</p>
-          <div class="my-orders"></div>
-        </div>
-
-        <!-- step 1: choose & create -->
-        <form class="checkout" id="buy-form" novalidate>
-          <div class="panel">
-            <h2 data-i18n="buy.step1">选择版本并填写邮箱</h2>
-            <p data-i18n="buy.step1p">邮箱用来查询订单和找回许可证，我们不会发送营销邮件。</p>
-
-            <fieldset class="fieldset">
-              <legend data-i18n="buy.planLabel">版本</legend>
-              <div class="choices" id="plan-choices"></div>
-            </fieldset>
-
-            <div class="field">
-              <label for="email" data-i18n="buy.email">邮箱</label>
-              <input class="input" id="email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com" aria-describedby="email-err">
-              <div class="err-text" id="email-err" hidden></div>
-            </div>
-
-            <fieldset class="fieldset">
-              <legend data-i18n="buy.payLabel">付款方式</legend>
-              <div class="choices">
-                <label class="choice"><input type="radio" name="payMethod" value="wechat" checked><span class="box"><span class="pay-row"><span class="pay-logo wechat" aria-hidden="true">微</span><b data-i18n="buy.wechat">微信支付</b></span></span></label>
-                <label class="choice"><input type="radio" name="payMethod" value="alipay"><span class="box"><span class="pay-row"><span class="pay-logo alipay" aria-hidden="true">支</span><b data-i18n="buy.alipay">支付宝</b></span></span></label>
-              </div>
-            </fieldset>
-
-            <div id="form-msg"></div>
-            <div class="form-actions">
-              <button class="btn btn-primary btn-lg" type="submit" id="submit-btn"><span data-i18n="buy.submit">创建订单并付款</span></button>
-            </div>
-          </div>
-
-          <aside class="panel">
-            <h2 data-i18n="buy.summary">订单摘要</h2>
-            <ul class="summary-list" id="summary">
-              <li><span data-i18n="buy.planLabel">版本</span><span id="sum-plan">—</span></li>
-              <li><span data-i18n="buy.devicesLabel">可激活设备</span><span id="sum-devices">—</span></li>
-              <li class="total"><span data-i18n="buy.total">合计</span><span id="sum-total">—</span></li>
-            </ul>
-            <div class="side-note">
-              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#undo"/></svg><span data-i18n="buy.n1">30 天内无理由退款</span></div>
-              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#lock"/></svg><span data-i18n="buy.n2">一次付费，没有订阅，不会自动扣款</span></div>
-              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#clock"/></svg><span data-i18n="buy.n3">人工核对收款，通常在 24 小时内发放许可证</span></div>
-              <div><svg class="i" aria-hidden="true"><use href="/assets/img/icons.svg#checkup"/></svg><span data-i18n="buy.n4">还没试过？先<a href="/download.html">免费下载</a>试用 7 天</span></div>
-            </div>
-          </aside>
-        </form>
-
-        <!-- step 2/3: pay, then license -->
-        <div id="order-box" tabindex="-1" hidden></div>
-        <p class="hint" id="restart" hidden style="margin-top:20px;text-align:center"><a class="link" href="/buy.html" data-i18n="buy.another">再买一份</a></p>
-      </div>
-    </section>
-  </main>
+  <main id="main"><section class="page-hero"><div class="wrap"><h1 data-i18n="license.buyH">MacClean 日常使用已免费</h1><p data-i18n="license.buyP">个人与企业内部无需购买。下载 1.6 或更新版本，即可使用全部功能；对外销售或集成到收费产品，请联系商业授权。</p><div class="hero-cta"><a class="btn btn-primary" href="/download.html" data-i18n="cta.download">免费下载</a><a class="btn btn-ghost" href="/terms.html" data-i18n="license.full">查看完整许可条款</a></div><p><a href="/order.html" data-i18n="foot.order">历史订单</a></p></div></section></main>
 
   <!-- @footer -->
   <footer class="footer">
@@ -145,9 +76,9 @@
           <h4 data-i18n="foot.product">产品</h4>
           <ul>
             <li><a href="/#features" data-i18n="nav.features">功能</a></li>
-            <li><a href="/#pricing" data-i18n="nav.pricing">价格</a></li>
+            <li><a href="/#pricing" data-i18n="nav.pricing">使用许可</a></li>
             <li><a href="/download.html" data-i18n="nav.download">下载</a></li>
-            <li><a href="/buy.html" data-i18n="foot.buy">购买</a></li>
+            <li><a href="/terms.html" data-i18n="foot.buy">商业授权</a></li>
           </ul>
         </div>
         <div>
@@ -155,7 +86,7 @@
           <ul>
             <li><a href="/guides/" data-i18n="nav.guides">清理指南</a></li>
             <li><a href="/support.html" data-i18n="foot.faq">常见问题</a></li>
-            <li><a href="/order.html" data-i18n="foot.order">查询订单</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">历史订单</a></li>
             <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">联系我们</a></li>
           </ul>
         </div>
@@ -163,7 +94,7 @@
           <h4 data-i18n="foot.legal">条款</h4>
           <ul>
             <li><a href="/privacy.html" data-i18n="foot.privacy">隐私政策</a></li>
-            <li><a href="/terms.html" data-i18n="foot.terms">用户协议与退款</a></li>
+            <li><a href="/terms.html" data-i18n="foot.terms">使用许可与条款</a></li>
           </ul>
         </div>
       </div>
@@ -176,6 +107,6 @@
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- /@footer -->
-  <script type="module" src="/assets/js/buy.js?v=20261023.1"></script>
+  <script type="module" src="/assets/js/page.js?v=20261024.1"></script>
 </body>
 </html>

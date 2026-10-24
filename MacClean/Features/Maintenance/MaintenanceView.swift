@@ -147,7 +147,7 @@ struct MaintenanceView: View {
     /// 付费校验后，有副作用提示的任务先确认，其余直接运行。
     private func request(_ tasks: [MaintenanceTask]) {
         guard !tasks.isEmpty else { return }
-        guard ProGate.allowAction() else { return }
+
         if tasks.contains(where: { $0.warning != nil }) {
             pendingTasks = tasks
             showConfirm = true

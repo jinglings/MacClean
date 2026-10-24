@@ -230,7 +230,7 @@ struct AppStorageView: View {
                             viewModel: viewModel,
                             isExpanded: expanded.contains(app.id),
                             onToggle: { toggle(app.id) },
-                            onClean: { guard ProGate.allowAction() else { return }; confirmApp = app }
+                            onClean: { confirmApp = app }
                         )
                     }
                 }
@@ -697,7 +697,7 @@ private struct DockerSection: View {
                                     .foregroundColor(AppTheme.textMuted)
                             }
                             Spacer()
-                            Button("执行") { guard ProGate.allowAction() else { return }; confirmLevel = level }
+                            Button("执行") { confirmLevel = level }
                                 .buttonStyle(NeonOutlineButtonStyle(color: level == .allUnusedImages ? AppTheme.danger : AppTheme.textPrimary))
                                 .disabled(viewModel.isPruning)
                         }

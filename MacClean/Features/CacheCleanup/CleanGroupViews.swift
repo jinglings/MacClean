@@ -202,7 +202,7 @@ struct CleanGroupsPage: View {
             cleanProgress: viewModel.cleanProgress,
             restoreResult: viewModel.lastRestoreResult,
             warning: viewModel.permanentSelectedSize > 0 ? String(localized: "含永久删除") : nil,
-            action: { guard ProGate.allowAction() else { return }; showConfirm = true }
+            action: { showConfirm = true }
         )
     }
 }

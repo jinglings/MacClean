@@ -9,7 +9,6 @@ import SwiftUI
 
 struct CoolSidebarView: View {
     @EnvironmentObject var appState: AppState
-    @ObservedObject private var license = LicenseManager.shared
     @Binding var selectedTab: AppTab
     @State private var fullDiskAccessGranted = true
 
@@ -95,43 +94,13 @@ struct CoolSidebarView: View {
     }
 
     private var brandHeader: some View {
-        HStack(spacing: 10) {
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text("MacClean")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                    .fixedSize()
-                Text(licenseCaption)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-                    .font(.system(size: 11, weight: license.status == .expired ? .semibold : .regular))
-                    .foregroundColor(license.status == .expired ? AppTheme.warning : AppTheme.textMuted)
-            }
-            Spacer(minLength: 4)
-            if license.status != .licensed {
-                Button {
-                    appState.showLicenseActivation = true
-                } label: {
-                    Text("升级")
-                        .font(.system(size: 11, weight: .bold))
-                        .fixedSize()
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 9)
-                        .frame(height: 22)
-                        .background(Capsule().fill(AppTheme.brandGradient))
-                }
-                .buttonStyle(.plain)
-                .help("解锁完整版")
-            }
-        }
-    }
-
-    private var licenseCaption: String {
-        switch license.status {
-        case .licensed: return String(localized: "完整版")
-        case .trial: return String(localized: "试用剩余 \(license.trialDaysRemaining) 天")
-        case .expired: return String(localized: "试用已结束")
+        VStack(alignment: .leading, spacing: 2) {
+            Text("MacClean")
+                .font(.system(size: 15, weight: .bold))
+                .foregroundColor(AppTheme.textPrimary)
+            Text("免费使用 · 全部功能开放")
+                .font(.system(size: 11))
+                .foregroundColor(AppTheme.textMuted)
         }
     }
 

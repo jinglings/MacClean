@@ -65,17 +65,19 @@ export function qrPath(db, kind) {
   return entry?.file ? `/files/${entry.file}?v=${entry.version}` : null;
 }
 
-export function publicConfig(db) {
+export function publicConfig(db, config = {}) {
   const latest = latestRelease(db);
   const announcement = str(getSetting(db, 'announcement', ''), 2000);
   return {
-    plans: getPlans(db).map(({ id, name, nameEn, price, currency, devices, features, featuresEn, highlight }) =>
-      ({ id, name, nameEn, price, currency, devices, features, featuresEn, highlight })),
-    payment: {
+    salesEnabled: config.salesEnabled === true,
+    license: { name: 'MacClean Community License 1.0', personalUse: 'free', internalBusinessUse: 'free', commercialDistribution: 'separate-paid-agreement', termsUrl: '/terms.html', sourcePublic: false },
+    plans: config.salesEnabled === true ? getPlans(db).map(({ id, name, nameEn, price, currency, devices, features, featuresEn, highlight }) =>
+      ({ id, name, nameEn, price, currency, devices, features, featuresEn, highlight })) : [],
+    payment: config.salesEnabled === true ? {
       wechatQr: qrPath(db, 'wechat'),
       alipayQr: qrPath(db, 'alipay'),
       instructions: getSetting(db, 'payment_instructions', DEFAULT_INSTRUCTIONS),
-    },
+    } : { wechatQr: null, alipayQr: null, instructions: '' },
     contactEmail: getSetting(db, 'contact_email', ''),
     announcement: announcement || null,
     latestRelease: latest ? {

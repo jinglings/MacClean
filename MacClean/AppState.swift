@@ -16,7 +16,6 @@ class AppState: ObservableObject {
     // MARK: - UI 状态
     @Published var currentTab: AppTab = .diskAnalysis
     @Published var showOnboarding: Bool = false
-    @Published var showLicenseActivation: Bool = false
     /// 置为 true 即打开系统「设置」窗口（由 AppShellActions 响应后复位，不再以 sheet 呈现）
     @Published var showSettingsWindow: Bool = false
     /// 由菜单栏快速搜索带过来的关键词，「文件搜索」页面读取后清空。
@@ -24,11 +23,6 @@ class AppState: ObservableObject {
     
     // MARK: - 磁盘信息
     @Published var diskInfo: DiskInfo?
-    
-    // MARK: - 许可证状态
-    @Published var isLicensed: Bool = false
-    @Published var licenseType: LicenseType = .trial
-    @Published var trialDaysRemaining: Int = 7
     
     /// 由任一 SwiftUI 场景注入，供菜单命令 / 通知回调等非视图上下文重新打开主窗口
     var openWindowAction: OpenWindowAction?
@@ -107,16 +101,5 @@ enum AppTab: String, CaseIterable, Identifiable {
     
     var localizedName: String {
         NSLocalizedString(rawValue, comment: "")
-    }
-}
-
-// MARK: - 许可证类型
-enum LicenseType: String {
-    case trial = "trial"
-    case annual = "annual"
-    case lifetime = "lifetime"
-    
-    var localizedName: String {
-        NSLocalizedString("license_\(rawValue)", comment: "")
     }
 }

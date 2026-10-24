@@ -79,9 +79,6 @@ struct ContentView: View {
                 .environmentObject(appState)
                 .interactiveDismissDisabled()
         }
-        .sheet(isPresented: $appState.showLicenseActivation) {
-            LicenseActivationView()
-        }
         .onAppear {
             selectedTab = appState.currentTab
             if !hasCompletedOnboarding {

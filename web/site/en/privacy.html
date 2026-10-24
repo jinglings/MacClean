@@ -15,8 +15,8 @@
   <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
   <meta property="og:site_name" content="MacClean">
   <meta property="og:image" content="https://thulem.com/assets/img/icon-512.png">
-  <link rel="stylesheet" href="/assets/css/site.css?v=20261023.1">
-  <link rel="stylesheet" href="/assets/css/guides.css?v=20261023.1">
+  <link rel="stylesheet" href="/assets/css/site.css?v=20261024.1">
+  <link rel="stylesheet" href="/assets/css/guides.css?v=20261024.1">
   <script>
     (function () {
       var d = document.documentElement, l = null;
@@ -57,7 +57,7 @@
       <ul class="nav-links" id="nav-links">
         <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
         <li><a href="/en/#safety" data-i18n="nav.safety">Safety</a></li>
-        <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+        <li><a href="/en/#pricing" data-i18n="nav.pricing">License</a></li>
         <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
         <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
         <li><a href="/en/support.html" data-i18n="nav.support">Support</a></li>
@@ -84,14 +84,14 @@
     </section>
     <div class="wrap">
       <article class="doc">
-        <p class="updated" data-i18n="pv.updated">Last updated: October 23, 2026</p>
+        <p class="updated" data-i18n="pv.updated">Last updated: October 24, 2026</p>
 
         <h2 data-i18n="pv.h.app">The MacClean app</h2>
         <p data-i18n="pv.app1">MacClean scans, analyzes and cleans entirely on your Mac. File names, paths, file contents, photos, browsing history and scan results never leave your computer. The app has no ads and no third-party analytics or crash-reporting SDKs.</p>
         <p data-i18n="pv.chat">Chat Cleanup reads only the names, sizes and dates of files in the WeChat, QQ and WeCom data folders, and makes thumbnails on your Mac. It never reads chat databases or message contents, and nothing is uploaded.</p>
         <p data-i18n="pv.app2">The app goes online only in these cases:</p>
         <ul>
-          <li data-i18n="pv.net1"><b>Activating, validating and deactivating a license</b>: it sends the license key, your Mac’s model and computer name (so you can tell your devices apart in the activation list), a randomly generated instance ID and the MacClean version.</li>
+          <li data-i18n="pv.net1"><b>License requests from older versions</b>: version 1.6 removes activation, validation and deactivation requests. Version 1.5 and earlier may still send a license key, Mac model and computer name, random instance ID and version. The server retains compatibility support.</li>
           <li data-i18n="pv.net2"><b>Checking for MacClean updates</b>: it asks thulem.com for update information, including the current version number.</li>
           <li data-i18n="pv.net3"><b>Checking other apps for updates</b> (only when you use this in App Manager): it contacts the update URLs those apps’ developers publish, the same request those apps make themselves.</li>
           <li data-i18n="pv.net4"><b>Security checking whether certificates are revoked</b>: macOS contacts Apple’s certificate status service, the same check it makes when you open an app. Everything else is read locally from system settings, permission records and signatures.</li>
@@ -101,16 +101,16 @@
         <p data-i18n="pv.usageControl">Enable or disable this in the welcome guide or Settings → General → Privacy → Share usage statistics. Turning it off cancels in-flight requests, stops future reporting and clears unsent events; it cannot retract events already received by the server. The random ID and deduplication markers for sent events remain on your Mac to avoid recounting. Offline events stay locally for up to 30 days and are retried while statistics are enabled. Activity while disabled is not reported later.</p>
         <p data-i18n="pv.usageLimits">These statistics help us understand successful launches, daily use and first completed scans. They cover only supported versions whose users opted in. The first report may come from an upgrade and is not evidence of a new installation. Older versions cannot be measured retrospectively, and a download request does not prove a completed download or installation.</p>
 
-        <h2 data-i18n="pv.h.site">The website and purchases</h2>
+        <h2 data-i18n="pv.h.site">Website, commercial inquiries and previous orders</h2>
         <ul>
-          <li data-i18n="pv.site1"><b>Orders</b>: we store your email, plan, payment method, payment code and order time to match payments, issue licenses and help you find your order. We don’t send marketing email, and we never sell or share it.</li>
-          <li data-i18n="pv.site2"><b>Payment</b>: you pay inside WeChat Pay or Alipay. We only see the amount received, the note you wrote and the payer nickname the platform shows us, never your payment account details.</li>
-          <li data-i18n="pv.site3"><b>Access logs</b>: the server briefly records IP addresses to prevent abuse (such as limiting how often orders can be placed) and to count downloads.</li>
-          <li data-i18n="pv.site4"><b>Browser storage</b>: the site uses no tracking cookies. Your language choice and orders created on this device are kept in your browser’s local storage, readable only by your browser. Clearing site data removes them.</li>
+          <li data-i18n="pv.site1"><b>Previous orders</b>: purchase email, plan, payment method, payment code and time are retained for lookup, support and refunds. The new version no longer creates paid orders for personal or internal business use. Commercial inquiries use information you choose to provide; we do not send marketing email.</li>
+          <li data-i18n="pv.site2"><b>Previous payments and commercial agreements</b>: previous payments were handled by WeChat Pay or Alipay; we cannot access payment account details. Payment and data handling for new commercial licenses are specified in a separate agreement.</li>
+          <li data-i18n="pv.site3"><b>Access logs</b>: the server briefly records IP addresses to prevent abuse, protect previous-order lookup and count download requests. A request does not prove download completion or installation.</li>
+          <li data-i18n="pv.site4"><b>Browser storage</b>: the site uses no tracking cookies. Your language choice and previous-order links saved on this device stay in browser storage. Clearing site data removes them.</li>
         </ul>
 
         <h2 data-i18n="pv.h.rights">Your rights</h2>
-        <p data-i18n="pv.rights">Email us anytime to see, correct or delete order information about you. To handle refunds and prevent license abuse, we keep the minimum fields needed for licenses already issued.</p>
+        <p data-i18n="pv.rights">Email us to access, correct or delete order and inquiry information about you. We retain only the minimum records necessary to handle previous refunds and meet contractual or legal obligations.</p>
 
         <h2 data-i18n="pv.h.contact">Contact</h2>
         <p><span data-i18n="pv.contact">Questions about privacy? Email</span> <a href="mailto:wjw599330@gmail.com" data-contact-email data-show-email>wjw599330@gmail.com</a></p>
@@ -129,9 +129,9 @@
           <h4 data-i18n="foot.product">Product</h4>
           <ul>
             <li><a href="/en/#features" data-i18n="nav.features">Features</a></li>
-            <li><a href="/en/#pricing" data-i18n="nav.pricing">Pricing</a></li>
+            <li><a href="/en/#pricing" data-i18n="nav.pricing">License</a></li>
             <li><a href="/en/download.html" data-i18n="nav.download">Download</a></li>
-            <li><a href="/buy.html" data-i18n="foot.buy">Buy</a></li>
+            <li><a href="/en/terms.html" data-i18n="foot.buy">Commercial licensing</a></li>
           </ul>
         </div>
         <div>
@@ -139,7 +139,7 @@
           <ul>
             <li><a href="/en/guides/" data-i18n="nav.guides">Guides</a></li>
             <li><a href="/en/support.html" data-i18n="foot.faq">FAQ</a></li>
-            <li><a href="/order.html" data-i18n="foot.order">Find my order</a></li>
+            <li><a href="/order.html" data-i18n="foot.order">Previous orders</a></li>
             <li><a href="mailto:wjw599330@gmail.com" data-contact-email data-i18n="foot.contact">Contact us</a></li>
           </ul>
         </div>
@@ -147,7 +147,7 @@
           <h4 data-i18n="foot.legal">Legal</h4>
           <ul>
             <li><a href="/en/privacy.html" data-i18n="foot.privacy">Privacy policy</a></li>
-            <li><a href="/en/terms.html" data-i18n="foot.terms">Terms & refunds</a></li>
+            <li><a href="/en/terms.html" data-i18n="foot.terms">License and terms</a></li>
           </ul>
         </div>
       </div>
@@ -160,6 +160,6 @@
   </footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <!-- /@footer -->
-  <script type="module" src="/assets/js/page.js?v=20261023.1"></script>
+  <script type="module" src="/assets/js/page.js?v=20261024.1"></script>
 </body>
 </html>

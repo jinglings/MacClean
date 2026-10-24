@@ -349,7 +349,7 @@ final class SpaceLensViewModel: ObservableObject {
 
     func requestCleanBasket() {
         guard !basket.isEmpty, !isDeleting else { return }
-        guard ProGate.allowAction() else { return }
+
         showBasketList = false
         showBasketConfirm = true
     }

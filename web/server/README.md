@@ -1,6 +1,6 @@
 # MacClean server (thulem.com)
 
-The license API (LemonSqueezy-compatible), the manual QR-payment order desk, downloads, the Sparkle appcast and the admin panel.
+Downloads, optional usage statistics, the Sparkle appcast and the admin panel. The license API and order desk remain for historical purchases and older clients. From 1.6, personal and internal business use are free; new production orders return 410. Public config hides plans and payment details. Commercial distribution requires a separate written agreement.
 It needs Node.js ≥ 22.13 and has **zero npm dependencies** (`node:http`, `node:sqlite`, `node:crypto`). The API contract is in `../SPEC.md`.
 
 ```

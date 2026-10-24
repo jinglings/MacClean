@@ -234,7 +234,7 @@ struct LargeOldFilesView: View {
                 isCleaning: viewModel.isCleaning,
                 cleanProgress: viewModel.cleanProgress,
                 restoreResult: viewModel.lastRestoreResult,
-                action: { guard ProGate.allowAction() else { return }; showConfirm = true }
+                action: { showConfirm = true }
             )
             }
         }

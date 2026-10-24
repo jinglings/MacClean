@@ -1,31 +1,30 @@
 # 发布清单
 
-## 当前官网版本（2026-10-24）
+## 当前发布状态（2026-10-24）
 
-- MacClean **1.5（构建 6）**，Apple 芯片与 Intel 通用，最低 macOS 14。
-- 已使用 Apple Development 证书签名；尚未完成 Developer ID 公证，安装时可能出现系统验证提示。Sparkle 公钥仍为占位值，应用内自动更新未启用。
-- 自愿使用统计默认关闭。已从实际 DMG 启动应用，验证首次打开、每日活跃、首次完成扫描上报及已登录后台显示，重复扫描不会重复计数。
-- 385 项应用测试通过（含参数化测试共 427 次执行）；官网完整下载的 DMG 与本地发布包逐字节一致。
-- DMG SHA-256：`fe82260c9557d7fd9b768567ab539eec8aeebe7441196961cf09075407d8fb70`。
-- 当前下载入口：<https://thulem.com/download/latest>。安装包和验收截图保留在本地，源代码仓库不包含证书私钥、运行数据和推广账号资料。
+- MacClean **1.6（构建 7）**：Apple 芯片与 Intel 通用，最低 macOS 14。
+- 个人及企业内部全部功能免费；移除试用、设备名额和激活机制。旧版许可记录保留但不再影响新版。
+- 采用 [MacClean Community License 1.0](LICENSE)。对外销售、修改后销售或集成到收费产品需另行取得付费商业授权；源码仓库保持私有，尚未公开。不得宣传为 OSI 开源许可。
+- 安装包使用 Apple Development 证书签名，尚未完成 Developer ID 签名和 Apple 公证。自动更新因 Sparkle 签名密钥未配置而保持禁用。
+- 357 项原生测试通过，含参数化执行共 399 次。52 项网站后台测试通过。18 个中英文页面及 45 个静态目标检查通过。
+- DMG 已通过签名、通用架构及镜像完整性校验，实际挂载打开确认为 1.6（7）。设置中无许可页，使用统计默认关闭；系统维护的 DNS 刷新已实际运行成功。
+- DMG SHA-256：`c955d290a2e99616b0de52a97a08359c6593bd6228d687c37abdec701c1a1938`，15,145,063 字节。
+- 下载地址：<https://thulem.com/download/latest>。发布后需完整下载核对校验和。
+- 网站不再显示个人付费套餐；新订单入口返回 410，历史订单、售后与旧版许可服务保留。
+- 发布备份：`/var/backups/macclean-web/release-1.6-20261024`（包含一致性数据库快照及发布审计）；网站备份：`/var/backups/macclean-web/usage-20261024T002455Z-2591961`。
 
-MacClean 走官网直销：Developer ID 签名 + 公证，不上 Mac App Store（沙盒会让系统垃圾、启动项、维护任务、卸载残留等核心功能失效）。
+## 1. 发版前配置
 
-## 1. 发布前必须填写的占位值
-
-| 位置 | 内容 |
+| 位置 | 用途 |
 |---|---|
-| `MacClean/Core/Licensing/LicenseConfig.swift` | `purchaseURL` 购买页（目前为 nil，按钮置灰）；`lemonSqueezyStoreID` / `lemonSqueezyProductID`（为 0 时不校验产品归属，其他产品的 key 也能激活）；`pricingHeadline` / `pricingDetail` 定价文案 |
-| `MacClean/Features/About/AboutView.swift` → `AppLinks` | 官网、隐私政策、支持页地址（目前为 nil，不显示） |
-| `MacClean-Info.plist` | `SUPublicEDKey`（Sparkle 公钥，见第 3 步）、`SUFeedURL`（appcast 地址） |
-| `project.pbxproj` | `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` 每次发布递增 |
+| `MacClean/Features/About/AboutView.swift` | 官网、隐私、支持与许可链接 |
+| `LICENSE` / `MacClean/Resources/CommunityLicense.txt` / `web/site/license.txt` | 三份许可文本需保持一致，DMG 中同时附带原文 |
+| `MacClean-Info.plist` | 正式启用自动更新前配置 `SUPublicEDKey` 和 `SUFeedURL` |
+| `project.pbxproj` | 同步修改 `MARKETING_VERSION` / `CURRENT_PROJECT_VERSION` |
 
-## 2. 收款与授权
+## 2. 付费服务兼容
 
-- 国际：LemonSqueezy（自带 License Key、支持支付宝/微信支付、代缴税）。在商品里开启 “Generate license keys”，设置激活数上限（建议 2–3 台）。
-- 国内：面包多 / 爱发电等可通过 webhook 发放 key；接入时实现 `LicenseBackend` 协议即可（见 `LicenseBackend.swift`），界面与试用逻辑不用改。
-- 试用 7 天；试用结束后扫描、浏览永远免费，清理/卸载/启动项/维护等操作需要授权（`ProGate.allowAction()`）。
-- 准备：隐私政策（说明扫描只在本机进行、不上传文件信息）、用户协议、退款政策（行业惯例 30 天）、支持邮箱。
+原有订单、退款、许可证及激活数据继续保留，用于历史售后与旧版客户端兼容。新版不再调用许可服务。生产 `salesEnabled` 固定默认关闭，商业分发授权通过单独书面协议处理，不得恢复旧个人套餐作为新版使用门槛。
 
 ## 3. 自动更新（Sparkle 2）
 

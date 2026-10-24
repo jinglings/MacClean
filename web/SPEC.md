@@ -17,6 +17,12 @@ web/
 
 Caddy routes: `/api/*`, `/admin*`, `/appcast.xml`, `/download/*`, `/files/*` → `reverse_proxy 127.0.0.1:8787`; everything else → static `site/`.
 
+## Current policy (MacClean 1.6, 2026-10-24)
+
+Personal and internal business use, deployment and modifications are free, with all features included, no trial, device limit or activation. Selling original/modified copies or integrating code into a paid product requires a separate written paid commercial agreement. See `../LICENSE`. This is a community source-available license, not OSI open source. The repository remains private.
+
+Production `salesEnabled` defaults to false and is not enabled through an environment variable. Public config returns `salesEnabled: false`, `plans: []`, empty payment details and license policy metadata. `POST /api/orders` returns 410 without creating a record. Historical order lookup, refunds, the admin desk and old client license endpoints remain compatible. The order creation contract below describes legacy behavior exercised only by explicit test overrides.
+
 ## Product facts (use these in copy)
 
 MacClean: a local-only macOS disk cleaning and maintenance app, for macOS 14+ on Apple silicon and Intel. Chinese and English UI.
@@ -34,9 +40,9 @@ Features (tab names in zh / en):
 - 应用管家 App Manager: full uninstall with leftovers, update check for Sparkle apps, orphaned leftovers, installers
 - 文件搜索 File Search: Spotlight plus its own index
 - Menu bar panel: disk, memory, battery health, CPU, network speed test, Bluetooth device batteries
-Safety promises (core brand): everything goes to the Trash first and can be undone from 清理记录 (Cleanup History); a PathGuard allowlist protects system and user folders; scans are read-only; 100% local, nothing is uploaded, no account.
+Safety: ordinary file cleanup moves files to the Trash and supports Cleanup History recovery before emptying it. Emptying Trash, Docker cleanup and snapshot deletion have separate irreversible-operation warnings. PathGuard protects system and user folders; scans are read-only. File information stays local; optional first-party usage reporting is off by default. No account is required.
 Honesty rule: never claim "speeds up your Mac", no fake scare numbers.
-Pricing (editable in admin; defaults): 终身版 Lifetime ¥98 (2 Macs) · 家庭版 Family ¥168 (5 Macs). 7-day free trial; scanning is always free.
+Legacy personal plans (¥98 / ¥168) are retained for historical records only. New daily-use purchases are closed. Commercial distribution terms are agreed separately.
 
 ## Public API (JSON, UTF-8)
 
@@ -51,7 +57,7 @@ Errors: `{ "error": "message" }` with 4xx/5xx. All POST bodies accept `applicati
   "latestRelease": { "version": "1.0", "build": "1", "minOS": "14.0", "size": 12345678, "notes": "markdown/plain", "publishedAt": "ISO", "downloadUrl": "/download/latest" } | null }
 ```
 
-### Orders (manual QR payment)
+### Historical orders (new production orders closed)
 `POST /api/orders` `{ "plan": "lifetime", "email": "a@b.com", "payMethod": "wechat"|"alipay", "note": "optional" }` →
 `201 { "orderNo": "MC20261001-7K3Q", "amount": 98, "payMethod": "wechat", "payCode": "7K3Q", "status": "pending", "accessToken": "<random 24 chars>" }`
 - `payCode` = short code the buyer must write in the payment remark (备注) so the admin can match the payment.

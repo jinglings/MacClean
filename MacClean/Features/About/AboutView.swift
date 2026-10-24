@@ -12,6 +12,7 @@ import SwiftUI
 enum AppLinks {
     static let website: URL? = URL(string: "https://thulem.com/")
     static let privacy: URL? = URL(string: "https://thulem.com/privacy.html")
+    static let terms: URL? = URL(string: "https://thulem.com/terms.html")
     static let support: URL? = URL(string: "https://thulem.com/support.html")
 }
 
@@ -38,7 +39,7 @@ struct AboutView: View {
                     Text("MacClean")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
-                    Text("看清磁盘去向，让 Mac 保持轻盈")
+                    Text("个人与企业内部免费使用")
                         .font(.system(size: 12.5))
                         .foregroundColor(AppTheme.textSecondary)
                 }
@@ -78,7 +79,7 @@ struct AboutLinksRow: View {
     }
 
     private var links: [(title: LocalizedStringKey, url: URL)] {
-        [("官网", AppLinks.website), ("隐私政策", AppLinks.privacy), ("支持", AppLinks.support)]
+        [("官网", AppLinks.website), ("隐私政策", AppLinks.privacy), ("支持", AppLinks.support), ("使用许可", AppLinks.terms)]
             .compactMap { title, url in url.map { (title, $0) } }
     }
 

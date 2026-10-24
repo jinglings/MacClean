@@ -553,7 +553,7 @@ struct FileRecoveryView: View {
             Spacer()
 
             Button {
-                guard ProGate.allowAction() else { return }
+
                 showRestoreConfirm = true
             } label: {
                 HStack(spacing: 6) {

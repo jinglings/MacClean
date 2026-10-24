@@ -68,7 +68,7 @@ struct SecurityCenterView: View {
     }
 
     private func confirmTrash(_ finding: PersistenceFinding) {
-        guard ProGate.allowAction() else { return }
+
         pendingTrash = finding
     }
 

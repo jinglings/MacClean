@@ -1,8 +1,8 @@
 // Renders an order (pending / paid / cancelled) for buy.html and order.html,
 // and keeps it fresh by polling GET /api/orders/:no every 10 s.
-import { api, errorMessage } from './api.js?v=20261023.1';
-import { t, getLang } from './i18n.js?v=20261023.1';
-import { getConfig, money, formatDate, escapeHTML, copyText, planName } from './common.js?v=20261023.1';
+import { api, errorMessage } from './api.js?v=20261024.1';
+import { t, getLang } from './i18n.js?v=20261024.1';
+import { getConfig, money, formatDate, escapeHTML, copyText, planName } from './common.js?v=20261024.1';
 
 const STORE = 'mc.orders';
 const POLL_MS = 10000;

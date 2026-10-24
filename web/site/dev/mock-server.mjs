@@ -32,9 +32,11 @@ const plans = [
   { id: 'lifetime', name: '终身版', nameEn: 'Lifetime', price: 98, currency: 'CNY', devices: 2, features: ['全部功能，终身使用', '可激活 2 台 Mac', '30 天无理由退款'], featuresEn: ['Every feature, for life', 'Activate 2 Macs', '30-day refund, no questions asked'], highlight: true },
   { id: 'family', name: '家庭版', nameEn: 'Family', price: 168, currency: 'CNY', devices: 5, features: ['全部功能，终身使用', '可激活 5 台 Mac', '适合家庭共享', '30 天无理由退款'], featuresEn: ['Every feature, for life', 'Activate 5 Macs', 'Share with your household', '30-day refund, no questions asked'], highlight: false },
 ];
+const legacySales = process.env.MOCK_LEGACY_SALES === '1';
 const config = () => ({
-  plans,
-  payment: process.env.MOCK_QR === 'none'
+  salesEnabled: legacySales,
+  plans: legacySales ? plans : [],
+  payment: !legacySales || process.env.MOCK_QR === 'none'
     ? { wechatQr: null, alipayQr: null, instructions: '' }
     : { wechatQr: '/files/qr-wechat.svg?v=1727770000', alipayQr: null, instructions: '请使用扫码付款，金额与订单一致。' },
   contactEmail: 'wjw599330@gmail.com',
@@ -85,6 +87,7 @@ async function apiRoute(req, res, url) {
   }
 
   if (req.method === 'POST' && path === '/api/orders') {
+    if (!legacySales) return send(res, 410, { error: 'Free for personal and internal business use. See /terms.html for commercial distribution.' });
     const ip = req.socket.remoteAddress;
     const recent = (hits.get(ip) || []).filter(t => Date.now() - t < 3600_000);
     if (recent.length >= 5) return send(res, 429, { error: 'too many orders, try again later' }, { 'Retry-After': '3600' });

@@ -74,7 +74,7 @@ struct PrivacyCleanupView: View {
                     restoreResult: viewModel.lastRestoreResult,
                     warning: viewModel.selectedEntries.contains { $0.kind == .cookies } ? String(localized: "将退出网站登录") : nil,
                     action: {
-                        guard ProGate.allowAction() else { return }
+
                         showConfirm = true
                     }
                 )

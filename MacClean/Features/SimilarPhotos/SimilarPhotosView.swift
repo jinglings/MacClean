@@ -346,7 +346,7 @@ struct SimilarPhotosPane: View {
                 cleanProgress: viewModel.cleanProgress,
                 restoreResult: viewModel.lastRestoreResult,
                 warning: viewModel.fullySelectedGroupCount > 0 ? String(localized: "\(viewModel.fullySelectedGroupCount) 组将被整组删除") : nil,
-                action: { guard ProGate.allowAction() else { return }; showConfirm = true }
+                action: { showConfirm = true }
             )
             }
         }

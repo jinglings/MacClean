@@ -18,6 +18,8 @@ export function loadConfig(env = process.env, overrides = {}) {
     isDev: env.NODE_ENV === 'development',
     // Business day boundaries for "today" and the 30-day charts.
     timeZone: env.TIMEZONE || 'Asia/Shanghai',
+    // Legacy orders remain readable; the free application no longer sells seats.
+    salesEnabled: false,
     maxReleaseBytes: 500 * 1024 * 1024,
     maxQrBytes: 2 * 1024 * 1024,
     maxJsonBytes: 64 * 1024,

@@ -6,14 +6,14 @@
 
 - [产品介绍](https://thulem.com/): 微信、QQ 和企业微信媒体整理，存储地图，开发缓存与本地 AI 模型整理，应用卸载，重复文件与相似照片。
 - [下载与安装](https://thulem.com/download.html): 系统要求、安装步骤、首次打开与权限设置。
-- [常见问题](https://thulem.com/support.html): 清理范围、恢复限制、试用、许可证及联系方式。
+
 - [隐私政策](https://thulem.com/privacy.html): 本地扫描与联网说明。
 - [用户协议与退款](https://thulem.com/terms.html): 许可与退款条款。
 
 ## 产品事实与限制
 
-- 扫描与查看结果免费；首次启动后 7 天可试用全部功能，试用结束后清理需要许可证。最新价格见官网。
-- 扫描与文件分析在 Mac 本地进行。许可证激活、更新检查与下载需要网络。可选使用统计默认关闭，主动开启后仅发送随机安装标识、应用与系统版本和打开、活跃、首次完成扫描的事件时间，具体以隐私政策为准。
+
+- 扫描与文件分析在 Mac 本地进行。1.6 起无需联网激活。更新检查与下载需要网络。可选使用统计默认关闭，主动开启后仅发送随机安装标识、应用与系统版本和打开、活跃、首次完成扫描的事件时间，具体以隐私政策为准。
 - 普通文件清理先移入废纸篓，清空前可从清理记录恢复。清空废纸篓、Docker 清理与删除本地快照不能通过清理记录撤销。
 - 普通文件移入废纸篓后仍占用空间，清空后才可能释放相应空间；快照、共享数据和 macOS 统计更新也会影响结果。不保证固定释放多少 GB。
 - 找回文件依赖现有 APFS 快照或时间机器备份，不保证恢复成功。
@@ -27,7 +27,7 @@
 - [Download](https://thulem.com/en/download.html): Installation and system requirements.
 - [Support](https://thulem.com/en/support.html): Frequently asked questions.
 - [Privacy](https://thulem.com/en/privacy.html): Local scanning and network use.
-- [Terms](https://thulem.com/en/terms.html): License and refund policy.
+
 
 ## 清理指南 / Cleanup guides
 
@@ -42,4 +42,6 @@
 
 ## English summary
 
-MacClean helps people review disk usage and selectively remove unwanted files. Features include chat media cleanup, a storage map, developer cache and local AI model cleanup, app removal, duplicate files and similar photos. Ordinary file cleanup uses the Trash and can be undone before it is emptied. Docker cleanup and local snapshot deletion have separate limitations. Scanning remains free after the seven-day full trial; cleanup requires a license. See the official pages above for current details.
+
+
+MacClean 1.6: free for personal and internal business use, all features, no activation or device limit. Selling original or modified copies or integrating code into paid products requires a separate commercial agreement. Source repository currently private. Community license: https://thulem.com/license.txt

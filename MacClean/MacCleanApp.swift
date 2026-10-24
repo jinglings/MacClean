@@ -125,7 +125,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         AppAppearance.current.apply()
-        LicenseManager.shared.start()
         AppUpdater.shared.start()
         DiskAlertScheduler.shared.start()
         UsageAnalytics.shared.start()

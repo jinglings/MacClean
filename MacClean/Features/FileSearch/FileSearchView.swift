@@ -268,7 +268,7 @@ struct FileSearchView: View {
                     isCleaning: viewModel.isCleaning,
                     cleanProgress: 0,
                     restoreResult: viewModel.lastRestoreResult,
-                    action: { guard ProGate.allowAction() else { return }; showConfirm = true }
+                    action: { showConfirm = true }
                 )
             }
         }

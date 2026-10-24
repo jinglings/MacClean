@@ -1,6 +1,6 @@
 // Shared behavior for every page: nav, language, config, screenshots, motion helpers.
-import { initI18n, getLang, setLang, onLangChange, t } from './i18n.js?v=20261023.1';
-import { api } from './api.js?v=20261023.1';
+import { initI18n, getLang, setLang, onLangChange, t } from './i18n.js?v=20261024.1';
+import { api } from './api.js?v=20261024.1';
 
 export const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 export const darkScheme = matchMedia('(prefers-color-scheme: dark)');
@@ -8,10 +8,8 @@ export const darkScheme = matchMedia('(prefers-color-scheme: dark)');
 /* ---------- site config (GET /api/public/config) ---------- */
 
 export const DEFAULT_CONFIG = {
-  plans: [
-    { id: 'lifetime', name: '终身版', nameEn: 'Lifetime', price: 98, currency: 'CNY', devices: 2, features: [], highlight: true },
-    { id: 'family', name: '家庭版', nameEn: 'Family', price: 168, currency: 'CNY', devices: 5, features: [], highlight: false },
-  ],
+  salesEnabled: false,
+  plans: [],
   payment: { wechatQr: null, alipayQr: null, instructions: '' },
   contactEmail: 'wjw599330@gmail.com',
   announcement: null,
@@ -24,7 +22,7 @@ export function getConfig() {
   configPromise ??= api('/api/public/config', { timeout: 8000 })
     .then(c => ({
       ...DEFAULT_CONFIG, ...c,
-      plans: Array.isArray(c.plans) && c.plans.length ? c.plans : DEFAULT_CONFIG.plans,
+      plans: c.salesEnabled === true && Array.isArray(c.plans) ? c.plans : [],
       payment: { ...DEFAULT_CONFIG.payment, ...(c.payment || {}) },
       contactEmail: c.contactEmail || DEFAULT_CONFIG.contactEmail,
       live: true,

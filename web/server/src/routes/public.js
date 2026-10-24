@@ -18,10 +18,11 @@ export function publicRoutes({ db, config, limiters }) {
 
     ['GET', '/api/public/config', ({ res }) => {
       // Short shared cache: Cloudflare/browsers can hold it briefly, edits show up within a minute.
-      sendJson(res, 200, publicConfig(db), { 'Cache-Control': 'public, max-age=60' });
+      sendJson(res, 200, publicConfig(db, config), { 'Cache-Control': 'public, max-age=60' });
     }],
 
     ['POST', '/api/orders', ({ res, body, ip }) => {
+      if (!config.salesEnabled) throw new HttpError(410, 'MacClean 1.6+ is free for personal and internal business use. Commercial distribution requires a separate agreement; see /terms.html.');
       enforceLimit(limiters.orders, ip);
       const order = createOrder(db, config, {
         plan: body.plan, email: body.email, payMethod: body.payMethod, note: body.note, ip,

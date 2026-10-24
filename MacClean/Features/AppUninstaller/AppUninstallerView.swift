@@ -575,17 +575,7 @@ final class AppUninstallerViewModel: ObservableObject {
 
     // MARK: 付费墙
 
-    /// 动手前检查授权。不允许时先关掉当前 Sheet，再弹出购买页（两个 Sheet 不能叠在一起）。
-    func allowAction(dismiss: () -> Void) -> Bool {
-        if ProGate.allowAction() { return true }
-        let appState = AppState.shared
-        appState.showLicenseActivation = false
-        dismiss()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            appState.showLicenseActivation = true
-        }
-        return false
-    }
+
 
     // MARK: 卸载
 
@@ -604,7 +594,7 @@ final class AppUninstallerViewModel: ObservableObject {
 
     /// 生成卸载确认（或拒绝说明）。dismiss 用于在执行前关闭发起操作的 Sheet。
     func uninstallRequest(for apps: [AppInfo], dismiss: @escaping () -> Void) -> AppManagerConfirm? {
-        guard !apps.isEmpty, allowAction(dismiss: dismiss) else { return nil }
+        guard !apps.isEmpty else { return nil }
 
         let refused = apps.compactMap { app in refusalReason(for: app).map { String(localized: "「\(app.name)」：\($0)") } }
         if !refused.isEmpty {
@@ -679,7 +669,7 @@ final class AppUninstallerViewModel: ObservableObject {
     // MARK: 残留与安装包
 
     func leftoverRequest(for files: [RelatedFile], dismiss: @escaping () -> Void) -> AppManagerConfirm? {
-        guard !files.isEmpty, allowAction(dismiss: dismiss) else { return nil }
+        guard !files.isEmpty else { return nil }
         let items = files.map { file -> CleanableItem in
             var item = CleanableItem(name: file.name, path: file.path, size: file.size, category: .appLeftovers, isSelected: true, description: file.owner)
             item.removesContainer = true
@@ -696,7 +686,7 @@ final class AppUninstallerViewModel: ObservableObject {
     }
 
     func installerRequest(for installers: [InstallerFile], dismiss: @escaping () -> Void) -> AppManagerConfirm? {
-        guard !installers.isEmpty, allowAction(dismiss: dismiss) else { return nil }
+        guard !installers.isEmpty else { return nil }
         let items = installers.map { installer -> CleanableItem in
             var item = CleanableItem(name: installer.name, path: installer.path, size: installer.size, category: .installers, isSelected: true, lastModified: installer.modified)
             item.removesContainer = true

@@ -146,7 +146,7 @@ struct ChatCleanupView: View {
                 action: {
                     viewModel.refreshRunning()
                     if viewModel.isAppRunning { showRunningAlert = true; return }
-                    guard ProGate.allowAction() else { return }
+
                     showConfirm = true
                 }
             )

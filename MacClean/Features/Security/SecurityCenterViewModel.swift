@@ -3,7 +3,7 @@
 //  MacClean
 //
 //  安全中心的状态：三部分检查并行在后台运行，证书吊销检查（需联网）最后单独进行。
-//  查看与扫描免费；停用 / 移到废纸篓之前过 ProGate。
+//  停用与移到废纸篓仍需用户确认，并保留系统权限与路径保护。
 //
 
 import AppKit
@@ -131,7 +131,7 @@ final class SecurityCenterViewModel: ObservableObject {
     func disable(_ finding: PersistenceFinding) {
         let item = finding.item
         guard item.isEditable, !item.isDisabled, let plistPath = item.plistPath, !busyIDs.contains(item.id) else { return }
-        guard ProGate.allowAction() else { return }
+
         busyIDs.insert(item.id)
         banner = nil
         let label = item.label
@@ -146,7 +146,7 @@ final class SecurityCenterViewModel: ObservableObject {
         }
     }
 
-    /// 调用方在弹确认框之前已经过 ProGate
+    /// 调用方先展示操作确认，清理仍经过路径与权限检查。
     func moveToTrash(_ finding: PersistenceFinding) async {
         let item = finding.item
         guard item.isEditable, let plistPath = item.plistPath else { return }

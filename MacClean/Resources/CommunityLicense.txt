@@ -1,0 +1,53 @@
+MacClean Community License 1.0
+Effective date: 2026-10-24
+Copyright (c) 2026 MacClean contributors. All rights reserved except as granted below.
+
+1. Scope and acceptance
+This license covers the original MacClean code and application distributed with
+this license. By exercising the permissions below, you accept these terms.
+Third-party components remain subject to their own licenses and notices. This
+license neither replaces those terms nor restricts rights they independently grant.
+
+2. Free personal and internal business use
+You may use, install, run, copy, inspect, build and modify MacClean without charge
+for your own personal use or your organization's internal business operations.
+There is no trial period, device limit or activation requirement. Internal use
+includes deployment to your organization's employees and devices. Merely using
+MacClean while performing paid work does not require a commercial license.
+
+3. Free sharing
+You may share original or modified copies without charge, provided you include
+this license and the existing copyright and third-party notices, identify your
+changes, and do not imply endorsement by MacClean. Recipients receive the same
+permissions and restrictions under this license. Do not add restrictions or
+remove notices that prevent recipients from exercising these permissions.
+
+4. Commercial distribution requires a separate paid agreement
+You must obtain a separate written commercial license from the MacClean rights
+holder before selling, licensing for a fee, or distributing MacClean or a
+substantial portion of its code as part of a product or service offered for
+payment. This includes reselling the original application, selling a modified
+version, and integrating its code into a product sold or licensed to others.
+An internal modification or internal integration permitted by section 2 does not
+require payment. Free sharing under section 3 does not require payment.
+Commercial terms and prices are agreed separately; this license does not itself
+grant commercial distribution rights. Contact: https://thulem.com/support.html
+
+5. Other rights
+No trademark rights are granted. Fair use and other rights provided by law are
+not limited by this license. Rights not expressly granted are reserved. This is
+a source-available community license, not an OSI-approved open-source license.
+This license does not promise public access to a currently private repository.
+
+6. Termination
+If you violate these terms, your permissions under this license terminate. They
+are reinstated if you correct the violation within 30 days after receiving your
+first written notice of it. Separately executed commercial agreements and valid
+third-party licenses are governed by their own terms.
+
+7. Disclaimer
+TO THE EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
+WARRANTIES OF ANY KIND, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NON-INFRINGEMENT. THE RIGHTS HOLDERS AND CONTRIBUTORS SHALL NOT BE
+LIABLE FOR CLAIMS OR DAMAGES ARISING FROM THE SOFTWARE OR ITS USE. MANDATORY
+RIGHTS THAT CANNOT LAWFULLY BE EXCLUDED REMAIN UNAFFECTED.

@@ -105,7 +105,7 @@ describe('releases, downloads, files', () => {
   let srv;
   let headers;
   before(async () => {
-    srv = await startServer();
+    srv = await startServer({ salesEnabled: true });
     headers = await adminLogin(srv);
   });
   after(() => srv.close());

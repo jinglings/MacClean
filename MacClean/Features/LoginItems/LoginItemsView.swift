@@ -71,7 +71,7 @@ final class LoginItemsViewModel: ObservableObject {
 
     func setEnabled(_ enabled: Bool, for item: LaunchItem) {
         guard item.isEditable, let plistPath = item.plistPath, !busyIDs.contains(item.id) else { return }
-        guard ProGate.allowAction() else { return }
+
         busyIDs.insert(item.id)
         banner = nil
         let label = item.label
@@ -93,7 +93,7 @@ final class LoginItemsViewModel: ObservableObject {
 
     // MARK: - 移除失效项
 
-    /// 调用方在弹确认框之前已经过 ProGate
+    /// 调用方先展示操作确认，清理仍经过路径与权限检查。
     func remove(_ targets: [LaunchItem]) async {
         let targets = targets.filter { $0.isEditable && $0.isBroken && $0.plistPath != nil }
         guard !targets.isEmpty else { return }
@@ -200,7 +200,7 @@ struct LoginItemsView: View {
     }
 
     private func confirmRemoval(_ items: [LaunchItem]) {
-        guard !items.isEmpty, ProGate.allowAction() else { return }
+        guard !items.isEmpty else { return }
         pendingRemoval = items
     }
 

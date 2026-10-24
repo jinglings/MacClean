@@ -7,7 +7,8 @@ describe('orders', () => {
   let srv;
   let api;
   before(async () => {
-    srv = await startServer();
+    // Preserve regression coverage for historical order and refund handling.
+    srv = await startServer({ salesEnabled: true });
     api = admin(srv, await adminLogin(srv));
   });
   after(() => srv.close());

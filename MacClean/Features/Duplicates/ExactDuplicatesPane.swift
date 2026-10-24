@@ -73,7 +73,7 @@ struct ExactDuplicatesPane: View {
 
             if viewModel.hasScanned && !viewModel.isScanning && !viewModel.groups.isEmpty {
                 DuplicatesFooterBar(viewModel: viewModel) {
-                    guard ProGate.allowAction() else { return }
+
                     showConfirm = true
                 }
             }

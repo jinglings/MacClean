@@ -2,7 +2,7 @@
 //  SettingsView.swift
 //  MacClean
 //
-//  设置窗口：通用 / 通知 / 许可证 / 关于
+//  设置窗口：通用 / 通知 / 关于
 //
 
 import SwiftUI
@@ -17,9 +17,6 @@ struct SettingsView: View {
 
             NotificationSettingsView()
                 .tabItem { Label("通知", systemImage: "bell.badge") }
-
-            LicenseSettingsView()
-                .tabItem { Label("许可证", systemImage: "key") }
 
             AboutView()
                 .frame(width: 520, height: 360)
@@ -312,18 +309,6 @@ struct NotificationSettingsView: View {
 
     private func requestAuthorization() {
         Task { await scheduler.requestAuthorization() }
-    }
-}
-
-// MARK: - 许可证
-
-struct LicenseSettingsView: View {
-    var body: some View {
-        ScrollView {
-            LicenseStatusView()
-                .padding(24)
-        }
-        .frame(width: 520, height: 420)
     }
 }
 

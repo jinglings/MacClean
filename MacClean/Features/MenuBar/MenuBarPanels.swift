@@ -42,7 +42,7 @@ struct DiskReleasePanel: View {
                 isDestructive: false,
                 isDisabled: model.junkSize == 0 || model.isCleaning
             ) {
-                guard ProGate.allowAction() else { openMain(nil); return }
+
                 Task { await model.cleanJunk() }
             }
 
@@ -55,7 +55,7 @@ struct DiskReleasePanel: View {
                 isDestructive: model.isConfirmingEmptyTrash,
                 isDisabled: model.trashSize == 0 || model.isCleaning
             ) {
-                guard ProGate.allowAction() else { openMain(nil); return }
+
                 if model.isConfirmingEmptyTrash {
                     Task { await model.emptyTrash() }
                 } else {
@@ -223,7 +223,7 @@ struct MemoryReleasePanel: View {
     }
 
     private func purge() {
-        guard ProGate.allowAction() else { return }
+
         isPurging = true
         let before = monitor.memory?.used ?? 0
         Task {

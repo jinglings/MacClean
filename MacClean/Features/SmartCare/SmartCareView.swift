@@ -355,7 +355,7 @@ struct SmartCareView: View {
             Spacer()
 
             Button {
-                guard ProGate.allowAction() else { return }
+
                 showConfirm = true
             } label: {
                 HStack(spacing: 6) {
