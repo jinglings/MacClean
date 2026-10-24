@@ -6,7 +6,7 @@
 # 2. 运行此脚本：bash setup_project.sh <新项目路径>
 
 NEW_PROJECT_PATH="$1"
-SOURCE_PATH="./MacClean"
+SOURCE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/MacClean"
 
 if [ -z "$NEW_PROJECT_PATH" ]; then
     echo "用法: bash setup_project.sh <Xcode项目路径>"
